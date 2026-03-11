@@ -22,7 +22,10 @@ namespace Car_Project.Controllers
         private readonly IEmailService _emailService;
         private readonly ILogger<AddListingController> _logger;
 
-        // Fixed VIP listing fee
+        // Normal listing fee (2nd listing onwards)
+        private const decimal NormalFee = 5.00m;
+
+        // VIP listing fee (always paid)
         private const decimal VipFee = 9.99m;
 
         // Allowed image extensions
@@ -178,10 +181,12 @@ namespace Car_Project.Controllers
             // ── If payment is required, redirect to VIP/Payment page ─────────
             if (requiresPayment)
             {
-                decimal fee = car.ListingType == ListingType.VIP ? VipFee : VipFee; // same fee for now
+                // VIP listings always pay the VIP fee; normal paid listings pay the lower Normal fee
+                decimal fee = car.ListingType == ListingType.VIP ? VipFee : NormalFee;
                 TempData["PendingCarId"]    = car.Id;
                 TempData["PendingCarTitle"] = car.Title;
                 TempData["PendingFee"]      = fee.ToString("0.00");
+                TempData["PendingIsVip"]    = (car.ListingType == ListingType.VIP).ToString();
                 return RedirectToAction("VipPayment");
             }
 
@@ -197,17 +202,21 @@ namespace Car_Project.Controllers
             if (TempData["PendingCarId"] == null)
                 return RedirectToAction("Index");
 
+            var isVip = TempData["PendingIsVip"]?.ToString()?.Equals("True", StringComparison.OrdinalIgnoreCase) ?? false;
+
             var vm = new VipPaymentViewModel
             {
                 CarId    = (int)TempData["PendingCarId"]!,
                 CarTitle = TempData["PendingCarTitle"]?.ToString() ?? "",
-                VipFee   = decimal.TryParse(TempData["PendingFee"]?.ToString(), out var f) ? f : VipFee
+                VipFee   = decimal.TryParse(TempData["PendingFee"]?.ToString(), out var f) ? f : (isVip ? VipFee : NormalFee),
+                IsVip    = isVip
             };
 
             // Keep TempData for a POST re-display
             TempData.Keep("PendingCarId");
             TempData.Keep("PendingCarTitle");
             TempData.Keep("PendingFee");
+            TempData.Keep("PendingIsVip");
 
             return View(vm);
         }
@@ -243,13 +252,18 @@ namespace Car_Project.Controllers
                 return View(vm);
             }
 
-            car.ListingType = ListingType.VIP;
-            car.VipPaidAt   = DateTime.UtcNow;
+            // Only upgrade to VIP if the user specifically chose VIP
+            if (vm.IsVip)
+            {
+                car.ListingType = ListingType.VIP;
+                car.VipPaidAt   = DateTime.UtcNow;
+            }
+
             await _db.SaveChangesAsync();
 
             await NotifyAdminsAsync(car);
 
-            // ── VIP ödəniş təsdiq maili göndər ──────────────────────────────
+            // ── Send confirmation email ───────────────────────────────────────
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.Email))
             {
@@ -265,11 +279,11 @@ namespace Car_Project.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "VIP listing payment email failed for {Email}", currentUser.Email);
+                    _logger.LogError(ex, "Listing payment email failed for {Email}", currentUser.Email);
                 }
             }
 
-            TempData["AuthSuccess"] = car.ListingType == ListingType.VIP
+            TempData["AuthSuccess"] = vm.IsVip
                 ? "VIP elanınız uğurla göndərildi! Admin təsdiqindən sonra siyahının başında göstəriləcək. ⭐"
                 : "Elanınız uğurla göndərildi! Admin təsdiqindən sonra yayımlanacaq.";
 

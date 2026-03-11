@@ -5,6 +5,10 @@
     var brands = ViewBag.Brands as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
     var allFeatures = ViewBag.AllFeatures as List<CarFeature> ?? new List<CarFeature>();
     bool isFirstListing = ViewBag.IsFirstListing ?? true;
+
+    // Keep fee values in sync with AddListingController constants
+    const decimal normalFee = 5.00m;
+    const decimal vipFee    = 9.99m;
 }
 
 <style>
@@ -269,7 +273,7 @@
                                     @if (isFirstListing)
                                     { <span style="color:#059669">✓ Pulsuz</span> }
                                     else
-                                    { <span>$9.99</span> }
+                                    { <span>$@normalFee.ToString("0.00")</span> }
                                 </div>
                             </div>
                         </label>
@@ -281,7 +285,7 @@
                                 <div class="lt-box-icon">🏆</div>
                                 <div class="lt-box-title">VIP Elan</div>
                                 <div class="lt-box-desc">Siyahının <strong>ən üstündə</strong> göstərilir, VIP nişanı ilə fərqlənir.</div>
-                                <div class="lt-box-price">$9.99</div>
+                                <div class="lt-box-price">$@vipFee.ToString("0.00")</div>
                             </div>
                         </label>
                     </div>
@@ -289,7 +293,7 @@
                     @if (!isFirstListing)
                     {
                         <p style="font-size:12px;color:#9ca3af;margin-top:8px;">
-                            ℹ️ İkinci elanınızdan etibarən aktivləşdirmə haqqı tələb olunur ($9.99).
+                            ℹ️ İkinci elanınızdan etibarən aktivləşdirmə haqqı tələb olunur (Normal: $@normalFee.ToString("0.00") · VIP: $@vipFee.ToString("0.00")).
                         </p>
                     }
                 </div>
@@ -499,6 +503,9 @@
 @section Scripts {
 <script>
     // ====== Listing type selector — update submit button text ======
+    var NORMAL_FEE = '@normalFee.ToString("0.00")';
+    var VIP_FEE    = '@vipFee.ToString("0.00")';
+
     function updateSubmitText() {
         var isVip  = document.getElementById('lt-vip').checked;
         var isFirst = @(isFirstListing ? "true" : "false");
@@ -506,11 +513,11 @@
         var note = document.getElementById('submitNote');
 
         if (isVip) {
-            btn.textContent  = '⭐ VIP Elan Göndər — Ödənişə keç ($9.99)';
+            btn.textContent  = '⭐ VIP Elan Göndər — Ödənişə keç ($' + VIP_FEE + ')';
             note.textContent = 'Növbəti addımda kart məlumatlarınızı daxil edəcəksiniz.';
         } else if (!isFirst) {
-            btn.textContent  = 'Elan Göndər — Ödənişə keç ($9.99)';
-            note.textContent = 'İkinci elanınızdan etibarən $9.99 aktivləşdirmə haqqı tələb olunur.';
+            btn.textContent  = 'Elan Göndər — Ödənişə keç ($' + NORMAL_FEE + ')';
+            note.textContent = 'İkinci elanınızdan etibarən $' + NORMAL_FEE + ' aktivləşdirmə haqqı tələb olunur.';
         } else {
             btn.textContent  = '✓ Elanı Pulsuz Göndər';
             note.textContent = '';
@@ -518,7 +525,7 @@
     }
 
     document.getElementById('lt-normal').addEventListener('change', updateSubmitText);
-    document.getElementById('lt-vip').addEventListener('change', updateSubmitText);
+    document.getElementById('lt-vip').addEventListener('change',   updateSubmitText);
     updateSubmitText();
 
     // ====== Image preview helpers ======

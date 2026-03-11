@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Xəta";
+}
+
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Xəta</span></li>
+        </ul>
+    </div>
+</section>
+
+<section class="bg-white pb-100">
+    <div class="container" style="text-align:center;padding:80px 20px;">
+        <div style="font-size:72px;margin-bottom:16px;">⚠️</div>
+        <h2 style="margin-bottom:12px;">Xəta baş verdi</h2>
+        <p style="color:#6b7280;font-size:15px;margin-bottom:32px;">
+            Zəhmət olmasa bir az sonra yenidən cəhd edin.
+        </p>
+        <a asp-controller="Home" asp-action="Index"
+           class="btn btn-primary btn-large">Ana Səhifəyə Qayıt</a>
+    </div>
+</section>

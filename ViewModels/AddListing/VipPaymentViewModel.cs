@@ -13,6 +13,9 @@ namespace Car_Project.ViewModels.AddListing
         /// <summary>VIP listing fee (fixed price).</summary>
         public decimal VipFee { get; set; } = 9.99m;
 
+        /// <summary>True when the user chose a VIP listing; false for a normal paid listing.</summary>
+        public bool IsVip { get; set; }
+
         // ── Payment card details ─────────────────────────────────────
         [Required(ErrorMessage = "Kart üzərindəki ad tələb olunur.")]
         [Display(Name = "Kart Sahibinin Adı")]

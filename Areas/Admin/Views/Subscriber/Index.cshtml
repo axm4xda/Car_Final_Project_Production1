@@ -1,0 +1,80 @@
+@model IEnumerable<Car_Project.Models.NewsletterSubscriber>
+@{
+    ViewData["Title"] = "Abunəçilər";
+}
+
+<div class="a-card">
+    <div class="a-card-head">
+        <div>
+            Xəbər Bülleteni Abunəçiləri
+            <span class="a-badge blue" style="margin-left:8px;">@Model.Count() nəfər</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+            <span class="a-badge green">Aktiv: @Model.Count(s => s.IsActive)</span>
+            <span class="a-badge red">Deaktiv: @Model.Count(s => !s.IsActive)</span>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Qeydiyyat Tarixi</th>
+                        <th>Əməliyyat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int i = 1;}
+                    @foreach (var sub in Model)
+                    {
+                        <tr>
+                            <td style="color:#9ca3af;font-size:12px;">@i</td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#FF5722,#ff8a65);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">
+                                        @sub.Email[0].ToString().ToUpper()
+                                    </div>
+                                    <strong>@sub.Email</strong>
+                                </div>
+                            </td>
+                            <td>
+                                @if (sub.IsActive)
+                                {
+                                    <span class="a-badge green">✔ Aktiv</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge red">✘ Deaktiv</span>
+                                }
+                            </td>
+                            <td style="color:#6b7280;font-size:13px;">
+                                @sub.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                            </td>
+                            <td>
+                                <form asp-action="Delete" asp-route-id="@sub.Id" method="post"
+                                      class="del-form"
+                                      onsubmit="return confirm('Bu abunəçini silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑 Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st">
+            <i data-lucide="mail" style="width:48px;height:48px;margin-bottom:12px;color:#d1d5db;"></i>
+            <p>Hələ heç bir abunəçi yoxdur.</p>
+        </div>
+    }
+</div>
