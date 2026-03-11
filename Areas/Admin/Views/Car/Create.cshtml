@@ -1,0 +1,66 @@
+@model Car
+@{
+    ViewData["Title"] = "Yeni Maşın";
+    var brands = ViewBag.Brands as SelectList;
+    var allFeatures = ViewBag.AllFeatures as List<CarFeature> ?? new List<CarFeature>();
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Yeni Maşın Əlavə Et</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="f-row">
+            <div class="fg"><label>Ad</label><input asp-for="Title" class="fc" required></div>
+            <div class="fg"><label>Marka</label><select asp-for="BrandId" asp-items="@brands" class="fc"><option value="">Seçin</option></select></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Qiymət ($)</label><input asp-for="Price" class="fc" type="number" step="0.01" required></div>
+            <div class="fg"><label>Aylıq Ödəniş ($)</label><input asp-for="MonthlyPayment" class="fc" type="number" step="0.01"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>İl</label><input asp-for="Year" class="fc" type="number" required></div>
+            <div class="fg"><label>Yürüş (km)</label><input asp-for="Mileage" class="fc" type="number" required></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Yanacaq</label><select asp-for="FuelType" asp-items="Html.GetEnumSelectList<FuelType>()" class="fc"></select></div>
+            <div class="fg"><label>Transmissiya</label><select asp-for="Transmission" asp-items="Html.GetEnumSelectList<TransmissionType>()" class="fc"></select></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Vəziyyət</label><select asp-for="Condition" asp-items="Html.GetEnumSelectList<CarCondition>()" class="fc"></select></div>
+            <div class="fg"><label>Kuzov Tipi</label><input asp-for="BodyStyle" class="fc"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Ötürmə Tipi</label><input asp-for="DriveType" class="fc"></div>
+            <div class="fg"><label>Rəng</label><input asp-for="Color" class="fc"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Salon Rəngi</label><input asp-for="InteriorColor" class="fc"></div>
+            <div class="fg"><label>Silindr</label><input asp-for="Cylinders" class="fc" type="number"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Qapı Sayı</label><input asp-for="DoorCount" class="fc" type="number"></div>
+            <div class="fg"><label>Badge</label><input asp-for="Badge" class="fc" placeholder="Special, Great Price"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Badge Rəngi</label><input asp-for="BadgeColor" class="fc" placeholder="bg-primary-2"></div>
+            <div class="fg"><label>Thumbnail</label><input type="file" name="thumbnailFile" class="fc" accept="image/*"></div>
+        </div>
+        <div class="fg"><label>Əlavə Şəkillər</label><input type="file" name="imageFiles" class="fc" accept="image/*" multiple></div>
+        <div class="fg"><label>Təsvir</label><textarea asp-for="Description" class="fc" rows="4"></textarea></div>
+        @if (allFeatures.Any())
+        {
+            <div class="fg">
+                <label>Xüsusiyyətlər</label>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px">
+                    @foreach (var f in allFeatures)
+                    {
+                        <label class="f-chk"><input type="checkbox" name="featureIds" value="@f.Id"> @f.Name</label>
+                    }
+                </div>
+            </div>
+        }
+        <button class="btn-a primary" type="submit">Əlavə Et</button>
+    </form>
+</div>

@@ -1,0 +1,255 @@
+@model Car_Project.ViewModels.AddListing.VipPaymentViewModel
+@{
+    ViewData["Title"] = "Ödəniş — Elan Aktivləşdirmə";
+}
+
+<style>
+    .vp-page { max-width: 560px; margin: 0 auto; padding-bottom: 80px; }
+
+    .vp-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .vp-header { text-align: center; margin-bottom: 32px; }
+    .vp-icon {
+        width: 64px; height: 64px;
+        background: linear-gradient(135deg,#FF5722,#ff7043);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+    }
+    .vp-header h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .vp-header p  { color: #6b7280; font-size: 14px; }
+
+    .vp-summary {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 28px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .vp-summary-title { font-size: 14px; color: #6b7280; margin-bottom: 4px; }
+    .vp-summary-car   { font-size: 15px; font-weight: 600; color: #111; }
+    .vp-summary-fee   { font-size: 22px; font-weight: 800; color: #FF5722; }
+
+    .vp-field { margin-bottom: 20px; }
+    .vp-field label {
+        display: block;
+        font-size: 13px; font-weight: 600; color: #374151;
+        margin-bottom: 6px;
+    }
+    .vp-field .required { color: #FF5722; }
+    .vp-field input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color .2s, box-shadow .2s;
+    }
+    .vp-field input:focus {
+        border-color: #FF5722;
+        box-shadow: 0 0 0 3px rgba(255,87,34,.08);
+    }
+
+    .vp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .vp-submit {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg,#FF5722,#e64a19);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px; font-weight: 700;
+        cursor: pointer;
+        transition: opacity .2s;
+        margin-top: 8px;
+    }
+    .vp-submit:hover { opacity: .9; }
+
+    .vp-secure {
+        display: flex; align-items: center; justify-content: center;
+        gap: 6px; margin-top: 16px;
+        font-size: 12px; color: #9ca3af;
+    }
+
+    .vp-notice {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 13px;
+        color: #92400e;
+        margin-bottom: 28px;
+        display: flex; gap: 8px; align-items: flex-start;
+    }
+
+    .vp-free-badge {
+        display: inline-block;
+        background: #ecfdf5;
+        color: #065f46;
+        font-size: 12px; font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        border: 1px solid #a7f3d0;
+        margin-left: 8px;
+    }
+
+    span.field-validation-error { color: #dc2626; font-size: 12px; display: block; margin-top: 4px; }
+
+    @@media (max-width: 576px) {
+        .vp-card { padding: 24px 18px; }
+        .vp-row  { grid-template-columns: 1fr; }
+    }
+</style>
+
+<!-- Breadcrumb -->
+<section class="background-light mb-32">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt=">"></li>
+            <li><a asp-controller="AddListing" asp-action="Index">Yeni Elan</a></li>
+            <li><img src="~/assets/icons/right.svg" alt=">"></li>
+            <li><span>Ödəniş</span></li>
+        </ul>
+    </div>
+</section>
+
+<section class="pb-100">
+    <div class="container">
+        <div class="vp-page">
+            <div class="vp-card">
+
+                <div class="vp-header">
+                    <div class="vp-icon">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                  fill="white" stroke="white" stroke-width="1" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2>
+                        @(Model.CarId > 0 && Model.VipFee > 0 ? "Elan Aktivləşdirmə" : "Ödəniş")
+                        @if (Model.VipFee == 9.99m)
+                        {
+                            <span class="vp-free-badge">⭐ VIP</span>
+                        }
+                    </h2>
+                    <p>Elanınızı aktivləşdirmək üçün ödənişi tamamlayın</p>
+                </div>
+
+                <!-- Summary -->
+                <div class="vp-summary">
+                    <div>
+                        <div class="vp-summary-title">Elan</div>
+                        <div class="vp-summary-car">@Model.CarTitle</div>
+                    </div>
+                    <div class="vp-summary-fee">$@Model.VipFee.ToString("0.00")</div>
+                </div>
+
+                @if (Model.VipFee == 9.99m)
+                {
+                    <div class="vp-notice">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                  stroke="#92400e" stroke-width="1.5"/>
+                            <path d="M12 8V12M12 16H12.01" stroke="#92400e" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>
+                            <strong>VIP Elan:</strong> Ödənişdən sonra elanınız siyahının <strong>ən üstündə</strong> göstəriləcək və
+                            <strong>⭐ VIP</strong> nişanı alacaq.
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="vp-notice">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                  stroke="#92400e" stroke-width="1.5"/>
+                            <path d="M12 8V12M12 16H12.01" stroke="#92400e" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>İlk elan pulsuz olur. Sonrakı elanlar üçün kiçik aktivləşdirmə haqqı tutulur.</span>
+                    </div>
+                }
+
+                <!-- Payment form -->
+                <form asp-controller="AddListing" asp-action="VipPayment" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CarId" />
+                    <input type="hidden" asp-for="VipFee" />
+                    <input type="hidden" asp-for="CarTitle" />
+
+                    <div asp-validation-summary="ModelOnly" class="mb-16 p-12"
+                         style="background:#fee2e2;color:#dc2626;border-radius:8px;"></div>
+
+                    <div class="vp-field">
+                        <label asp-for="CardHolderName">Kart Sahibinin Adı <span class="required">*</span></label>
+                        <input asp-for="CardHolderName" placeholder="AD SOYAD" autocomplete="cc-name" />
+                        <span asp-validation-for="CardHolderName"></span>
+                    </div>
+
+                    <div class="vp-field">
+                        <label asp-for="CardNumber">Kart Nömrəsi <span class="required">*</span></label>
+                        <input asp-for="CardNumber" placeholder="0000 0000 0000 0000"
+                               maxlength="16" inputmode="numeric" autocomplete="cc-number"
+                               id="cardNumberInput" />
+                        <span asp-validation-for="CardNumber"></span>
+                    </div>
+
+                    <div class="vp-row">
+                        <div class="vp-field">
+                            <label asp-for="ExpiryDate">Bitmə Tarixi <span class="required">*</span></label>
+                            <input asp-for="ExpiryDate" placeholder="MM/YY" maxlength="5"
+                                   inputmode="numeric" autocomplete="cc-exp" id="expiryInput" />
+                            <span asp-validation-for="ExpiryDate"></span>
+                        </div>
+                        <div class="vp-field">
+                            <label asp-for="Cvv">CVV <span class="required">*</span></label>
+                            <input asp-for="Cvv" placeholder="123" maxlength="4"
+                                   inputmode="numeric" autocomplete="cc-csc" type="password" />
+                            <span asp-validation-for="Cvv"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="vp-submit">
+                        💳 $@Model.VipFee.ToString("0.00") — Ödə və Elanı Aktivləşdir
+                    </button>
+                </form>
+
+                <div class="vp-secure">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="11" width="18" height="11" rx="2" stroke="#9ca3af" stroke-width="1.5"/>
+                        <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11"
+                              stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    SSL ilə qorunmuş ödəniş
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // Auto-format card number: allow digits only
+    document.getElementById('cardNumberInput').addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 16);
+    });
+
+    // Auto-format expiry: MM/YY
+    document.getElementById('expiryInput').addEventListener('input', function () {
+        var v = this.value.replace(/\D/g, '').slice(0, 4);
+        if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+        this.value = v;
+    });
+</script>
+}

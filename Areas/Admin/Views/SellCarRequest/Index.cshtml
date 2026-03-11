@@ -1,0 +1,130 @@
+@model IEnumerable<SellCarRequest>
+@using Car_Project.Models
+@{
+    ViewData["Title"] = "Satış Müraciətləri";
+    var currentTab = ViewBag.CurrentTab as string ?? "all";
+    var allList = Model.ToList();
+    var pendingList = allList.Where(s => s.Status == SellCarRequestStatus.Pending).ToList();
+    var approvedList = allList.Where(s => s.Status == SellCarRequestStatus.Approved).ToList();
+    var rejectedList = allList.Where(s => s.Status == SellCarRequestStatus.Rejected).ToList();
+}
+
+<style>
+    .tab-bar{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid #e5e7eb;padding-bottom:0}
+    .tab-btn{padding:10px 20px;font-size:13px;font-weight:600;color:#6b7280;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+    .tab-btn:hover{color:#1c1c1c}
+    .tab-btn.active{color:#FF5722;border-bottom-color:#FF5722}
+    .tab-badge{min-width:20px;height:20px;border-radius:10px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+    .tab-badge.orange{background:#fff7ed;color:#ea580c}
+    .tab-badge.green{background:#ecfdf5;color:#059669}
+    .tab-badge.red{background:#fef2f2;color:#dc2626}
+    .tab-badge.gray{background:#f3f4f6;color:#6b7280}
+</style>
+
+<div class="a-card">
+    <div class="a-card-head">
+        <div class="a-card-title">Satış Müraciətləri</div>
+        <a asp-action="Trash" class="btn-a ghost" style="gap:8px;">
+            🗑 Zibil Qutusu
+        </a>
+    </div>
+
+    <div class="tab-bar">
+        <a href="@Url.Action("Index", new { tab = "all" })" class="tab-btn @(currentTab == "all" ? "active" : "")">
+            Hamısı <span class="tab-badge gray">@allList.Count</span>
+        </a>
+        <a href="@Url.Action("Index", new { tab = "pending" })" class="tab-btn @(currentTab == "pending" ? "active" : "")">
+            Gözləyir <span class="tab-badge orange">@pendingList.Count</span>
+        </a>
+        <a href="@Url.Action("Index", new { tab = "approved" })" class="tab-btn @(currentTab == "approved" ? "active" : "")">
+            Təsdiqləndi <span class="tab-badge green">@approvedList.Count</span>
+        </a>
+        <a href="@Url.Action("Index", new { tab = "rejected" })" class="tab-btn @(currentTab == "rejected" ? "active" : "")">
+            Rədd edildi <span class="tab-badge red">@rejectedList.Count</span>
+        </a>
+    </div>
+
+    @{
+        var displayList = currentTab switch
+        {
+            "pending" => pendingList,
+            "approved" => approvedList,
+            "rejected" => rejectedList,
+            _ => allList
+        };
+    }
+
+    @if (displayList.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr>
+                        <th>Ad</th>
+                        <th>Email</th>
+                        <th>Maşın</th>
+                        <th>Qiymət</th>
+                        <th>Status</th>
+                        <th>Tarix</th>
+                        <th>Əməliyyat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var req in displayList)
+                    {
+                        <tr>
+                            <td><strong>@req.OwnerName</strong></td>
+                            <td>@req.Email</td>
+                            <td>@req.CarTitle (@req.Year)</td>
+                            <td>$@req.AskingPrice.ToString("N0")</td>
+                            <td>
+                                @switch (req.Status)
+                                {
+                                    case SellCarRequestStatus.Pending:
+                                        <span class="a-badge yellow">Gözləyir</span>
+                                        break;
+                                    case SellCarRequestStatus.Approved:
+                                        <span class="a-badge green">Təsdiqləndi</span>
+                                        break;
+                                    case SellCarRequestStatus.Rejected:
+                                        <span class="a-badge red">Rədd edildi</span>
+                                        break;
+                                }
+                            </td>
+                            <td>@req.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="act-btns">
+                                <a asp-action="Details" asp-route-id="@req.Id" class="btn-a info btn-sm">👁</a>
+                                @if (req.Status == SellCarRequestStatus.Pending)
+                                {
+                                    <form asp-action="Reject" method="post" class="del-form" onsubmit="return confirm('Rədd etmək istədiyinizdən əminsiniz?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@req.Id" />
+                                        <button class="btn-a danger btn-sm">✕</button>
+                                    </form>
+                                }
+                                <form asp-action="MoveToTrash" asp-route-id="@req.Id" method="post" class="del-form" onsubmit="return confirm('Zibil qutusuna göndərmək istəyirsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a ghost btn-sm" title="Zibil qutusuna at">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st">
+            <p>
+                @(currentTab switch
+                {
+                    "pending" => "Gözləyən müraciət yoxdur.",
+                    "approved" => "Təsdiqlənmiş müraciət yoxdur.",
+                    "rejected" => "Rədd edilmiş müraciət yoxdur.",
+                    _ => "Hələ satış müraciəti yoxdur."
+                })
+            </p>
+        </div>
+    }
+</div>

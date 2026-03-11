@@ -1,0 +1,61 @@
+﻿@model List<Car_Project.ViewModels.FAQGroupViewModel>
+@{
+    ViewData["Title"] = "Frequently Asked Questions";
+}
+
+<!-- breadcrumb -->
+<section class="background-light mb-32">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li>
+                <a asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li>
+                <img src="~/assets/icons/right.svg" alt="chevron-right">
+            </li>
+            <li>
+                <span>Pages</span>
+            </li>
+            <li>
+                <img src="~/assets/icons/right.svg" alt="chevron-right">
+            </li>
+            <li>
+                <span>Frequently Asked Questions</span>
+            </li>
+        </ul>
+    </div>
+</section>
+<!-- breadcrumb -->
+
+<section class="bg-white pb-84">
+    @for (int g = 0; g < Model.Count; g++)
+    {
+        var group = Model[g];
+        bool isLast = (g == Model.Count - 1);
+
+        <div class="container @(isLast ? "" : "mb-60")">
+            <p class="h3 mb-20 text-center capitalize">@group.GroupTitle</p>
+            <div class="max-width-850 mx-auto w-full">
+                <div class="flat-accordion flex flex-col gap-18 max-width-930 wow fadeIn" data-wow-delay=".3s">
+                    @for (int i = 0; i < group.Items.Count; i++)
+                    {
+                        var item = group.Items[i];
+                        <div class="flat-toggle bg-white @(item.IsOpen ? "active" : "")">
+                            <div class="toggle-title @(item.IsOpen ? "active" : "")">
+                                <p class="h5 title">@item.Question</p>
+                                <span class="icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 15L12 7L4 15" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="toggle-content">
+                                <p class="h7 text-secondary line-height-28">@item.Answer</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</section>

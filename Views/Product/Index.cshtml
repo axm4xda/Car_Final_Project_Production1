@@ -1,0 +1,230 @@
+﻿@model Car_Project.ViewModels.Shop.ShopIndexViewModel
+@{
+    ViewData["Title"] = "Shop";
+}
+
+<!-- breadcrumb -->
+<section class="background-light mb-32">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Pages</span></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Shop</span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- Shop -->
+<section class="bg-white pb-100">
+    <div class="container">
+        <h2>Shop</h2>
+        <div class="tf-spacing-style3"></div>
+
+        <div class="inner-page-sidebar">
+            <div class="inner-page-sidebar__content">
+                <div class="row mb-32">
+                    <div class="col-md-6 flex items-center">
+                        <div class="flex items-center gap-16">
+                            <button class="btn-filter hidden md-block" id="filterSidebarToggle">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3.125 6.87499H5.70312C5.84081 7.41275 6.15356 7.88939 6.59207 8.22976C7.03057 8.57014 7.56989 8.75489 8.125 8.75489C8.68011 8.75489 9.21943 8.57014 9.65793 8.22976C10.0964 7.88939 10.4092 7.41275 10.5469 6.87499H16.875C17.0408 6.87499 17.1997 6.80914 17.3169 6.69193C17.4342 6.57472 17.5 6.41575 17.5 6.24999C17.5 6.08423 17.4342 5.92526 17.3169 5.80805C17.1997 5.69084 17.0408 5.62499 16.875 5.62499H10.5469C10.4092 5.08723 10.0964 4.61059 9.65793 4.27021C9.21943 3.92984 8.68011 3.74509 8.125 3.74509C7.56989 3.74509 7.03057 3.92984 6.59207 4.27021C6.15356 4.61059 5.84081 5.08723 5.70312 5.62499H3.125C2.95924 5.62499 2.80027 5.69084 2.68306 5.80805C2.56585 5.92526 2.5 6.08423 2.5 6.24999C2.5 6.41575 2.56585 6.57472 2.68306 6.69193C2.80027 6.80914 2.95924 6.87499 3.125 6.87499Z" fill="#1C1C1C" />
+                                </svg>
+                                Filters
+                            </button>
+                            <p>Showing @(((Model.CurrentPage - 1) * 12) + 1)–@(Math.Min(Model.CurrentPage * 12, Model.TotalCount)) of @Model.TotalCount Products</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="flex items-center gap-8 justify-end md-flex-start md-mt-16">
+                            <p>Sort by:</p>
+                            <div class="core-dropdown">
+                                <button class="core-dropdown__button" type="button">
+                                    <span class="core-dropdown__selected">
+                                        @(Model.SortBy == "price-asc" ? "Lowest Price" :
+                                          Model.SortBy == "price-desc" ? "Highest Price" :
+                                          Model.SortBy == "newest" ? "Newest" : "Featured")
+                                    </span>
+                                    <img src="~/assets/icons/chevron-down-primary.svg" alt="chevron" class="core-dropdown__icon">
+                                </button>
+                                <div class="core-dropdown__menu">
+                                    <ul class="core-dropdown__list">
+                                        <li class="core-dropdown__item">
+                                            <a asp-controller="Product" asp-action="Index"
+                                               asp-route-sortBy="featured"
+                                               asp-route-category="@Model.SelectedCategory"
+                                               asp-route-q="@Model.SearchQuery"
+                                               class="core-dropdown__option @(Model.SortBy == null ? "active" : "")">Featured</a>
+                                        </li>
+                                        <li class="core-dropdown__item">
+                                            <a asp-controller="Product" asp-action="Index"
+                                               asp-route-sortBy="price-asc"
+                                               asp-route-category="@Model.SelectedCategory"
+                                               asp-route-q="@Model.SearchQuery"
+                                               class="core-dropdown__option @(Model.SortBy == "price-asc" ? "active" : "")">Lowest Price</a>
+                                        </li>
+                                        <li class="core-dropdown__item">
+                                            <a asp-controller="Product" asp-action="Index"
+                                               asp-route-sortBy="price-desc"
+                                               asp-route-category="@Model.SelectedCategory"
+                                               asp-route-q="@Model.SearchQuery"
+                                               class="core-dropdown__option @(Model.SortBy == "price-desc" ? "active" : "")">Highest Price</a>
+                                        </li>
+                                        <li class="core-dropdown__item">
+                                            <a asp-controller="Product" asp-action="Index"
+                                               asp-route-sortBy="newest"
+                                               asp-route-category="@Model.SelectedCategory"
+                                               asp-route-q="@Model.SearchQuery"
+                                               class="core-dropdown__option @(Model.SortBy == "newest" ? "active" : "")">Newest</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="grid grid-cols-3 xl-grid-cols-2 sm-grid-cols-1 gap-x-30 gap-y-40 mb-30 product-list">
+                    @if (!Model.Products.Any())
+                    {
+                        <div class="col-span-3">
+                            <p class="text-secondary">Məhsul tapılmadı.</p>
+                        </div>
+                    }
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="product">
+                            <div class="product-top">
+                                @if (!string.IsNullOrEmpty(product.Badge))
+                                {
+                                    <div class="promotion uppercase text-white"
+                                         style="background-color:@(product.BadgeColor ?? "#ef4444")">
+                                        @product.Badge
+                                    </div>
+                                }
+                                <div class="actions">
+                                    <p class="action action-heart">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M16.6875 3C14.7516 3 13.0566 3.8325 12 5.23969C10.9434 3.8325 9.24844 3 7.3125 3C5.77146 3.00174 4.29404 3.61468 3.20436 4.70436C2.11468 5.79404 1.50174 7.27146 1.5 8.8125C1.5 15.375 11.2303 20.6869 11.6447 20.9062C11.7539 20.965 11.876 20.9958 12 20.9958C12.124 20.9958 12.2461 20.965 12.3553 20.9062C12.7697 20.6869 22.5 15.375 22.5 8.8125C22.4983 7.27146 21.8853 5.79404 20.7956 4.70436C19.706 3.61468 18.2285 3.00174 16.6875 3Z" fill="#1C1C1C" />
+                                        </svg>
+                                    </p>
+                                </div>
+                                <a class="img" asp-controller="Product" asp-action="Details" asp-route-id="@product.Id">
+                                    <img class="img"
+                                         src="@(product.ThumbnailUrl ?? "~/assets/images/shop/product-1.jpg")"
+                                         alt="@product.Name">
+                                </a>
+                                <form asp-controller="Product" asp-action="AddToCart" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@product.Id">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="product-add-to-cart">
+                                        @(product.InStock ? "Add to Cart" : "Out of Stock")
+                                    </button>
+                                </form>
+                            </div>
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id"
+                               class="block mb-4 h7 font-weight-500">@product.Name</a>
+                            <p class="h5 price">
+                                $@product.Price.ToString("F2")
+                                @if (product.OldPrice.HasValue)
+                                {
+                                    <span class="price-old">$@product.OldPrice.Value.ToString("F2")</span>
+                                }
+                            </p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <ul class="pagination">
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li>
+                                <a asp-controller="Product" asp-action="Index"
+                                   asp-route-page="@i"
+                                   asp-route-category="@Model.SelectedCategory"
+                                   asp-route-sortBy="@Model.SortBy"
+                                   asp-route-q="@Model.SearchQuery"
+                                   class="pagination__link @(i == Model.CurrentPage ? "active" : "")">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <!-- Filter Sidebar -->
+            <div class="inner-page-sidebar__nav filter-sidebar-desktop md-hidden">
+                <form asp-controller="Product" asp-action="Index" method="get" id="filterForm">
+                    <div class="widget-search w-full mb-36">
+                        <input class="input-normal" type="text" name="q" value="@Model.SearchQuery"
+                               placeholder="Search products..." />
+                        <button type="submit" class="widget-search-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M15.8047 15.8047L21.0012 21.0012" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <p class="h4 mb-16">Categories</p>
+                    <div class="filter-features mb-32 style-2">
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <label class="filter-checkbox style-4">
+                                <input type="radio" name="category" value="@cat"
+                                       @(Model.SelectedCategory == cat ? "checked" : "")>
+                                <span>@cat</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="divider mb-32"></div>
+
+                    <p class="h4 mb-22">Price Range</p>
+                    <div class="mb-28">
+                        <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <label class="text-sm mb-4 block">Min price</label>
+                                <input class="input-normal" type="number" name="minPrice"
+                                       value="@Model.MinPrice" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-sm mb-4 block">Max price</label>
+                                <input class="input-normal" type="number" name="maxPrice"
+                                       value="@Model.MaxPrice" placeholder="9999">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filter Sidebar -->
+<div class="filter-sidebar filter-sidebar-popup " id="filterSidebar">
+    <div class="filter-sidebar__overlay"></div>
+    <div class="filter-sidebar__panel">
+        <div class="filter-sidebar__header bg-white">
+            <p class="h5">Advanced Search</p>
+
+            <button class="filter-sidebar__close" id="filterSidebarClose">
+                <img src="assets/icons/X.svg" alt="close">
+            </button>
+        </div>
+        <form action="#">
+            <div class="filter-sidebar__content filter-sidebar-mobile">
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Filter Sidebar -->

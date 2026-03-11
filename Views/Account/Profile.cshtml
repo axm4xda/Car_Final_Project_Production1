@@ -1,0 +1,244 @@
+@model Car_Project.Models.AppUser
+@inject UserManager<AppUser> UserManager
+
+@{
+    var open2faPanel   = TempData["Open2faPanel"]   as string;
+    var maskedEmail2fa = TempData["MaskedEmail2fa"] as string ?? string.Empty;
+}
+
+<style>
+/* ── Profile page tokens ── */
+:root {
+    --p-radius:       20px;
+    --p-card-border:  1px solid #e5e7eb;
+    --p-accent:       #FF5722;
+    --p-accent-light: #fff3ef;
+    --p-green:        #10b981;
+    --p-red:          #dc2626;
+    --p-transition:   .25s ease;
+}
+
+/* ── Grid wrapper ── */
+.profile-grid {
+    display:         grid;
+    grid-template-columns: 1fr;
+    gap:             18px;
+    max-width:       700px;
+    margin:          0 auto;
+    padding:         0 16px 80px;
+}
+
+/* ── Cards ── */
+.profile-card {
+    background:    #fff;
+    border:        var(--p-card-border);
+    border-radius: var(--p-radius);
+    overflow:      hidden;
+}
+
+/* ── Avatar circle ── */
+.profile-avatar {
+    width:         88px;
+    height:        88px;
+    border-radius: 50%;
+    background:    linear-gradient(135deg, var(--p-accent), #ff7043);
+    color:         #fff;
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    font-size:     34px;
+    font-weight:   700;
+    margin:        0 auto 18px;
+    box-shadow:    0 6px 24px rgba(255,87,34,.28);
+    flex-shrink:   0;
+}
+
+/* ── Badge ── */
+.profile-badge {
+    display:       inline-block;
+    padding:       5px 18px;
+    border-radius: 20px;
+    font-size:     13px;
+    font-weight:   600;
+    margin-bottom: 12px;
+}
+
+/* ── Inline 2FA panel slide animation ── */
+.profile-2fa-panel {
+    overflow:      hidden;
+    will-change:   max-height, opacity;
+}
+.profile-2fa-panel.is-open {
+    display:       block !important;
+    max-height:    700px !important;
+    opacity:       1    !important;
+    margin-top:    0    !important;
+}
+
+/* ── Action button strip ── */
+.profile-actions {
+    display:       flex;
+    gap:           10px;
+    flex-wrap:     wrap;
+}
+.profile-actions > * {
+    flex:          1 1 120px;
+    text-align:    center;
+}
+
+/* ── OTP digit boxes responsive ── */
+.otp-boxes {
+    display:       flex;
+    gap:           8px;
+    justify-content: center;
+}
+.otp-boxes input {
+    width:         46px;
+    height:        54px;
+}
+
+/* ── Mobile ── */
+@@media (max-width: 480px) {
+    .profile-grid    { padding: 0 10px 60px; }
+    .profile-avatar  { width: 72px; height: 72px; font-size: 28px; }
+    .otp-boxes input { width: 38px; height: 48px; font-size: 20px; }
+    .profile-actions > * { flex: 1 1 100%; }
+    .twofa-header-content { flex-wrap: wrap; }
+}
+</style>
+
+@* ══════════════  Breadcrumb  ══════════════ *@
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Profil</span></li>
+        </ul>
+    </div>
+</section>
+
+<section class="pb-100">
+    <div class="tf-spacing-style3"></div>
+
+    <div class="profile-grid">
+
+        @* ── Toast bildirişləri ── *@
+        @if (TempData["AuthSuccess"] != null)
+        {
+            <div class="auth-toast auth-toast--success"
+                 style="position:relative;top:auto;right:auto;margin-bottom:0;animation:none;">
+                <span>@TempData["AuthSuccess"]</span>
+            </div>
+        }
+        @if (TempData["AuthError"] != null)
+        {
+            <div class="auth-toast auth-toast--error"
+                 style="position:relative;top:auto;right:auto;margin-bottom:0;animation:none;">
+                <span>@TempData["AuthError"]</span>
+            </div>
+        }
+        @if (TempData["AuthInfo"] != null)
+        {
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;
+                        padding:14px 18px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:18px;flex-shrink:0;">ℹ️</span>
+                <span style="color:#1d4ed8;font-size:14px;font-weight:500;">@TempData["AuthInfo"]</span>
+            </div>
+        }
+
+        @* ════════════════════════════════════════════
+             USER INFO CARD
+           ════════════════════════════════════════════ *@
+        <div class="profile-card" style="padding:36px 32px;text-align:center;">
+
+            @* Avatar or profile picture *@
+            @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+            {
+                <img src="@Model.AvatarUrl" alt="@Model.FullName"
+                     style="width:88px;height:88px;border-radius:50%;object-fit:cover;
+                            margin:0 auto 18px;display:block;
+                            box-shadow:0 6px 24px rgba(0,0,0,.12);" />
+            }
+            else
+            {
+                <div class="profile-avatar" aria-hidden="true">
+                    @(Model.FullName.Length > 0 ? Model.FullName[0].ToString().ToUpper() : "?")
+                </div>
+            }
+
+            <h2 style="margin:0 0 6px;font-size:22px;font-weight:700;">@Model.FullName</h2>
+            <p style="margin:0 0 14px;font-size:15px;color:#6b7280;">@Model.Email</p>
+
+            @if (ViewBag.UserRole != null)
+            {
+                var role = (string)ViewBag.UserRole;
+                var (bg, fg) = role switch {
+                    "SuperAdmin" => ("#7c3aed", "white"),
+                    "Admin"      => ("#2563eb", "white"),
+                    "Agent"      => ("#f59e0b", "white"),
+                    _            => ("#e5e7eb", "#374151")
+                };
+                <div>
+                    <span class="profile-badge"
+                          style="background:@bg;color:@fg;">
+                        @role
+                    </span>
+                </div>
+            }
+
+            @* Stats row *@
+            <div style="display:flex;gap:0;border-top:1px solid #f3f4f6;margin-top:20px;">
+                <div style="flex:1;padding:16px 8px;border-right:1px solid #f3f4f6;">
+                    <p style="margin:0 0 4px;font-size:20px;font-weight:700;color:#111827;">
+                        @Model.CreatedDate.ToString("yyyy")
+                    </p>
+                    <p style="margin:0;font-size:12px;color:#9ca3af;">Qeydiyyat ili</p>
+                </div>
+                <div style="flex:1;padding:16px 8px;border-right:1px solid #f3f4f6;">
+                    <p style="margin:0 0 4px;font-size:20px;font-weight:700;color:#111827;">
+                        @Model.CreatedDate.ToString("dd/MM")
+                    </p>
+                    <p style="margin:0;font-size:12px;color:#9ca3af;">Qeydiyyat tarixi</p>
+                </div>
+            </div>
+        </div>
+
+        @* ════════════════════════════════════════════
+             ACTION BUTTONS CARD
+           ════════════════════════════════════════════ *@
+        <div class="profile-card" style="padding:22px 28px;">
+            <div class="profile-actions">
+
+                <a asp-controller="Home" asp-action="Index"
+                   class="btn btn-line btn-medium font-weight-600">
+                    Ana Səhifə
+                </a>
+
+                <a asp-controller="ChangePassword" asp-action="Index"
+                   class="btn btn-line btn-medium font-weight-600">
+                    Şifrə Dəyiş
+                </a>
+
+                @if (User.IsInRole("SuperAdmin"))
+                {
+                    <a asp-controller="Account" asp-action="ManageUsers"
+                       class="btn btn-primary btn-medium font-weight-600">
+                        İstifadəçiləri İdarə Et
+                    </a>
+                }
+
+                <form asp-controller="Account" asp-action="Logout" method="post" style="flex:1;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="btn btn-medium font-weight-600"
+                            style="width:100%;background:#dc2626;color:white;border:none;
+                                   border-radius:8px;cursor:pointer;padding:10px 20px;">
+                        Çıxış
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div><!-- /.profile-grid -->
+</section>

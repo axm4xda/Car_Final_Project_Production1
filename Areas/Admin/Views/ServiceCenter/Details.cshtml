@@ -1,0 +1,89 @@
+@model ServiceCenter
+@{
+    ViewData["Title"] = "Servis Mərkəzi Detalları";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div class="a-card-title">@Model.Name</div>
+        <div class="act-btns">
+            <a asp-action="Index" class="btn-a ghost">← Geri</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-a warning">✏️ Redaktə Et</a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                @Html.AntiForgeryToken()
+                <button class="btn-a danger">🗑 Sil</button>
+            </form>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <div class="fg" style="margin-bottom:20px;">
+            <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width:400px;border-radius:12px;border:1px solid #e5e7eb;">
+        </div>
+    }
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Ad</label>
+            <p style="font-size:15px;font-weight:600;">@Model.Name</p>
+        </div>
+        <div class="fg">
+            <label>Ünvan</label>
+            <p style="font-size:15px;">@Model.Address</p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Telefon</label>
+            <p style="font-size:15px;">
+                @if (!string.IsNullOrEmpty(Model.Phone))
+                {
+                    <a href="tel:@Model.Phone" style="color:#2563eb;text-decoration:underline;">@Model.Phone</a>
+                }
+                else
+                {
+                    <text>—</text>
+                }
+            </p>
+        </div>
+        <div class="fg">
+            <label>Email</label>
+            <p style="font-size:15px;">
+                @if (!string.IsNullOrEmpty(Model.Email))
+                {
+                    <a href="mailto:@Model.Email" style="color:#2563eb;text-decoration:underline;">@Model.Email</a>
+                }
+                else
+                {
+                    <text>—</text>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>İş Saatları</label>
+            <p style="font-size:15px;">@(Model.WorkingHours ?? "—")</p>
+        </div>
+        <div class="fg">
+            <label>Koordinatlar</label>
+            <p style="font-size:15px;">
+                @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                {
+                    <text>@Model.Latitude.Value, @Model.Longitude.Value</text>
+                }
+                else
+                {
+                    <text>—</text>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="fg">
+        <label>Yaradılma tarixi</label>
+        <p style="font-size:14px;color:#6b7280;">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+@model IEnumerable<BlogCategory>
+@{
+    ViewData["Title"] = "Blog Kateqoriyalar";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Blog Kateqoriyalar (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Kateqoriya</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead><tr><th>Ad</th><th>Slug</th><th>Yazı Sayı</th><th>Əməliyyat</th></tr></thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td><strong>@c.Name</strong></td>
+                            <td><span class="a-badge blue">@c.Slug</span></td>
+                            <td>@c.Posts.Count</td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@c.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ kateqoriya yoxdur.</p></div>
+    }
+</div>

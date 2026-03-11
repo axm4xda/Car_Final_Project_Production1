@@ -1,0 +1,293 @@
+@inject UserManager<AppUser> UserManager
+@inject Car_Project.Services.Abstractions.INotificationService NotificationService
+@{
+    var adminUser = await UserManager.GetUserAsync(User);
+    var activePage = ViewData["ActivePage"]?.ToString() ?? "";
+    var adminNotifCount = await NotificationService.GetAdminUnreadCountAsync();
+}
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] — Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1c1c1c}
+        a{text-decoration:none;color:inherit}
+
+        /* ═══ Sidebar ═══ */
+        .adm-side{position:fixed;top:0;left:0;bottom:0;width:260px;background:#1c1c2e;color:#fff;overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+        .adm-side::-webkit-scrollbar{width:4px}
+        .adm-side::-webkit-scrollbar-thumb{background:#ffffff30;border-radius:4px}
+        .adm-side-logo{padding:24px 20px;border-bottom:1px solid #ffffff15;display:flex;align-items:center;gap:12px}
+        .adm-side-logo .ico{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#FF5722,#ff8a65);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff}
+        .adm-side-logo span{font-size:18px;font-weight:700}
+        .adm-sec{padding:16px 0}
+        .adm-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#ffffff50;padding:0 20px;margin-bottom:8px}
+        .adm-link{display:flex;align-items:center;gap:12px;padding:10px 20px;font-size:13.5px;font-weight:500;color:#ffffffb0;transition:all .2s;border-left:3px solid transparent}
+        .adm-link:hover{background:#ffffff10;color:#fff}
+        .adm-link.active{background:#FF572220;color:#FF5722;border-left-color:#FF5722;font-weight:600}
+        .adm-link svg{flex-shrink:0;width:20px;height:20px}
+        .adm-link i[data-lucide]{flex-shrink:0;width:20px;height:20px}
+
+        /* ═══ Topbar ═══ */
+        .adm-top{position:fixed;top:0;left:260px;right:0;height:64px;background:#fff;border-bottom:1px solid #e5e7eb;z-index:99;display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+        .adm-top h1{font-size:18px;font-weight:700}
+        .adm-top-r{display:flex;align-items:center;gap:16px}
+        .adm-top-user{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#374151}
+        .adm-top-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FF5722,#ff8a65);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+        .adm-top-btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;background:#f3f4f6;color:#374151;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+        .adm-top-btn:hover{background:#e5e7eb}
+
+        /* ═══ Content ═══ */
+        .adm-content{margin-left:260px;margin-top:64px;padding:28px;min-height:calc(100vh - 64px)}
+
+        /* ═══ Card ═══ */
+        .a-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;margin-bottom:24px}
+        .a-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+        .a-card-title{font-size:16px;font-weight:700}
+
+        /* ═══ Stats ═══ */
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;margin-bottom:28px}
+        .st-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;display:flex;align-items:center;gap:16px;transition:box-shadow .2s}
+        .st-card:hover{box-shadow:0 4px 16px #0001}
+        .st-ico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .st-ico svg,.st-ico i[data-lucide]{width:26px;height:26px}
+        .st-ico.blue{background:#eff6ff;color:#2563eb}
+        .st-ico.green{background:#ecfdf5;color:#059669}
+        .st-ico.orange{background:#fff7ed;color:#ea580c}
+        .st-ico.purple{background:#f5f3ff;color:#7c3aed}
+        .st-ico.red{background:#fef2f2;color:#dc2626}
+        .st-ico.teal{background:#f0fdfa;color:#0d9488}
+        .st-ico.yellow{background:#fefce8;color:#ca8a04}
+        .st-ico.pink{background:#fdf2f8;color:#db2777}
+        .st-val{font-size:26px;font-weight:800;line-height:1}
+        .st-lbl{font-size:12px;color:#6b7280;font-weight:500;margin-top:4px}
+
+        /* ═══ Table ═══ */
+        .a-table{width:100%;border-collapse:collapse}
+        .a-table thead th{text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;padding:12px 14px;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+        .a-table tbody td{padding:12px 14px;border-bottom:1px solid #f3f4f6;font-size:13.5px;vertical-align:middle}
+        .a-table tbody tr:hover{background:#f9fafb}
+        .a-table .thumb{width:48px;height:48px;border-radius:8px;object-fit:cover}
+
+        /* ═══ Buttons ═══ */
+        .btn-a{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+        .btn-a.primary{background:#FF5722;color:#fff}.btn-a.primary:hover{background:#e64a19}
+        .btn-a.success{background:#ecfdf5;color:#059669}.btn-a.success:hover{background:#d1fae5}
+        .btn-a.danger{background:#fef2f2;color:#dc2626}.btn-a.danger:hover{background:#fee2e2}
+        .btn-a.info{background:#eff6ff;color:#2563eb}.btn-a.info:hover{background:#dbeafe}
+        .btn-a.warning{background:#fff7ed;color:#ea580c}.btn-a.warning:hover{background:#fed7aa}
+        .btn-a.ghost{background:#f3f4f6;color:#374151}.btn-a.ghost:hover{background:#e5e7eb}
+        .btn-sm{padding:5px 10px;font-size:12px}
+
+        /* ═══ Badge ═══ */
+        .a-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+        .a-badge.green{background:#ecfdf5;color:#059669}.a-badge.red{background:#fef2f2;color:#dc2626}
+        .a-badge.yellow{background:#fefce8;color:#ca8a04}.a-badge.blue{background:#eff6ff;color:#2563eb}
+        .a-badge.gray{background:#f3f4f6;color:#6b7280}
+
+        /* ═══ Forms ═══ */
+        .fg{margin-bottom:18px}
+        .fg label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+        .fc{width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+        .fc:focus{border-color:#FF5722}
+        select.fc{appearance:auto}
+        textarea.fc{resize:vertical;min-height:100px}
+        .f-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .f-chk{display:flex;align-items:center;gap:8px;font-size:14px}
+        .f-chk input[type="checkbox"]{width:18px;height:18px;accent-color:#FF5722}
+
+        /* ═══ Alert ═══ */
+        .a-alert{padding:14px 18px;border-radius:10px;margin-bottom:20px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px}
+        .a-alert.success{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+        .a-alert.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+
+        /* ═══ Misc ═══ */
+        .empty-st{text-align:center;padding:60px 20px;color:#9ca3af}
+        .empty-st p{font-size:15px;font-weight:500}
+        .act-btns{display:flex;gap:6px}
+        .del-form{display:inline}
+        .tbl-wrap{overflow-x:auto}
+    </style>
+</head>
+<body>
+    <aside class="adm-side">
+        <div class="adm-side-logo">
+            <div class="ico">A</div>
+            <span>Aurexo Admin</span>
+        </div>
+
+        <div class="adm-sec">
+            <div class="adm-sec-title">Ana Menyu</div>
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="adm-link @(activePage=="Dashboard"?"active":"")">
+                <i data-lucide="layout-dashboard"></i>
+                Dashboard
+            </a>
+        </div>
+
+        <div class="adm-sec">
+            <div class="adm-sec-title">Avtomobillər</div>
+            <a asp-area="Admin" asp-controller="Car" asp-action="Index" class="adm-link @(activePage=="Cars"?"active":"")">
+                <i data-lucide="car"></i>
+                Maşınlar
+            </a>
+            <a asp-area="Admin" asp-controller="Brand" asp-action="Index" class="adm-link @(activePage=="Brands"?"active":"")">
+                <i data-lucide="tag"></i>
+                Markalar
+            </a>
+            <a asp-area="Admin" asp-controller="CarFeature" asp-action="Index" class="adm-link @(activePage=="CarFeatures"?"active":"")">
+                <i data-lucide="list-checks"></i>
+                Xüsusiyyətlər
+            </a>
+        </div>
+
+        <div class="adm-sec">
+            <div class="adm-sec-title">Məzmun</div>
+            <a asp-area="Admin" asp-controller="BlogPost" asp-action="Index" class="adm-link @(activePage=="BlogPosts"?"active":"")">
+                <i data-lucide="newspaper"></i>
+                Blog Yazılar
+            </a>
+            <a asp-area="Admin" asp-controller="BlogCategory" asp-action="Index" class="adm-link @(activePage=="BlogCategories"?"active":"")">
+                <i data-lucide="folder-open"></i>
+                Blog Kateqoriyalar
+            </a>
+            <a asp-area="Admin" asp-controller="Faq" asp-action="Index" class="adm-link @(activePage=="FAQs"?"active":"")">
+                <i data-lucide="circle-help"></i>
+                FAQ
+            </a>
+        </div>
+
+        <div class="adm-sec">
+            <div class="adm-sec-title">Mağaza</div>
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="adm-link @(activePage=="Products"?"active":"")">
+                <i data-lucide="package"></i>
+                Məhsullar
+            </a>
+            <a asp-area="Admin" asp-controller="ProductCategory" asp-action="Index" class="adm-link @(activePage=="ProductCategories"?"active":"")">
+                <i data-lucide="shapes"></i>
+                Məhsul Kateqoriyalar
+            </a>
+            <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="adm-link @(activePage=="Orders"?"active":"")">
+                <i data-lucide="shopping-bag"></i>
+                Sifarişlər
+            </a>
+            <a asp-area="Admin" asp-controller="Coupon" asp-action="Index" class="adm-link @(activePage=="Coupons"?"active":"")">
+                <i data-lucide="ticket-percent"></i>
+                Kuponlar
+            </a>
+        </div>
+
+        <div class="adm-sec">
+            <div class="adm-sec-title">Agentlər & Rəylər</div>
+            <a asp-area="Admin" asp-controller="SalesAgent" asp-action="Index" class="adm-link @(activePage=="SalesAgents"?"active":"")">
+                <i data-lucide="user-tie" style="display:none"></i>
+                <i data-lucide="briefcase"></i>
+                Satış Agentləri
+            </a>
+            <a asp-area="Admin" asp-controller="Review" asp-action="Index" class="adm-link @(activePage=="Reviews"?"active":"")">
+                <i data-lucide="star"></i>
+                Müştəri Rəyləri
+            </a>
+            <a asp-area="Admin" asp-controller="ServiceCenter" asp-action="Index" class="adm-link @(activePage=="ServiceCenters"?"active":"")">
+                <i data-lucide="map-pin"></i>
+                Servis Mərkəzləri
+            </a>
+        </div>
+
+        <div class="adm-sec">
+            <div class="adm-sec-title">Müraciətlər</div>
+            <a asp-area="Admin" asp-controller="ContactMessage" asp-action="Index" class="adm-link @(activePage=="ContactMessages"?"active":"")">
+                <i data-lucide="mail"></i>
+                Əlaqə Mesajları
+            </a>
+            <a asp-area="Admin" asp-controller="SellCarRequest" asp-action="Index" class="adm-link @(activePage=="SellCarRequests"?"active":"")">
+                <i data-lucide="file-text"></i>
+                Satış Müraciətləri
+            </a>
+            <a asp-area="Admin" asp-controller="SellCarRequest" asp-action="Trash" class="adm-link @(activePage=="SellCarTrash"?"active":"")">
+                <i data-lucide="trash-2"></i>
+                Zibil Qutusu
+            </a>
+            <a asp-area="Admin" asp-controller="Subscriber" asp-action="Index" class="adm-link @(activePage=="Subscribers"?"active":"")">
+                <i data-lucide="bell"></i>
+                Abunəçilər
+            </a>
+            <a asp-area="Admin" asp-controller="Notification" asp-action="Index" class="adm-link @(activePage=="Notifications"?"active":"")" style="position:relative;">
+                <i data-lucide="bell-ring"></i>
+                Bildirişlər
+                @if (adminNotifCount > 0)
+                {
+                    <span style="margin-left:auto;min-width:20px;height:20px;background:#FF5722;color:#fff;font-size:10px;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 5px;">@adminNotifCount</span>
+                }
+            </a>
+        </div>
+
+        @if (User.IsInRole("SuperAdmin"))
+        {
+            <div class="adm-sec">
+                <div class="adm-sec-title">İdarəetmə</div>
+                <a asp-area="Admin" asp-controller="User" asp-action="Index" class="adm-link @(activePage=="Users"?"active":"")">
+                    <i data-lucide="users"></i>
+                    İstifadəçilər
+                </a>
+            </div>
+        }
+
+        <div class="adm-sec" style="margin-top:auto;border-top:1px solid #ffffff15;padding-top:16px;">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="adm-link">
+                <i data-lucide="arrow-left"></i>
+                Sayta Qayıt
+            </a>
+        </div>
+    </aside>
+
+    <header class="adm-top">
+        <h1>@ViewData["Title"]</h1>
+        <div class="adm-top-r">
+            <a asp-area="Admin" asp-controller="Notification" asp-action="Index" class="adm-top-btn" style="position:relative;">
+                <i data-lucide="bell" style="width:18px;height:18px"></i>
+                Bildirişlər
+                @if (adminNotifCount > 0)
+                {
+                    <span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;background:#FF5722;color:#fff;font-size:10px;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 4px;">@adminNotifCount</span>
+                }
+            </a>
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="adm-top-btn">
+                <i data-lucide="globe" style="width:16px;height:16px"></i>
+                Sayta Bax
+            </a>
+            <div class="adm-top-user">
+                <div class="adm-top-avatar">@(adminUser?.FullName?.Length > 0 ? adminUser.FullName[0].ToString().ToUpper() : "A")</div>
+                <span>@(adminUser?.FullName ?? "Admin")</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="adm-content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="a-alert success">
+                <i data-lucide="check-circle" style="width:18px;height:18px;flex-shrink:0"></i>
+                @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="a-alert error">
+                <i data-lucide="alert-triangle" style="width:18px;height:18px;flex-shrink:0"></i>
+                @TempData["Error"]
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <script>lucide.createIcons();</script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

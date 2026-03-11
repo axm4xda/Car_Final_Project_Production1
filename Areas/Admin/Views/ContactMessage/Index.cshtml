@@ -1,0 +1,51 @@
+@model IEnumerable<ContactMessage>
+@{
+    ViewData["Title"] = "Əlaqə Mesajları";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Əlaqə Mesajları (@Model.Count())</div>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr><th>Ad</th><th>Email</th><th>Mövzu</th><th>Status</th><th>Tarix</th><th>Əməliyyat</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var msg in Model)
+                    {
+                        <tr>
+                            <td><strong>@msg.FullName</strong></td>
+                            <td>@msg.Email</td>
+                            <td>@msg.Subject</td>
+                            <td>
+                                @if (msg.IsRead)
+                                {
+                                    <span class="a-badge green">Oxundu</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge yellow">Yeni</span>
+                                }
+                            </td>
+                            <td>@msg.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="act-btns">
+                                <a asp-action="Details" asp-route-id="@msg.Id" class="btn-a info btn-sm">👁</a>
+                                <form asp-action="Delete" asp-route-id="@msg.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ əlaqə mesajı yoxdur.</p></div>
+    }
+</div>

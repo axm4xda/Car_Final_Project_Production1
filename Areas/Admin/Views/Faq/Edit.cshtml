@@ -1,0 +1,21 @@
+@model FAQ
+@{
+    ViewData["Title"] = "FAQ Redaktə Et";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>FAQ Redaktə Et</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label>Sual</label><input asp-for="Question" class="fc" required></div>
+        <div class="fg"><label>Cavab</label><textarea asp-for="Answer" class="fc" rows="4" required></textarea></div>
+        <div class="f-row">
+            <div class="fg"><label>Qrup Adı</label><input asp-for="GroupName" class="fc"></div>
+            <div class="fg"><label>Sıra</label><input asp-for="Order" class="fc" type="number"></div>
+        </div>
+        <div class="fg"><label class="f-chk"><input asp-for="IsActive" type="checkbox"> Aktiv</label></div>
+        <button class="btn-a primary" type="submit">Yadda Saxla</button>
+    </form>
+</div>

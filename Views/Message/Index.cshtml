@@ -1,0 +1,593 @@
+@inject Microsoft.AspNetCore.Identity.UserManager<AppUser> UserManager
+@{
+    ViewData["Title"] = "Mesajlar";
+    var currentUser = await UserManager.GetUserAsync(User);
+    var currentUserId = currentUser?.Id ?? "";
+    var currentUserName = currentUser?.FullName ?? "";
+}
+
+<style>
+    /* ── Sidebar ───────────────────────────── */
+    .dash-sidebar { background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:24px 0; position:sticky; top:100px; }
+    .dash-sidebar .dash-nav-item { display:flex; align-items:center; gap:12px; padding:12px 24px; font-size:14px; font-weight:500; color:#4b5563; text-decoration:none; transition:all .2s; border-left:3px solid transparent; }
+    .dash-sidebar .dash-nav-item:hover { background:#f9fafb; color:#1c1c1c; }
+    .dash-sidebar .dash-nav-item.active { background:#fff5f2; color:#FF5722; border-left-color:#FF5722; font-weight:600; }
+    .dash-sidebar .dash-nav-item svg { flex-shrink:0; }
+
+    /* ── WhatsApp-style Chat Layout ─────────── */
+    .wa-wrap {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+        height: calc(100vh - 220px);
+        min-height: 500px;
+        max-height: 800px;
+        box-shadow: 0 4px 24px rgba(0,0,0,.07);
+    }
+
+    /* ── Left Panel (conversation list) ────── */
+    .wa-left { display:flex; flex-direction:column; border-right:1px solid #e5e7eb; background:#fafafa; overflow:hidden; }
+    .wa-left-header { padding:16px 20px; background:#075e54; color:#fff; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .wa-left-header-title { font-weight:700; font-size:16px; letter-spacing:.3px; }
+    .wa-search { padding:8px 12px; background:#f0f2f5; border-bottom:1px solid #e5e7eb; flex-shrink:0; }
+    .wa-search input { width:100%; padding:8px 14px 8px 36px; border:none; border-radius:20px; background:#fff; font-size:13px; outline:none; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+    .wa-search-wrap { position:relative; }
+    .wa-search-wrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#aaa; pointer-events:none; }
+
+    .wa-conv-list { flex:1; overflow-y:auto; min-height:0; }
+    .wa-conv-item {
+        display:flex; align-items:center; gap:12px;
+        padding:12px 16px; cursor:pointer;
+        transition:background .15s;
+        border-bottom:1px solid #f0f2f5;
+        position:relative;
+    }
+    .wa-conv-item:hover { background:#f0f2f5; }
+    .wa-conv-item.active { background:#e9f2f1; }
+
+    .wa-avatar {
+        width:46px; height:46px; border-radius:50%;
+        color:#fff; display:flex; align-items:center; justify-content:center;
+        font-size:18px; font-weight:700; flex-shrink:0; position:relative;
+    }
+    .wa-avatar.online::after {
+        content:''; position:absolute; bottom:1px; right:1px;
+        width:12px; height:12px; border-radius:50%;
+        background:#25d366; border:2px solid #fafafa;
+    }
+    .wa-conv-body { flex:1; min-width:0; }
+    .wa-conv-name { font-size:14px; font-weight:600; color:#1c1c1c; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .wa-conv-preview { font-size:12px; color:#667781; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+    .wa-conv-preview.unread-preview { color:#1c1c1c; font-weight:600; }
+    .wa-conv-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .wa-conv-time { font-size:11px; color:#aaa; }
+    .wa-conv-time.unread-time { color:#25d366; font-weight:600; }
+    .wa-badge {
+        background:#25d366; color:#fff;
+        border-radius:50%; width:20px; height:20px;
+        font-size:11px; font-weight:700;
+        display:flex; align-items:center; justify-content:center;
+        min-width:20px;
+    }
+
+    /* ── Right Panel (chat window) ──────────── */
+    .wa-right { display:flex; flex-direction:column; background:#efeae2; overflow:hidden; min-height:0; }
+    .wa-chat-header {
+        padding:12px 20px; background:#075e54; color:#fff;
+        display:flex; align-items:center; gap:12px; min-height:60px;
+        flex-shrink:0;
+    }
+    .wa-chat-header-name { font-weight:600; font-size:15px; }
+    .wa-chat-header-status { font-size:12px; opacity:.85; }
+
+    .wa-chat-body {
+        flex:1; overflow-y:auto; padding:16px 20px;
+        display:flex; flex-direction:column; gap:4px;
+        min-height:0;
+    }
+
+    /* Date separator */
+    .wa-date-sep {
+        text-align:center; margin:8px 0;
+        font-size:11px; color:#667781;
+    }
+    .wa-date-sep span {
+        background:#fff;
+        padding:3px 12px;
+        border-radius:8px;
+        box-shadow:0 1px 2px rgba(0,0,0,.1);
+    }
+
+    /* Message bubbles */
+    .wa-msg {
+        max-width:65%; padding:8px 12px 6px;
+        border-radius:8px; font-size:14px;
+        line-height:1.5; word-wrap:break-word;
+        position:relative; box-shadow:0 1px 2px rgba(0,0,0,.12);
+        flex-shrink:0;
+    }
+    .wa-msg.sent {
+        background:#dcf8c6; align-self:flex-end;
+        border-top-right-radius:2px;
+    }
+    .wa-msg.received {
+        background:#fff; align-self:flex-start;
+        border-top-left-radius:2px;
+    }
+    .wa-msg-footer {
+        display:flex; align-items:center; justify-content:flex-end;
+        gap:4px; margin-top:3px;
+    }
+    .wa-msg-time { font-size:10px; color:#667781; }
+    /* Tick icons */
+    .wa-tick { display:inline-flex; align-items:center; font-size:14px; line-height:1; }
+    .wa-tick.sent-only { color:#aaa; }
+    .wa-tick.read      { color:#53bdeb; }
+
+    /* Input area */
+    .wa-input-area {
+        padding:10px 16px; background:#f0f2f5;
+        display:flex; align-items:center; gap:10px;
+        border-top:1px solid #e5e7eb;
+        flex-shrink:0;
+    }
+    .wa-input-area input {
+        flex:1; padding:10px 16px; border:none;
+        border-radius:24px; font-size:14px; outline:none;
+        box-shadow:0 1px 3px rgba(0,0,0,.1);
+        min-width:0;
+    }
+    .wa-send-btn {
+        width:44px; height:44px; border-radius:50%;
+        background:#075e54; color:#fff; border:none;
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; transition:background .2s; flex-shrink:0;
+    }
+    .wa-send-btn:hover { background:#128c7e; }
+    .wa-send-btn:disabled { background:#ccc; cursor:not-allowed; }
+
+    /* Placeholder */
+    .wa-placeholder {
+        flex:1; display:flex; align-items:center; justify-content:center;
+        flex-direction:column; gap:12px; color:#667781; background:#f0f2f5;
+        min-height:0;
+    }
+    .wa-placeholder-icon {
+        width:100px; height:100px; border-radius:50%;
+        background:#e0e0e0;
+        display:flex; align-items:center; justify-content:center; font-size:48px;
+    }
+
+    /* Scrollbar */
+    .wa-conv-list::-webkit-scrollbar,
+    .wa-chat-body::-webkit-scrollbar { width:4px; }
+    .wa-conv-list::-webkit-scrollbar-thumb,
+    .wa-chat-body::-webkit-scrollbar-thumb { background:#ccc; border-radius:2px; }
+
+    @@media (max-width: 900px) {
+        .wa-wrap { grid-template-columns: 260px 1fr; }
+    }
+    @@media (max-width: 640px) {
+        .wa-wrap { grid-template-columns:1fr; height:calc(100vh - 160px); }
+        .wa-left { height:240px; flex-shrink:0; }
+    }
+</style>
+
+<!-- Breadcrumb -->
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Mesajlar</span></li>
+        </ul>
+    </div>
+</section>
+
+<section class="pb-100">
+    <div class="tf-spacing-style3"></div>
+    <div class="container">
+        <div style="display:grid;grid-template-columns:260px 1fr;gap:30px;align-items:start;">
+
+            <!-- Sidebar -->
+            <div class="dash-sidebar">
+                <a asp-controller="UserProfil" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15C15.3137 15 18 12.3137 18 9C18 5.68629 15.3137 3 12 3C8.68629 3 6 5.68629 6 9C6 12.3137 8.68629 15 12 15Z"/><path d="M3 20.25C4.81594 17.1122 8.11406 15 12 15C15.8859 15 19.1841 17.1122 21 20.25"/></svg>
+                    Profil
+                </a>
+                <a asp-controller="UserListing" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6H21"/><path d="M8 12H21"/><path d="M8 18H21"/><circle cx="3" cy="6" r="0.5"/><circle cx="3" cy="12" r="0.5"/><circle cx="3" cy="18" r="0.5"/></svg>
+                    Elanlarım
+                </a>
+                <a asp-controller="Reviews" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    Rəylər
+                </a>
+                <a asp-controller="Message" asp-action="Index" class="dash-nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"/></svg>
+                    Mesajlar
+                </a>
+                <a asp-controller="ChangePassword" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7C7 5.67 7.53 4.4 8.46 3.46C9.4 2.53 10.67 2 12 2C13.33 2 14.6 2.53 15.54 3.46C16.47 4.4 17 5.67 17 7V11"/></svg>
+                    Şifrə Dəyiş
+                </a>
+            </div>
+
+            <!-- WhatsApp Chat -->
+            <div class="wa-wrap">
+
+                <!-- LEFT: Conversation list -->
+                <div class="wa-left">
+                    <div class="wa-left-header">
+                        <span class="wa-left-header-title">💬 Mesajlar</span>
+                    </div>
+                    <div class="wa-search">
+                        <div class="wa-search-wrap">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="chatUserSearch" placeholder="Söhbət axtar..." />
+                        </div>
+                    </div>
+                    <div class="wa-conv-list" id="chatUsersList">
+                        <div style="text-align:center;padding:40px 16px;color:#aaa;font-size:13px;">Yüklənir...</div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: Chat window -->
+                <div class="wa-right" id="waChatRight">
+                    <!-- Placeholder (no chat selected) -->
+                    <div class="wa-placeholder" id="waPlaceholder">
+                        <div class="wa-placeholder-icon">💬</div>
+                        <p style="font-size:17px;font-weight:600;color:#41525d;">WhatsApp Web</p>
+                        <p style="font-size:13px;">Sol paneldən bir istifadəçi seçərək söhbətə başlayın</p>
+                    </div>
+
+                    <!-- Chat header (hidden until user selected) -->
+                    <div class="wa-chat-header" id="waChatHeader" style="display:none;">
+                        <div class="wa-avatar" id="waChatHeaderAvatar" style="width:38px;height:38px;font-size:15px;"></div>
+                        <div>
+                            <div class="wa-chat-header-name" id="waChatHeaderName"></div>
+                            <div class="wa-chat-header-status" id="waChatHeaderStatus"></div>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="wa-chat-body" id="chatMessages" style="display:none;"></div>
+
+                    <!-- Input area -->
+                    <div class="wa-input-area" id="chatInputArea" style="display:none;">
+                        <input type="text" id="chatInput" placeholder="Mesaj yazın..." autocomplete="off" />
+                        <button type="button" id="chatSendBtn" class="wa-send-btn" disabled title="Göndər">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+    (function () {
+        const currentUserId   = '@currentUserId';
+        const currentUserName = '@currentUserName';
+        let selectedUserId    = null;
+        let selectedUserName  = '';
+        let chatUsers         = [];
+
+        // ── Avatar colours ──────────────────────────────
+        const COLORS = ['#128c7e','#25d366','#075e54','#f59e0b','#6366f1','#ec4899','#ef4444'];
+        function avatarColor(name) {
+            return COLORS[(name || '?').charCodeAt(0) % COLORS.length];
+        }
+        function initial(name) {
+            return (name || '?')[0].toUpperCase();
+        }
+
+        // ── Tick SVG helpers ────────────────────────────
+        function singleTick() {
+            return '<span class="wa-tick sent-only" title="Göndərildi">' +
+                   '<svg width="16" height="11" viewBox="0 0 16 11" fill="none">' +
+                   '<path d="M1 5.5L5.5 10L15 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+                   '</svg></span>';
+        }
+        function doubleTick(read) {
+            var cls = read ? 'read' : 'sent-only';
+            var title = read ? 'Oxundu' : 'Çatdırıldı';
+            return '<span class="wa-tick ' + cls + '" title="' + title + '">' +
+                   '<svg width="20" height="11" viewBox="0 0 20 11" fill="none">' +
+                   '<path d="M1 5.5L5.5 10L14 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+                   '<path d="M6 5.5L10.5 10L19 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+                   '</svg></span>';
+        }
+
+        // ── Build SignalR connection ─────────────────────
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl('/chatHub')
+            .withAutomaticReconnect()
+            .build();
+
+        connection.start().then(function () {
+            connection.invoke('GetChatUsers');
+            connection.invoke('GetTotalUnread');
+        }).catch(function (err) {
+            console.error('SignalR error:', err);
+            document.getElementById('chatUsersList').innerHTML =
+                '<div style="text-align:center;padding:40px 16px;color:#ef4444;font-size:13px;">Bağlantı xətası. Səhifəni yeniləyin.</div>';
+        });
+
+        // ── Receive full conversation list ──────────────
+        connection.on('ChatUserList', function (users) {
+            chatUsers = users;
+            renderConvList();
+        });
+
+        // ── Receive chat history ────────────────────────
+        connection.on('ChatHistory', function (history) {
+            var container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+
+            if (!history || history.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#aaa;font-size:13px;">Hələ mesaj yoxdur. Söhbəti başladın!</div>';
+                return;
+            }
+
+            var lastDate = null;
+            history.forEach(function (msg) {
+                // Date separator
+                var msgDate = msg.sentAt ? msg.sentAt.split(' ')[0] : null;
+                if (msgDate && msgDate !== lastDate) {
+                    lastDate = msgDate;
+                    var sep = document.createElement('div');
+                    sep.className = 'wa-date-sep';
+                    sep.innerHTML = '<span>' + msgDate + '</span>';
+                    container.appendChild(sep);
+                }
+                appendMessage(msg);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        });
+
+        // ── Online / Offline ────────────────────────────
+        connection.on('UserOnline', function (userId) {
+            var u = chatUsers.find(x => x.id === userId);
+            if (u) { u.online = true; renderConvList(); }
+            // Update header if that user is open
+            if (userId === selectedUserId) setHeaderStatus(true);
+        });
+
+        connection.on('UserOffline', function (userId) {
+            var u = chatUsers.find(x => x.id === userId);
+            if (u) { u.online = false; renderConvList(); }
+            if (userId === selectedUserId) setHeaderStatus(false);
+        });
+
+        // ── Real-time incoming message ──────────────────
+        connection.on('ReceiveMessage', function (msg) {
+            if (selectedUserId &&
+                (msg.senderId === selectedUserId || msg.receiverId === selectedUserId ||
+                 msg.senderId === currentUserId)) {
+                appendMessage(msg);
+            }
+        });
+
+        // ── Unread counter update ───────────────────────
+        connection.on('UpdateUnreadCount', function (userId, count) {
+            var u = chatUsers.find(x => x.id === userId);
+            if (u) { u.unreadCount = count; renderConvList(); }
+        });
+
+        // ── Conversation bumped to top ──────────────────
+        connection.on('ConversationBumped', function (userId, name, lastMsg, lastTime) {
+            var u = chatUsers.find(x => x.id === userId);
+            if (!u) {
+                u = { id: userId, name: name, role: 'User', online: false,
+                      lastMessage: lastMsg, lastTime: lastTime,
+                      lastSentAt: new Date().toISOString(), unreadCount: 0 };
+                chatUsers.unshift(u);
+            } else {
+                u.lastMessage = lastMsg;
+                u.lastTime    = lastTime;
+                u.lastSentAt  = new Date().toISOString();
+                if (userId !== selectedUserId) u.unreadCount = (u.unreadCount || 0) + 1;
+                // Move to top
+                chatUsers = [u].concat(chatUsers.filter(x => x.id !== userId));
+            }
+            renderConvList();
+        });
+
+        // ── Double-blue-tick when messages are read ─────
+        connection.on('MessagesRead', function (byUserId, ids) {
+            if (byUserId !== selectedUserId) return;
+            ids.forEach(function (id) {
+                var el = document.querySelector('.wa-msg[data-id="' + id + '"]');
+                if (!el) return;
+                var tick = el.querySelector('.wa-tick');
+                if (tick) tick.outerHTML = doubleTick(true);
+            });
+        });
+
+        // ── Total unread (nav badge) ────────────────────
+        connection.on('TotalUnread', function (total) {
+            updateNavBadge(total);
+        });
+
+        // ── Render conversation list ────────────────────
+        function renderConvList() {
+            var container = document.getElementById('chatUsersList');
+            var search    = (document.getElementById('chatUserSearch').value || '').toLowerCase();
+            var filtered  = chatUsers.filter(function (u) {
+                return u.name.toLowerCase().includes(search);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#aaa;font-size:13px;">İstifadəçi tapılmadı</div>';
+                return;
+            }
+
+            var html = '';
+            filtered.forEach(function (u) {
+                var isActive   = u.id === selectedUserId ? ' active' : '';
+                var onlineCls  = u.online ? ' online' : '';
+                var color      = avatarColor(u.name);
+                var ini        = initial(u.name);
+                var hasUnread  = u.unreadCount > 0;
+                var previewCls = hasUnread ? ' unread-preview' : '';
+                var timeCls    = hasUnread ? ' unread-time' : '';
+                var preview    = escapeHtml(u.lastMessage || (u.online ? 'Onlayn' : 'Oflayn'));
+                var badge      = hasUnread
+                    ? '<div class="wa-badge">' + (u.unreadCount > 99 ? '99+' : u.unreadCount) + '</div>'
+                    : '';
+
+                html += '<div class="wa-conv-item' + isActive + '" data-userid="' + u.id + '">'
+                      +   '<div class="wa-avatar' + onlineCls + '" style="background:' + color + ';">' + ini + '</div>'
+                      +   '<div class="wa-conv-body">'
+                      +     '<div class="wa-conv-name">' + escapeHtml(u.name) + '</div>'
+                      +     '<div class="wa-conv-preview' + previewCls + '">' + preview + '</div>'
+                      +   '</div>'
+                      +   '<div class="wa-conv-meta">'
+                      +     (u.lastTime ? '<div class="wa-conv-time' + timeCls + '">' + u.lastTime + '</div>' : '')
+                      +     badge
+                      +   '</div>'
+                      + '</div>';
+            });
+
+            container.innerHTML = html;
+            container.querySelectorAll('.wa-conv-item').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    var uid  = this.dataset.userid;
+                    var user = chatUsers.find(x => x.id === uid);
+                    if (user) selectUser(uid, user.name, user.online);
+                });
+            });
+        }
+
+        // ── Select a conversation ───────────────────────
+        function selectUser(userId, userName, online) {
+            selectedUserId   = userId;
+            selectedUserName = userName;
+
+            document.getElementById('waPlaceholder').style.display  = 'none';
+            document.getElementById('waChatHeader').style.display   = 'flex';
+            document.getElementById('chatMessages').style.display   = 'flex';
+            document.getElementById('chatInputArea').style.display  = 'flex';
+
+            var color = avatarColor(userName);
+            var ini   = initial(userName);
+            var headerAvatar = document.getElementById('waChatHeaderAvatar');
+            headerAvatar.textContent = ini;
+            headerAvatar.style.background = color;
+            headerAvatar.className = 'wa-avatar' + (online ? ' online' : '');
+            document.getElementById('waChatHeaderName').textContent = userName;
+            setHeaderStatus(online);
+
+            document.getElementById('chatMessages').innerHTML =
+                '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px;">Yüklənir...</div>';
+            connection.invoke('LoadHistory', userId).catch(function(err) {
+                console.error('LoadHistory error:', err);
+                document.getElementById('chatMessages').innerHTML =
+                    '<div style="text-align:center;padding:20px;color:#ef4444;font-size:13px;">Mesajlar yüklənə bilmədi.</div>';
+            });
+
+            var u = chatUsers.find(x => x.id === userId);
+            if (u) u.unreadCount = 0;
+            renderConvList();
+
+            document.getElementById('chatInput').focus();
+        }
+
+        function setHeaderStatus(online) {
+            var statusEl = document.getElementById('waChatHeaderStatus');
+            if (online)
+                statusEl.innerHTML = '<span style="color:#25d366;">● Onlayn</span>';
+            else
+                statusEl.textContent = 'Oflayn';
+        }
+
+        // ── Append a message bubble ─────────────────────
+        function appendMessage(msg) {
+            var container = document.getElementById('chatMessages');
+            // Remove "loading" placeholder if present
+            var placeholder = container.querySelector('div[style*="Yüklənir"]');
+            if (placeholder) placeholder.remove();
+
+            var isMe = msg.senderId === currentUserId;
+
+            var div = document.createElement('div');
+            div.className  = 'wa-msg ' + (isMe ? 'sent' : 'received');
+            div.dataset.id = msg.id;
+
+            var tickHtml = '';
+            if (isMe) {
+                tickHtml = msg.isRead ? doubleTick(true) : doubleTick(false);
+            }
+
+            div.innerHTML =
+                '<div>' + escapeHtml(msg.message) + '</div>' +
+                '<div class="wa-msg-footer">' +
+                '  <span class="wa-msg-time">' + (msg.sentAt || '') + '</span>' +
+                   tickHtml +
+                '</div>';
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ── Send a message ──────────────────────────────
+        function sendMessage() {
+            var input = document.getElementById('chatInput');
+            var text  = input.value.trim();
+            if (!text || !selectedUserId) return;
+
+            connection.invoke('SendPrivateMessage', selectedUserId, text);
+            input.value = '';
+            document.getElementById('chatSendBtn').disabled = true;
+
+            var u = chatUsers.find(x => x.id === selectedUserId);
+            if (u) {
+                u.lastMessage = text;
+                u.lastTime    = new Date().toLocaleTimeString('az', { hour:'2-digit', minute:'2-digit' });
+                u.lastSentAt  = new Date().toISOString();
+                chatUsers = [u].concat(chatUsers.filter(x => x.id !== selectedUserId));
+                renderConvList();
+            }
+        }
+
+        document.getElementById('chatSendBtn').addEventListener('click', sendMessage);
+        document.getElementById('chatInput').addEventListener('input', function () {
+            document.getElementById('chatSendBtn').disabled = !this.value.trim();
+        });
+        document.getElementById('chatInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+        document.getElementById('chatUserSearch').addEventListener('input', function () {
+            renderConvList();
+        });
+
+        // ── Nav badge ───────────────────────────────────
+        function updateNavBadge(count) {
+            var badge = document.getElementById('navMsgBadge');
+            if (!badge) return;
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ── Escape HTML ─────────────────────────────────
+        function escapeHtml(str) {
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    })();
+    </script>
+}

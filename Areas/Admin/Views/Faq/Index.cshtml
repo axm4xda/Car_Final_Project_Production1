@@ -1,0 +1,40 @@
+@model IEnumerable<FAQ>
+@{
+    ViewData["Title"] = "FAQ";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>FAQ (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni FAQ</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead><tr><th>#</th><th>Sual</th><th>Qrup</th><th>Status</th><th>Əməliyyat</th></tr></thead>
+                <tbody>
+                    @foreach (var f in Model)
+                    {
+                        <tr>
+                            <td>@f.Order</td>
+                            <td><strong>@f.Question</strong></td>
+                            <td>@(f.GroupName ?? "—")</td>
+                            <td><span class="a-badge @(f.IsActive ? "green" : "red")">@(f.IsActive ? "Aktiv" : "Deaktiv")</span></td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@f.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@f.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istəyirsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ FAQ yoxdur.</p></div>
+    }
+</div>

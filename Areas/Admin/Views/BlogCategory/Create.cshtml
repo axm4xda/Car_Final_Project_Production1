@@ -1,0 +1,16 @@
+@model BlogCategory
+@{
+    ViewData["Title"] = "Yeni Blog Kateqoriyası";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Yeni Blog Kateqoriyası</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label>Ad</label><input asp-for="Name" class="fc" required></div>
+        <div class="fg"><label>Slug (URL, boş buraxsanız avtomatik yaranır)</label><input asp-for="Slug" class="fc" placeholder="meselan-blog-kategoriyasi"></div>
+        <button class="btn-a primary" type="submit">Əlavə Et</button>
+    </form>
+</div>

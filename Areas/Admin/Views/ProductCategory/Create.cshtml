@@ -1,0 +1,17 @@
+@model ProductCategory
+@{
+    ViewData["Title"] = "Yeni Məhsul Kateqoriyası";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Yeni Məhsul Kateqoriyası</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label>Ad</label><input asp-for="Name" class="fc" required></div>
+        <div class="fg"><label>Slug (boş buraxsanız avtomatik yaradılacaq)</label><input asp-for="Slug" class="fc"></div>
+        <div class="fg"><label>İkon URL</label><input asp-for="IconUrl" class="fc"></div>
+        <button class="btn-a primary" type="submit">Əlavə Et</button>
+    </form>
+</div>

@@ -1,0 +1,36 @@
+@model IEnumerable<Brand>
+@{
+    ViewData["Title"] = "Markalar";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Markalar (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Marka</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead><tr><th>Logo</th><th>Ad</th><th>Maşın Sayı</th><th>Əməliyyat</th></tr></thead>
+                <tbody>
+                    @foreach (var b in Model)
+                    {
+                        <tr>
+                            <td>@if (!string.IsNullOrEmpty(b.LogoUrl)){<img src="@b.LogoUrl" class="thumb" alt="">}else{<span class="a-badge gray">Yoxdur</span>}</td>
+                            <td><strong>@b.Name</strong></td>
+                            <td>@b.Cars.Count</td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@b.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@b.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else{<div class="empty-st"><p>Hələ marka yoxdur.</p></div>}
+</div>

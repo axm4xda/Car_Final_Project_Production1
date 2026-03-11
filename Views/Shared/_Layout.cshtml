@@ -1,0 +1,1698 @@
+@inject Microsoft.AspNetCore.Identity.SignInManager<AppUser> SignInManager
+@inject Microsoft.AspNetCore.Identity.UserManager<AppUser> UserManager
+@inject Car_Project.Services.Abstractions.ICompareItemService CompareService
+@inject Car_Project.Services.Abstractions.IWishlistService WishlistService
+@inject Car_Project.Services.Abstractions.INotificationService NotificationService
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Aurexo | Car Dealer, Rental & Listing HTML Template</title>
+	<link rel="stylesheet" href="~/assets/scss/swiper/swiper-bundle.min.css">
+	<link rel="stylesheet" href="~/assets/app.css">
+	<link rel="stylesheet" href="~/assets/css/custom.css">
+	<meta property="og:image" content="~/assets/images/logo.png">
+	<meta property="og:type" content="website">
+	<!-- Favicon and Touch Icons  -->
+	<link rel="shortcut icon" href="~/assets/images/favicon.png">
+	<link rel="apple-touch-icon-precomposed" href="~/assets/images/favicon.png">
+
+	<style>
+		/* ===== User Dropdown ===== */
+		.user-dropdown {
+			position: relative;
+			display: inline-flex;
+		}
+		.user-dropdown-toggle {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			cursor: pointer;
+			position: relative;
+			background: transparent;
+		}
+		.user-dropdown-toggle .ud-chevron {
+			width: 16px;
+			height: 16px;
+			transition: transform 0.25s ease;
+			flex-shrink: 0;
+		}
+		.user-dropdown:hover .ud-chevron,
+		.user-dropdown.active .ud-chevron {
+			transform: rotate(180deg);
+		}
+		.user-dropdown-menu {
+			position: absolute;
+			top: calc(100% + 8px);
+			right: 0;
+			min-width: 180px;
+			background: #fff;
+			border: 1px solid #e7e7e7;
+			border-radius: 12px;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+			padding: 8px 0;
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(6px);
+			transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+			z-index: 9999;
+		}
+		.user-dropdown:hover .user-dropdown-menu,
+		.user-dropdown.active .user-dropdown-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+		/* invisible bridge so mouse can travel from button to menu */
+		.user-dropdown-menu::before {
+			content: '';
+			position: absolute;
+			top: -10px;
+			left: 0;
+			right: 0;
+			height: 10px;
+		}
+		.user-dropdown-item {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			width: 100%;
+			padding: 10px 20px;
+			font-size: 14px;
+			font-weight: 500;
+			color: #1C1C1C;
+			background: none;
+			border: none;
+			cursor: pointer;
+			text-decoration: none;
+			transition: background 0.15s ease, color 0.15s ease;
+			white-space: nowrap;
+		}
+		.user-dropdown-item:hover {
+			background: #f5f5f5;
+		}
+		.user-dropdown-item svg {
+			flex-shrink: 0;
+		}
+		.user-dropdown-item.text-danger {
+			color: #dc2626;
+		}
+		.user-dropdown-item.text-danger:hover {
+			background: #fef2f2;
+			color: #b91c1c;
+		}
+		.user-dropdown-divider {
+			height: 1px;
+			background: #e7e7e7;
+			margin: 4px 0;
+		}
+
+		/* Dark mode */
+		.is_dark .user-dropdown-menu {
+			background: #1C1C1C;
+			border-color: #333;
+		}
+		.is_dark .user-dropdown-item {
+			color: #fff;
+		}
+		.is_dark .user-dropdown-item:hover {
+			background: #2a2a2a;
+		}
+		.is_dark .user-dropdown-item.text-danger {
+			color: #f87171;
+		}
+		.is_dark .user-dropdown-item.text-danger:hover {
+			background: #2a1a1a;
+			color: #fca5a5;
+		}
+		.is_dark .user-dropdown-divider {
+			background: #333;
+		}
+
+		/* ===== Nav Count Badge */
+		.nav-count-badge {
+			position: absolute;
+			top: -6px;
+			right: -6px;
+			min-width: 18px;
+			height: 18px;
+			background: #FF5722;
+			color: #fff;
+			font-size: 11px;
+			font-weight: 700;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			line-height: 1;
+			padding: 0 4px;
+		}
+
+		/* Disable the CSS ::after pseudo-badge (green) — we use our own <span> badge */
+		.header .header-action-btn.header-action-icon::after {
+			display: none !important;
+		}
+
+		/* ===== Auth Toast */
+		.auth-toast {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			z-index: 99999;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 14px 20px;
+			border-radius: 10px;
+			font-size: 14px;
+			font-weight: 500;
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+			animation: toastSlideIn 0.35s ease;
+			max-width: 420px;
+		}
+		.auth-toast--success {
+			background: #ecfdf5;
+			color: #065f46;
+			border: 1px solid #a7f3d0;
+		}
+		.auth-toast--error {
+			background: #fef2f2;
+			color: #991b1b;
+			border: 1px solid #fecaca;
+		}
+		.auth-toast button {
+			background: none;
+			border: none;
+			font-size: 18px;
+			cursor: pointer;
+			color: inherit;
+			padding: 0;
+			line-height: 1;
+			opacity: 0.6;
+		}
+		.auth-toast button:hover {
+			opacity: 1;
+		}
+		@@keyframes toastSlideIn {
+			from { transform: translateX(100%); opacity: 0; }
+			to   { transform: translateX(0);    opacity: 1; }
+		}
+
+		/* ===== Mobile Action Icons Grid ===== */
+		.mobile-action-icons {
+			display: none;
+			padding: 20px 16px;
+			border-top: 1px solid #e7e7e7;
+		}
+		.mobile-action-icons .mobile-icons-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 16px 12px;
+		}
+		.mobile-action-icons .mobile-icon-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 6px;
+			text-decoration: none;
+			color: #1C1C1C;
+			padding: 10px 4px;
+			border-radius: 12px;
+			transition: background 0.15s ease;
+			position: relative;
+		}
+		.mobile-action-icons .mobile-icon-item:hover {
+			background: #f5f5f5;
+		}
+		.mobile-action-icons .mobile-icon-item .mobile-icon-wrap {
+			width: 44px;
+			height: 44px;
+			border-radius: 50%;
+			background: #f3f4f6;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+			transition: background 0.2s ease;
+		}
+		.mobile-action-icons .mobile-icon-item:hover .mobile-icon-wrap {
+			background: #fff5f2;
+		}
+		.mobile-action-icons .mobile-icon-item .mobile-icon-label {
+			font-size: 11px;
+			font-weight: 600;
+			text-align: center;
+			line-height: 1.2;
+			color: #4b5563;
+		}
+		.mobile-action-icons .mobile-icon-item .mobile-icon-badge {
+			position: absolute;
+			top: -4px;
+			right: -4px;
+			min-width: 18px;
+			height: 18px;
+			background: #FF5722;
+			color: #fff;
+			font-size: 10px;
+			font-weight: 700;
+		border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			line-height: 1;
+			padding: 0 4px;
+		}
+
+		/* Show mobile action icons only inside mobile nav */
+		#main-nav-mobile .mobile-action-icons,
+		#main-nav.mobile-action-icons-container .mobile-action-icons {
+			display: block;
+		}
+
+		/* Hide original header-actions on mobile */
+		@@media (max-width: 1199px) {
+			.header-actions {
+				display: none !important;
+			}
+		}
+
+		/* Dark mode for mobile action icons */
+		.is_dark .mobile-action-icons {
+			border-top-color: #333;
+		}
+		.is_dark .mobile-action-icons .mobile-icon-item {
+			color: #fff;
+		}
+		.is_dark .mobile-action-icons .mobile-icon-item:hover {
+			background: #2a2a2a;
+		}
+		.is_dark .mobile-action-icons .mobile-icon-wrap {
+			background: #2a2a2a;
+		}
+		.is_dark .mobile-action-icons .mobile-icon-item:hover .mobile-icon-wrap {
+			background: #3a2a2a;
+		}
+		.is_dark .mobile-action-icons .mobile-icon-label {
+			color: #9ca3af;
+		}
+		.is_dark .mobile-action-icons .mobile-icon-item svg path,
+		.is_dark .mobile-action-icons .mobile-icon-item svg rect,
+		.is_dark .mobile-action-icons .mobile-icon-item svg circle {
+			stroke: #fff;
+			fill: none;
+		}
+		.is_dark .mobile-action-icons .mobile-icon-item svg circle[fill="#1C1C1C"] {
+			fill: #fff;
+			stroke: none;
+		}
+	</style>
+</head>
+<body>
+	<!-- preloade -->
+	<div class="preload preload-container">
+		<img class="preload--icon" src="~/assets/icons/preload.svg" alt="preload">
+	</div>
+	<!-- preload -->
+
+	@{
+		var currentUser = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+		var sessionId   = Context.Session.Id;
+		var compareCount = await CompareService.GetCountAsync(sessionId);
+		var wishlistCount = await WishlistService.GetCountAsync(sessionId);
+		var notifCount = currentUser != null ? await NotificationService.GetUnreadCountAsync(currentUser.Id) : 0;
+
+		// Active nav detection
+		var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+		var currentArea = ViewContext.RouteData.Values["area"]?.ToString() ?? "";
+		bool isHome   = currentController == "Home" && string.IsNullOrEmpty(currentArea);
+		bool isAbout  = currentController == "About" && string.IsNullOrEmpty(currentArea);
+		bool isList   = currentController == "List" && string.IsNullOrEmpty(currentArea);
+		bool isBlog   = currentController == "Blog" && string.IsNullOrEmpty(currentArea);
+		bool isContact= currentController == "Contact" && string.IsNullOrEmpty(currentArea);
+		bool isProduct= currentController == "Product" && string.IsNullOrEmpty(currentArea);
+		bool isPages  = !isHome && !isAbout && !isList && !isBlog && !isContact && !isProduct && string.IsNullOrEmpty(currentArea);
+	}
+
+	@* Toast bildirişləri *@
+	@if (TempData["AuthSuccess"] != null)
+	{
+		<div id="auth-toast" class="auth-toast auth-toast--success">
+			<span>@TempData["AuthSuccess"]</span>
+			<button onclick="document.getElementById('auth-toast').remove()">✕</button>
+		</div>
+	}
+	@if (TempData["AuthError"] != null)
+	{
+		<div id="auth-toast" class="auth-toast auth-toast--error">
+			<span>@TempData["AuthError"]</span>
+			<button onclick="document.getElementById('auth-toast').remove()">✕</button>
+		</div>
+	}
+
+	<div id="wrapper">
+
+		<!-- Header -->
+		<div class="header-wrapper">
+			<header class="header bg-white header-style-1" id="header_main">
+				<div class="header-container-fluid max-w-1920 relative header-primary">
+					<div class="header-inner" id="site-header-inner">
+						<div class="logo">
+							<a asp-controller="Home" asp-action="Index">
+								<img src="~/assets/images/logo.png" alt="logo">
+							</a>
+						</div>
+						<div class="logo-mobile">
+							<a asp-controller="Home" asp-action="Index">
+								<img src="~/assets/images/logo-white.png" alt="logo">
+							</a>
+						</div>
+
+						<div class="header-right main-nav-wrapper gap-20">
+							<!-- Menu -->
+							<nav id="main-nav" class="main-nav mr-18">
+								<ul id="menu-primary-menu" class="menu">
+									<li class="menu-item menu-item-has-children menu-item--static menu-item-main @(isHome ? "current-menu-item" : "")">
+										<a asp-controller="Home" asp-action="Index">Home</a>
+									</li>
+									<li class="menu-item @(isAbout ? "current-menu-item" : "")">
+										<a asp-controller="About" asp-action="Index">About</a>
+									</li>
+									<li class="menu-item menu-item-has-children menu-item--static @(isList ? "current-menu-item" : "")">
+										<a asp-controller="List" asp-action="Index">List</a>
+									</li>
+									<li class="menu-item @(isProduct ? "current-menu-item" : "")">
+										<a asp-controller="Product" asp-action="Index">Products</a>
+									</li>
+									<li class="menu-item menu-item-has-children @(isBlog ? "current-menu-item" : "")">
+										<a asp-controller="Blog" asp-action="Index">
+											Blog
+										</a>
+									</li>
+
+									<li class="menu-item @(isContact ? "current-menu-item" : "")">
+										<a asp-controller="Contact" asp-action="Index">Contact</a>
+									</li>
+								</ul>
+
+								<!-- Mobile Action Icons (visible only in mobile menu) -->
+								<div class="mobile-action-icons">
+									<div class="mobile-icons-grid">
+										<a asp-controller="Calculator" asp-action="Index" class="mobile-icon-item">
+											<div class="mobile-icon-wrap">
+												<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<rect x="7" y="5" width="10" height="4" rx="1" stroke="#1C1C1C" stroke-width="1.5"/>
+													<circle cx="8" cy="13" r="1" fill="#1C1C1C"/>
+													<circle cx="12" cy="13" r="1" fill="#1C1C1C"/>
+													<circle cx="16" cy="13" r="1" fill="#1C1C1C"/>
+													<circle cx="8" cy="17" r="1" fill="#1C1C1C"/>
+													<circle cx="12" cy="17" r="1" fill="#1C1C1C"/>
+													<circle cx="16" cy="17" r="1" fill="#1C1C1C"/>
+												</svg>
+											</div>
+											<span class="mobile-icon-label">Kalkulyator</span>
+										</a>
+										<a asp-controller="Payment" asp-action="Index" class="mobile-icon-item">
+											<div class="mobile-icon-wrap">
+												<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M3 6H21" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+											</div>
+											<span class="mobile-icon-label">Səbət</span>
+										</a>
+										<a asp-controller="Compare" asp-action="Index" class="mobile-icon-item">
+											<div class="mobile-icon-wrap">
+												<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M16.5 13.5L19.5 16.5L16.5 19.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M4.5 16.5H19.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M7.5 10.5L4.5 7.5L7.5 4.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M19.5 7.5H4.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												@if (compareCount > 0)
+												{
+													<span class="mobile-icon-badge">@compareCount</span>
+												}
+											</div>
+											<span class="mobile-icon-label">Müqayisə</span>
+										</a>
+										<a asp-controller="Wishlist" asp-action="Index" class="mobile-icon-item">
+											<div class="mobile-icon-wrap">
+												<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M12 21C12 21 2.25 15.75 2.25 9.5625C2.25 8.21984 2.78337 6.93217 3.73277 5.98277C4.68217 5.03337 5.96984 4.5 7.3125 4.5C9.43031 4.5 11.2444 5.65406 12 7.5C12.7556 5.65406 14.5697 4.5 16.6875 4.5C18.0302 4.5 19.3178 5.03337 20.2672 5.98277C21.2166 6.93217 21.75 8.21984 21.75 9.5625C21.75 15.75 12 21 12 21Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											</div>
+											@if (wishlistCount > 0)
+											{
+												<span class="mobile-icon-badge">@wishlistCount</span>
+											}
+										</a>
+										@if (currentUser != null)
+										{
+											<a asp-controller="Notification" asp-action="Index" class="mobile-icon-item">
+												<div class="mobile-icon-wrap">
+													<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+														<path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													</svg>
+													@if (notifCount > 0)
+													{
+														<span class="mobile-icon-badge">@notifCount</span>
+													}
+												</div>
+												<span class="mobile-icon-label">Bildirişlər</span>
+											</a>
+											<a asp-controller="Message" asp-action="Index" class="mobile-icon-item">
+												<div class="mobile-icon-wrap">
+													<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													</svg>
+												</div>
+												<span class="mobile-icon-label">Mesajlar</span>
+											</a>
+										}
+									</div>
+								</div>
+								<!-- /Mobile Action Icons -->
+							</nav>
+							<!-- /Menu -->
+
+							<div class="header-button mobile-hidden-header-button flex items-center gap-20">
+								@if (currentUser != null)
+								{
+									<div class="user-dropdown">
+										<button type="button" class="btn btn-line btn-large font-weight-600 bg-sign-in user-dropdown-toggle">
+											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<g clip-path="url(#clip0_user_d)">
+													<path d="M12 15C15.3137 15 18 12.3137 18 9C18 5.68629 15.3137 3 12 3C8.68629 3 6 5.68629 6 9C6 12.3137 8.68629 15 12 15Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+													<path d="M3 20.25C4.81594 17.1122 8.11406 15 12 15C15.8859 15 19.1841 17.1122 21 20.25" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												</g>
+											</svg>
+											@currentUser.FullName.Split(' ')[0]
+											<svg class="ud-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M4 6L8 10L12 6" stroke="#9FA1A4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											</svg>
+										</button>
+										<div class="user-dropdown-menu">
+											<a asp-controller="UserProfil" asp-action="Index" class="user-dropdown-item">
+												<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M12 15C15.3137 15 18 12.3137 18 9C18 5.68629 15.3137 3 12 3C8.68629 3 6 5.68629 6 9C6 12.3137 8.68629 15 12 15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M3 20.25C4.81594 17.1122 8.11406 15 12 15C15.8859 15 19.1841 17.1122 21 20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												Profil
+											</a>
+											<a asp-controller="UserListing" asp-action="Index" class="user-dropdown-item">
+												<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M8 6H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M8 12H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M8 18H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M3 6H3.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M3 12H3.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M3 18H3.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												Elanlarım
+											</a>
+											<a asp-controller="Reviews" asp-action="Index" class="user-dropdown-item">
+												<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												Rəylər
+											</a>
+											<a asp-controller="Message" asp-action="Index" class="user-dropdown-item">
+												<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												Mesajlar
+											</a>
+											<a asp-controller="Notification" asp-action="Index" class="user-dropdown-item">
+												<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+												Bildirişlər
+												@if (notifCount > 0)
+												{
+													<span style="background:#FF5722;color:#fff;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:auto;">@notifCount</span>
+												}
+											</a>
+											<a asp-controller="ChangePassword" asp-action="Index" class="user-dropdown-item">
+												<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													<path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											</a>
+											@if (User.IsInRole("SuperAdmin"))
+											{
+												<a asp-controller="Account" asp-action="ManageUsers" class="user-dropdown-item">
+													<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+														<path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+														<path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+														<path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													</svg>
+													İstifadəçilər
+												</a>
+											}
+											<div class="user-dropdown-divider"></div>
+											<form asp-controller="Account" asp-action="Logout" method="post">
+												@Html.AntiForgeryToken()
+												<button type="submit" class="user-dropdown-item text-danger">
+													<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M16.3135 8.0625L20.2510 12L16.3135 15.9375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+														<path d="M9.75 12H20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+														<path d="M9.75 20.25H4.5C4.30109 20.25 4.11032 20.171 3.96967 20.0303C3.82902 19.8897 3.75 19.6989 3.75 19.5V4.5C3.75 4.30109 3.82902 4.11032 3.96967 3.96967C4.11032 3.82902 4.30109 3.75 4.5 3.75H9.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+													</svg>
+													Çıxış
+												</button>
+											</form>
+										</div>
+									</div>
+								}
+								else
+								{
+									<a class="btn btn-line btn-large font-weight-600 bg-sign-in open-modal" data-modal-id="#LoginModal" href="#">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<g clip-path="url(#clip0_13399_20436)">
+												<path d="M12 15C15.3137 15 18 12.3137 18 9C18 5.68629 15.3137 3 12 3C8.68629 3 6 5.68629 6 9C6 12.3137 8.68629 15 12 15Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												<path d="M3 20.25C4.81594 17.1122 8.11406 15 12 15C15.8859 15 19.1841 17.1122 21 20.25" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											</g>
+										</svg>
+										Sign In
+									</a>
+								}
+								<!-- Add Listing Button -->
+								<a asp-controller="AddListing" asp-action="Index" class="btn btn-primary btn-large font-weight-600">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+										<g clip-path="url(#clip0_13399_20442)">
+											<path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											<path d="M8.25 12H15.75" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											<path d="M12 8.25V15.75" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+										</g>
+										<defs><clipPath><rect width="24" height="24" fill="white" /></clipPath></defs>
+									</svg>
+									Add Listing
+								</a>
+							</div>
+
+							<div class="header-actions ml-20">
+								<div class="header-search-wrapper">
+									<span class="header-action-btn" id="searchToggle">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<g clip-path="url(#clip0_13399_20449)">
+												<path d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												<path d="M15.8047 15.8047L21.0012 21.0012" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											</g>
+										</svg>
+									</span>
+									<!-- Search Form -->
+									<div class="search-form" id="searchForm">
+										<form class="search-form__form" action="#" method="get">
+											<input type="text" class="search-form__input" placeholder="Search..." autocomplete="off" id="searchInput">
+										</form>
+									</div>
+									<!-- Search Form -->
+								</div>
+
+								<!-- Calculator Icon -->
+								<a asp-controller="Calculator" asp-action="Index" class="header-action-btn header-action-icon" aria-label="Calculator" title="Calculator" style="position:relative;">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+										<rect x="7" y="5" width="10" height="4" rx="1" stroke="#1C1C1C" stroke-width="1.5"/>
+										<circle cx="8" cy="13" r="1" fill="#1C1C1C"/>
+										<circle cx="12" cy="13" r="1" fill="#1C1C1C"/>
+										<circle cx="16" cy="13" r="1" fill="#1C1C1C"/>
+										<circle cx="8" cy="17" r="1" fill="#1C1C1C"/>
+										<circle cx="12" cy="17" r="1" fill="#1C1C1C"/>
+										<circle cx="16" cy="17" r="1" fill="#1C1C1C"/>
+									</svg>
+								</a>
+
+								<!-- Shopping Cart Icon -->
+								<a asp-controller="Payment" asp-action="Index" class="header-action-btn header-action-icon" aria-label="Shopping Cart" title="Shopping Cart" style="position:relative;">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+										<path d="M3 6H21" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+										<path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+									</svg>
+								</a>
+
+								@if (currentUser != null)
+								{
+									<a asp-controller="Notification" asp-action="Index" class="header-action-btn header-action-icon" aria-label="Bildirişlər" style="position:relative;">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											<path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+										</svg>
+										@if (notifCount > 0)
+										{
+											<span id="notifNavCount" class="nav-count-badge">@notifCount</span>
+										}
+										else
+										{
+											<span id="notifNavCount" class="nav-count-badge" style="display:none;">0</span>
+										}
+									</a>
+
+									<a asp-controller="Message" asp-action="Index" class="header-action-btn header-action-icon" aria-label="Mesajlar" style="position:relative;">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+										</svg>
+										<span id="navMsgBadge" class="nav-count-badge" style="display:none;background:#25d366;"></span>
+									</a>
+								}
+
+								<a asp-controller="Compare" asp-action="Index" class="header-action-btn header-action-icon" aria-label="Compare" style="position:relative;">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<g clip-path="url(#clip0_13399_20454)">
+											<path d="M16.5 13.5L19.5 16.5L16.5 19.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											<path d="M4.5 16.5H19.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											<path d="M7.5 10.5L4.5 7.5L7.5 4.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											<path d="M19.5 7.5H4.5" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+										</g>
+									</svg>
+									@if (compareCount > 0)
+									{
+										<span id="compareNavCount" class="nav-count-badge">@compareCount</span>
+									}
+									else
+									{
+										<span id="compareNavCount" class="nav-count-badge" style="display:none;">0</span>
+									}
+								</a>
+
+								<a asp-controller="Wishlist" asp-action="Index" class="header-action-btn header-action-icon" aria-label="Wishlist" style="position:relative;">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<g clip-path="url(#clip0_13399_20463)">
+											<path d="M12 21C12 21 2.25 15.75 2.25 9.5625C2.25 8.21984 2.78337 6.93217 3.73277 5.98277C4.68217 5.03337 5.96984 4.5 7.3125 4.5C9.43031 4.5 11.2444 5.65406 12 7.5C12.7556 5.65406 14.5697 4.5 16.6875 4.5C18.0302 4.5 19.3178 5.03337 20.2672 5.98277C21.2166 6.93217 21.75 8.21984 21.75 9.5625C21.75 15.75 12 21 12 21Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+										</g>
+									</svg>
+									@if (wishlistCount > 0)
+									{
+										<span id="wishlistNavCount" class="nav-count-badge">@wishlistCount</span>
+									}
+									else
+									{
+										<span id="wishlistNavCount" class="nav-count-badge" style="display:none;">0</span>
+									}
+								</a>
+								<div class="mobile-button"><span></span></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+		</div>
+		<!-- /Header -->
+
+		@RenderBody()
+
+		<!-- Footer -->
+		<footer class="bg-primary footer">
+			<div class="footer-top">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="footer-top-inner">
+								<div>
+									<a asp-controller="Home" asp-action="Index">
+										<img class="logo" src="~/assets/images/logo-white.png" alt="logo">
+									</a>
+
+									<p class="text-xs uppercase font-weight-500 mb-8 text-muted">Opening Hours:</p>
+
+									<p class="text-white mb-28">
+										Monday–Friday from 8 AM to 8 PM <br>
+										Saturday from 9 AM to 6 PM EST
+									</p>
+								</div>
+
+								<form class="form-footer relative" action="#">
+									<input type="text" placeholder="Enter your e-mail" name="footer-email" id="footer-email" required>
+									<button type="submit" class="btn-submit">
+										<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M19.1279 6V15.75C19.1279 16.0484 19.0094 16.3345 18.7984 16.5455C18.5874 16.7565 18.3013 16.875 18.0029 16.875C17.7045 16.875 17.4184 16.7565 17.2074 16.5455C16.9964 16.3345 16.8779 16.0484 16.8779 15.75V8.71875L6.79883 18.7959C6.58748 19.0073 6.30084 19.126 6.00195 19.126C5.70307 19.126 5.41642 19.0073 5.20508 18.7959C4.99373 18.5846 4.875 18.2979 4.875 17.9991C4.875 17.7002 4.99373 17.4135 5.20508 17.2022L15.2841 7.125H8.25289C7.95452 7.125 7.66837 7.00647 7.45739 6.7955C7.24642 6.58452 7.12789 6.29837 7.12789 6C7.12789 5.70163 7.24642 5.41548 7.45739 5.2045C7.66837 4.99353 7.95452 4.875 8.25289 4.875H18.0029C18.3013 4.875 18.5874 4.99353 18.7984 5.2045C19.0094 5.41548 19.1279 5.70163 19.1279 6Z" fill="#1C1C1C" />
+										</svg>
+									</button>
+								</form>
+							</div>
+						</div>
+
+						<div class="col-lg-4">
+							<div class="flex justify-between gap-8 footer-links">
+								<div class="collapse">
+									<p class="font-weight-600 text-white mb-14 collapse-title justify-between" data-breakpoint="mobile">
+										QUICK LINKS
+										<span class="icon text-white hidden md-block">
+											+
+										</span>
+									</p>
+									<ul class="widget-links collapse-content md-hidden">
+										<li>
+											<a asp-controller="About" asp-action="Index">About Us</a>
+										</li>
+										<li>
+											<a asp-controller="List" asp-action="Index">Buying a car</a>
+										</li>
+										<li>
+											<a asp-controller="SellYourCar" asp-action="Index">Selling a car</a>
+										</li>
+										<li>
+											<a asp-controller="Blog" asp-action="Index">News</a>
+										</li>
+										<li>
+											<a asp-controller="Contact" asp-action="Index">Contact Us</a>
+										</li>
+									</ul>
+								</div>
+								<div class="collapse">
+									<p class="font-weight-600 text-white mb-14 collapse-title justify-between" data-breakpoint="mobile">
+										BUYING & SELLING
+										<span class="icon text-white hidden md-block">
+											+
+										</span>
+									</p>
+									<ul class="widget-links collapse-content md-hidden">
+										<li>
+											<a asp-controller="Calculator" asp-action="Index">Financing</a>
+										</li>
+										<li>
+											<a asp-controller="List" asp-action="Index">Find a Car</a>
+										</li>
+										<li>
+											<a asp-controller="SalesAgent" asp-action="Index">Find a Dealer</a>
+										</li>
+										<li>
+											<a asp-controller="List" asp-action="Index">Listings by City</a>
+										</li>
+										<li>
+<a asp-controller="List" asp-action="Index">Certified Pre-Owned</a>
+</li>
+<li>
+<a asp-controller="Calculator" asp-action="Index">Car Payment Calculators</a>
+</li>
+<li>
+<a asp-controller="ClientsReviews" asp-action="Index">Car Reviews & Ratings</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="col-lg-4">
+<div class="footer-contact">
+<div>
+<p class="font-weight-500 text-white mb-8">
+<a href="tel:1-866-288-6868" class="flex items-start h7">1-866-288-6868</a>
+</p>
+<a href="#" class="block font-weight-500 text-white mb-20 h7">
+6205 Peachtree Dunwoody Rd, Atlanta, GA 30328
+</a>
+
+<ul class="widget-socical mb-12">
+<li>
+<a href="https://www.facebook.com/" target="_blank">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16980_9933)">
+<path d="M11.5502 20V10.8777H14.6109L15.0701 7.32156H11.5502V5.05147C11.5502 4.0222 11.8348 3.32076 13.3125 3.32076L15.194 3.31999V0.13923C14.8686 0.0969453 13.7517 0 12.4517 0C9.73708 0 7.87861 1.65697 7.87861 4.69927V7.32156H4.80859V10.8777H7.87861V20H11.5502Z" fill="white" />
+</g>
+</svg>
+</a>
+</li>
+<li>
+<a href="https://x.com/" target="_blank">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16980_9937)">
+<path d="M11.8616 8.46864L19.147 0H17.4206L11.0947 7.3532L6.04225 0H0.214844L7.85515 11.1193L0.214844 20H1.94134L8.62162 12.2348L13.9574 20H19.7848L11.8612 8.46864H11.8616ZM9.49695 11.2173L8.72283 10.1101L2.56342 1.29967H5.21521L10.1859 8.40994L10.96 9.51718L17.4214 18.7594H14.7696L9.49695 11.2177V11.2173Z" fill="white" />
+</g>
+</svg>
+</a>
+</li>
+<li>
+<a href="https://www.instagram.com/">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_16980_9941)">
+<path d="M14.9996 0H4.99988C2.25019 0 0 2.25019 0 4.99988V15.0001C0 17.7491 2.25019 20 4.99988 20H14.9996C17.7493 20 19.9995 17.7491 19.9995 15.0001V4.99988C19.9995 2.25019 17.7493 0 14.9996 0ZM18.3328 15.0001C18.3328 16.8376 16.8381 18.3333 14.9996 18.3333H4.99988C3.16218 18.3333 1.66671 16.8376 1.66671 15.0001V4.99988C1.66671 3.16193 3.16218 1.66671 4.99988 1.66671H14.9996C16.8381 1.66671 18.3328 3.16193 18.3328 4.99988V15.0001Z" fill="white" />
+<path d="M15.4179 5.83392C16.1083 5.83392 16.6679 5.27429 16.6679 4.58395C16.6679 3.89361 16.1083 3.33398 15.4179 3.33398C14.7276 3.33398 14.168 3.89361 14.168 4.58395C14.168 5.27429 14.7276 5.83392 15.4179 5.83392Z" fill="white" />
+<path d="M9.99988 5C7.23793 5 5 7.23818 5 9.99988C5 12.7606 7.23793 15.0002 9.99988 15.0002C12.761 15.0002 14.9998 12.7606 14.9998 9.99988C14.9998 7.23818 12.761 5 9.99988 5ZM9.99988 13.3335C8.15915 13.3335 6.66671 11.8411 6.66671 9.99988C6.66671 8.15866 8.15915 6.66671 9.99988 6.66671C11.8406 6.66671 13.333 8.15866 13.333 9.99988C13.333 11.8411 11.8406 13.3335 9.99988 13.3335Z" fill="white" />
+</g>
+</svg>
+</a>
+</li>
+<li>
+<a href="https://www.tiktok.com/" target="_blank">
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M18.125 6.25V9.375C18.125 9.54076 18.0592 9.69973 17.9419 9.81694C17.8247 9.93415 17.6658 10 17.5 10C16.1944 10.003 14.9075 9.6891 13.75 9.08516V12.1875C13.75 13.7622 13.1244 15.2724 12.0109 16.3859C10.8974 17.4994 9.38722 18.125 7.8125 18.125C6.23778 18.125 4.72755 17.4994 3.61405 16.3859C2.50056 15.2724 1.875 13.7622 1.875 12.1875C1.875 9.30469 3.97734 6.75625 6.76562 6.25938C6.85558 6.24339 6.94794 6.24731 7.03621 6.27088C7.12447 6.29444 7.2065 6.33707 7.27652 6.39576C7.34653 6.45446 7.40283 6.52778 7.44144 6.61058C7.48005 6.69338 7.50004 6.78364 7.5 6.875V10.2102C7.50004 10.3284 7.46651 10.4443 7.40331 10.5443C7.34011 10.6443 7.24983 10.7243 7.14297 10.775C6.89034 10.8948 6.67449 11.0802 6.51793 11.3119C6.36137 11.5435 6.26983 11.8129 6.25288 12.092C6.23592 12.3711 6.29416 12.6496 6.42152 12.8985C6.54888 13.1474 6.74069 13.3576 6.97695 13.5071C7.21322 13.6566 7.48527 13.74 7.76474 13.7486C8.0442 13.7571 8.32084 13.6905 8.5658 13.5557C8.81076 13.4209 9.01506 13.2229 9.15739 12.9822C9.29972 12.7415 9.37487 12.4671 9.375 12.1875V1.875C9.375 1.70924 9.44085 1.55027 9.55806 1.43306C9.67527 1.31585 9.83424 1.25 10 1.25H13.125C13.2908 1.25 13.4497 1.31585 13.5669 1.43306C13.6842 1.55027 13.75 1.70924 13.75 1.875C13.751 2.86924 14.1465 3.82247 14.8495 4.52551C15.5525 5.22855 16.5058 5.62397 17.5 5.625C17.6658 5.625 17.8247 5.69085 17.9419 5.80806C18.0592 5.92527 18.125 6.08424 18.125 6.25Z" fill="white" />
+</svg>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="divider divider-blur"></div>
+<div class="footer-bottom">
+<div class="container">
+<div class="flex justify-between md-flex-col">
+<p class="text-sm text-muted">©2026 Aurexo. All Rights Reserved.</p>
+<ul class="footer-bottom-links">
+<li><a asp-controller="Termsofuse" asp-action="Index">Terms Of Services</a></li>
+</ul>
+</div>
+</div>
+</div>
+</footer>
+<!-- /Footer -->
+</div>
+
+	<!-- ==================== AI CHAT POPUP ==================== -->
+	<div id="aiChatWidget">
+		<!-- Floating Button -->
+		<button id="aiChatToggle" type="button" aria-label="AI Assistant" title="AI Assistant">
+			<svg id="aiChatIconOpen" width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M12 2C6.48 2 2 5.58 2 10c0 2.24 1.12 4.26 2.93 5.72L4 20l4.35-2.18C9.5 18.26 10.72 18.5 12 18.5c5.52 0 10-3.58 10-8S17.52 2 12 2z" fill="white"/>
+				<circle cx="8" cy="10" r="1.2" fill="#FF5722"/>
+				<circle cx="12" cy="10" r="1.2" fill="#FF5722"/>
+				<circle cx="16" cy="10" r="1.2" fill="#FF5722"/>
+			</svg>
+			<svg id="aiChatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+				<path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+			</svg>
+		</button>
+
+		<!-- Chat Window -->
+		<div id="aiChatWindow" style="display:none;">
+			<div id="aiChatHeader">
+				<div style="display:flex;align-items:center;gap:10px;">
+					<div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 5.58 2 10c0 2.24 1.12 4.26 2.93 5.72L4 20l4.35-2.18C9.5 18.26 10.72 18.5 12 18.5c5.52 0 10-3.58 10-8S17.52 2 12 2z" fill="#FF5722"/></svg>
+					</div>
+					<div>
+						<p style="margin:0;font-size:15px;font-weight:700;color:#fff;">Aurexo Assistant</p>
+						<p id="aiChatStatus" style="margin:0;font-size:11px;color:rgba(255,255,255,0.7);">Online</p>
+					</div>
+				</div>
+				<button type="button" id="aiChatClear" title="Söhbəti təmizlə" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;padding:6px 8px;cursor:pointer;color:#fff;font-size:12px;display:flex;align-items:center;gap:4px;">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					Təmizlə
+				</button>
+			</div>
+			<div id="aiChatMessages">
+				<!-- Welcome message -->
+				<div class="ai-msg ai-msg--bot">
+					<div class="ai-msg__avatar">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 5.58 2 10c0 2.24 1.12 4.26 2.93 5.72L4 20l4.35-2.18C9.5 18.26 10.72 18.5 12 18.5c5.52 0 10-3.58 10-8S17.52 2 12 2z" fill="#FF5722"/></svg>
+					</div>
+					<div class="ai-msg__bubble">Salam! Mən Aurexo Assistant-am 🚗 Avtomobil haqqında istənilən sualınızda sizə kömək edə bilərəm. Necə kömək edim?</div>
+				</div>
+			</div>
+			<div id="aiChatTyping" style="display:none;padding:0 16px 8px;">
+				<div class="ai-msg ai-msg--bot">
+					<div class="ai-msg__avatar">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 5.58 2 10c0 2.24 1.12 4.26 2.93 5.72L4 20l4.35-2.18C9.5 18.26 10.72 18.5 12 18.5c5.52 0 10-3.58 10-8S17.52 2 12 2z" fill="#FF5722"/></svg>
+					</div>
+					<div class="ai-msg__bubble ai-typing">
+						<span class="ai-dot"></span><span class="ai-dot"></span><span class="ai-dot"></span>
+					</div>
+				</div>
+			</div>
+			<form id="aiChatForm">
+				<input type="text" id="aiChatInput" placeholder="Mesajınızı yazın..." autocomplete="off" maxlength="500" />
+				<button type="submit" id="aiChatSend" aria-label="Göndər">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+				</button>
+			</form>
+		</div>
+	</div>
+
+	<style>
+		/* ===== AI Chat Widget ===== */
+		#aiChatToggle {
+			position: fixed;
+			bottom: 24px;
+			right: 24px;
+			z-index: 99998;
+			width: 60px;
+			height: 60px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, #FF5722, #ff7043);
+			border: none;
+			cursor: pointer;
+			box-shadow: 0 4px 20px rgba(255,87,34,0.4);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: transform 0.3s, box-shadow 0.3s;
+		}
+		#aiChatToggle:hover {
+			transform: scale(1.08);
+			box-shadow: 0 6px 28px rgba(255,87,34,0.5);
+		}
+
+		#aiChatWindow {
+			position: fixed;
+			bottom: 96px;
+			right: 24px;
+			z-index: 99997;
+			width: 380px;
+			max-width: calc(100vw - 32px);
+			height: 520px;
+			max-height: calc(100vh - 140px);
+			background: #fff;
+			border-radius: 20px;
+			box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+			animation: aiChatSlideUp 0.3s ease;
+		}
+		@@keyframes aiChatSlideUp {
+			from { opacity: 0; transform: translateY(20px); }
+			to   { opacity: 1; transform: translateY(0); }
+		}
+
+		#aiChatHeader {
+			background: linear-gradient(135deg, #FF5722, #e64a19);
+			padding: 16px 18px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-shrink: 0;
+		}
+
+		#aiChatMessages {
+			flex: 1;
+			overflow-y: auto;
+			padding: 16px;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			scroll-behavior: smooth;
+		}
+		#aiChatMessages::-webkit-scrollbar { width: 4px; }
+#aiChatMessages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+/* Message styles */
+.ai-msg {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	max-width: 85%;
+}
+.ai-msg--user {
+	align-self: flex-end;
+	flex-direction: row-reverse;
+}
+.ai-msg--bot {
+	align-self: flex-start;
+}
+.ai-msg__avatar {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: #f3f4f6;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+.ai-msg--user .ai-msg__avatar {
+	background: #FF5722;
+}
+.ai-msg__bubble {
+	padding: 10px 14px;
+	border-radius: 16px;
+	font-size: 13.5px;
+	line-height: 1.5;
+	word-break: break-word;
+}
+.ai-msg--bot .ai-msg__bubble {
+	background: #f3f4f6;
+	color: #1c1c1c;
+	border-bottom-left-radius: 4px;
+}
+.ai-msg--user .ai-msg__bubble {
+	background: linear-gradient(135deg, #FF5722, #ff7043);
+	color: #fff;
+	border-bottom-right-radius: 4px;
+}
+
+/* Typing indicator */
+.ai-typing {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 12px 18px;
+}
+.ai-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #9ca3af;
+	animation: aiBounce 1.4s infinite ease-in-out;
+}
+.ai-dot:nth-child(2) { animation-delay: 0.16s; }
+.ai-dot:nth-child(3) { animation-delay: 0.32s; }
+@@keyframes aiBounce {
+	0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+	40%            { transform: scale(1);   opacity: 1; }
+}
+
+/* Input form */
+#aiChatForm {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 14px;
+	border-top: 1px solid #f3f4f6;
+	flex-shrink: 0;
+	background: #fff;
+}
+#aiChatInput {
+	flex: 1;
+	border: 1.5px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 10px 14px;
+	font-size: 13.5px;
+	outline: none;
+	transition: border-color 0.2s;
+}
+#aiChatInput:focus {
+	border-color: #FF5722;
+}
+#aiChatSend {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #FF5722, #e64a19);
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	transition: opacity 0.2s;
+}
+#aiChatSend:hover { opacity: 0.9; }
+#aiChatSend:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Mobile */
+@@media (max-width: 480px) {
+	#aiChatWindow {
+		bottom: 0;
+		right: 0;
+		width: 100vw;
+		height: 100vh;
+		max-height: 100vh;
+		border-radius: 0;
+	}
+	#aiChatToggle {
+		bottom: 16px;
+		right: 16px;
+		width: 54px;
+		height: 54px;
+	}
+}
+	</style>
+	<!-- ==================== END AI CHAT POPUP ==================== -->
+
+	<!-- ==================== MODALS ==================== -->
+
+<!-- LoginModal -->
+<div id="LoginModal" class="modal modal-login">
+	<div class="bg-modal"></div>
+	<div class="modal-content modal-sm">
+		<button class="close-modal" type="button">
+			<img src="~/assets/icons/close-modal.svg" alt="close">
+		</button>
+		<div class="modal-container">
+			<div class="modal-inner">
+				<h2 class="mb-20 text-center">Daxil Ol</h2>
+
+				<div id="loginErrorContainer" class="mb-16 p-12" style="background:#fee2e2;color:#dc2626;border-radius:8px;display:none;"></div>
+
+				@{
+					var googleReturnUrl = Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString);
+				}
+
+				<form asp-controller="Account" asp-action="Login" method="post" id="loginForm">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+					<label for="email-login" class="mb-20 px-2">
+						<span class="mb-8 flex">Email*</span>
+						<input class="input-large" type="email" id="email-login" name="Email"
+							   placeholder="Email daxil edin" required autocomplete="email">
+					</label>
+
+					<label for="Password-login" class="mb-24 px-2">
+						<span class="flex mb-8">Şifrə*</span>
+						<input class="input-large password-input is-hidden" type="password"
+							   id="Password-login" name="Password"
+							   placeholder="Şifrə" required minlength="8" autocomplete="current-password">
+					</label>
+
+					<div class="flex justify-between gap-12 mb-20">
+						<label class="filter-checkbox style-5">
+														<input type="checkbox" name="RememberMe" value="true">
+							<span class="text-sm">Məni xatırla</span>
+						</label>
+						<span class="text-sm font-bold text-underline open-modal cursor-pointer"
+							  data-modal-id="#ForgotPasswordModal">Şifrəni unutdunuz?</span>
+					</div>
+
+					<button type="submit" class="btn btn-primary btn-large w-full mb-12 font-weight-600">
+						Daxil Ol
+					</button>
+				</form>
+
+				<!-- Google OAuth -->
+				<div class="flex items-center gap-8 my-12">
+					<div style="flex:1;height:1px;background:#e5e7eb;"></div>
+					<span class="text-sm text-secondary">və ya</span>
+					<div style="flex:1;height:1px;background:#e5e7eb;"></div>
+				</div>
+
+				<a href="/Account/GoogleLogin?returnUrl=@googleReturnUrl"
+				   class="btn btn-large w-full font-weight-600 mb-16"
+				   style="border:1.5px solid #e5e7eb;background:#fff;color:#1C1C1C;display:flex;align-items:center;justify-content:center;gap:10px;">
+					<svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+						<path fill="#4285F4" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/>
+						<path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.7 16 0 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 16.1 4 9.3 8.4 6.3 14.7z"/>
+						<path fill="#FBBC05" d="M24 44c5.2 0 9.9-1.8 13.5-4.8l-6.2-5.2C29.2 35.6 26.7 36.5 24 36.5c-5.1 0-9.5-3.2-11.2-7.7L6.2 34c3.1 6.4 9.8 10 17.8 10z"/>
+						<path fill="#EA4335" d="M43.6 20.5H42V20H24v8h11.3c-.9 2.5-2.5 4.6-4.6 6l6.2 5.2C40.9 35.7 44 30.3 44 24c0-1.2-.1-2.3-.4-3.5z"/>
+					</svg>
+					Google ilə Daxil Ol
+				</a>
+
+				<p class="text-sm text-secondary flex gap-8 justify-center">
+					Qeydiyyatdan keçməmisiniz?
+					<span class="text-sm font-weight-600 text-underline open-modal cursor-pointer"
+						  data-modal-id="#SignUpModal">Qeydiyyat</span>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- SignUpModal -->
+<div id="SignUpModal" class="modal modal-login">
+	<div class="bg-modal"></div>
+	<div class="modal-content modal-sm">
+		<button class="close-modal" type="button">
+			<img src="~/assets/icons/close-modal.svg" alt="close">
+		</button>
+		<div class="modal-container">
+			<div class="modal-inner">
+				<h2 class="mb-20 text-center">Qeydiyyat</h2>
+
+				<div id="registerErrorContainer" class="mb-16 p-12" style="background:#fee2e2;color:#dc2626;border-radius:8px;display:none;"></div>
+
+				<form asp-controller="Account" asp-action="Register" method="post" id="registerForm">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+					<!-- Rol Seçimi -->
+					<div class="flex gap-12 mb-20 px-2">
+						<label class="role-selector flex-1" style="cursor:pointer;">
+							<input type="radio" name="Role" id="role-user" value="User" checked style="display:none;">
+							<div id="role-user-box" style="border:2px solid #FF5722;border-radius:10px;padding:12px 16px;text-align:center;background:#fff5f2;transition:border-color 0.2s,background 0.2s;">
+								<p style="font-size:22px;margin-bottom:4px;">👤</p>
+								<p style="font-size:13px;font-weight:600;margin:0;">İstifadəçi</p>
+								<p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">Avtomobil al / sat</p>
+							</div>
+						</label>
+						<label class="role-selector flex-1" style="cursor:pointer;">
+							<input type="radio" name="Role" id="role-agent" value="Agent" style="display:none;">
+							<div id="role-agent-box" style="border:2px solid #e0e0e0;border-radius:10px;padding:12px 16px;text-align:center;background:#fff;transition:border-color 0.2s,background 0.2s;">
+								<p style="font-size:22px;margin-bottom:4px;">🔑</p>
+								<p style="font-size:13px;font-weight:600;margin:0;">Agent</p>
+								<p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">Avtomobil kiralayıcı</p>
+							</div>
+						</label>
+					</div>
+
+					<label for="email-register" class="mb-20 px-2">
+						<span class="mb-8 flex">Email*</span>
+						<input class="input-large" type="email" id="email-register" name="Email"
+							   placeholder="Email daxil edin" required autocomplete="email">
+					</label>
+
+					<label for="fullName-register" class="mb-20 px-2">
+						<span class="mb-8 flex">Ad, Soyad*</span>
+						<input class="input-large" type="text" id="fullName-register" name="FullName"
+							   placeholder="Ad, Soyad daxil edin" required>
+					</label>
+
+					<label for="password-register" class="mb-24 px-2">
+						<span class="flex mb-8">Şifrə*</span>
+						<input class="input-large password-input is-hidden" type="password"
+							   id="password-register" name="Password"
+							   placeholder="Şifrə" required minlength="8" autocomplete="new-password">
+					</label>
+
+					<label for="confirmPassword-register" class="mb-24 px-2">
+						<span class="flex mb-8">Şifrəni təsdiq et*</span>
+						<input class="input-large password-input is-hidden" type="password"
+							   id="confirmPassword-register" name="ConfirmPassword"
+							   placeholder="Şifrəni təsdiq et" required minlength="8" autocomplete="new-password">
+					</label>
+
+					<div class="flex justify-between gap-12 mb-20">
+						<label class="filter-checkbox style-5">
+							<input type="checkbox" name="AgreeToTerms" value="true" required>
+							<span class="text-sm">
+								Şərtlərlə razıyam
+								<a asp-controller="Termsofuse" asp-action="Index" target="_blank" class="text-primary">
+									Şərtlər
+								</a>
+							</span>
+						</label>
+					</div>
+
+					<button type="submit" class="btn btn-primary btn-large w-full mb-12 font-weight-600">
+						Qeydiyyat
+					</button>
+
+					<p class="text-sm text-secondary flex gap-8 justify-center">
+						Artıq üzv varsınız?
+						<span class="text-sm font-weight-600 text-underline open-modal cursor-pointer"
+						  data-modal-id="#LoginModal">Daxil Ol</span>
+					</p>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /SignUpModal -->
+
+<!-- ForgotPasswordModal -->
+<div id="ForgotPasswordModal" class="modal modal-login">
+	<div class="bg-modal"></div>
+	<div class="modal-content modal-sm">
+		<button class="close-modal" type="button">
+			<img src="~/assets/icons/close-modal.svg" alt="close">
+		</button>
+		<div class="modal-container">
+			<div class="modal-inner">
+				<h2 class="mt-20 mb-20 text-center">Şifrəni Unutdunuz?</h2>
+
+				<div id="forgotPasswordMsg" class="mb-16 p-12" style="border-radius:8px;display:none;"></div>
+
+				<form asp-controller="Account" asp-action="ForgotPassword" method="post" id="forgotPasswordForm">
+					@Html.AntiForgeryToken()
+					<label for="email-forgot-password" class="mb-20 px-2">
+						<span class="mb-8 flex">Email *</span>
+						<input class="input-large" type="email" id="email-forgot-password"
+							   name="email" placeholder="Email daxil edin" required autocomplete="email">
+					</label>
+					<button type="submit" class="btn btn-primary btn-large w-full mb-12 font-weight-600">
+						Sıfırlama Linki Göndər
+					</button>
+				</form>
+				<p class="text-sm text-secondary flex gap-8 justify-center">
+					Qeydiyyatdan keçməmisiniz?
+					<span class="text-sm font-weight-600 text-underline open-modal cursor-pointer"
+						  data-modal-id="#SignUpModal">Qeydiyyat</span>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /ForgotPasswordModal -->
+
+<!-- Search Modal -->
+<div id="SearchModal" class="search-modal">
+	<div class="search-modal__overlay"></div>
+	<div class="search-modal__content">
+		<button class="search-modal__close" id="searchModalClose" type="button">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+		</button>
+		<h2 class="search-modal__title">WHAT ARE YOU LOOKING FOR?</h2>
+		<form class="search-modal__form" action="#" method="get">
+			<div class="search-modal__input-wrapper">
+				<input type="text" class="search-modal__input" placeholder="Search for anything" autocomplete="off">
+				<button type="submit" class="search-modal__submit" aria-label="Search">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+						<path d="M15.8047 15.8047L21.0012 21.0012" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+<!-- /Search Modal -->
+
+<!-- ==================== END MODALS ==================== -->
+
+<!-- Scripts -->
+<script src="~/assets/js/jquery.min.js"></script>
+<script src="~/assets/js/jquery.cookie.min.js"></script>
+<script src="~/assets/js/swiper-bundle.min.js"></script>
+<script src="~/assets/js/wow.min.js"></script>
+<script src="~/assets/js/jquery.fancybox.js"></script>
+<script src="~/assets/js/simpleParallaxVanilla.umd.js"></script>
+<script src="~/assets/js/app.js"></script>
+<script src="~/assets/js/swiper.js"></script>
+<script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+<script>
+	// ====== AI CHAT WIDGET ======
+	(function () {
+		"use strict";
+
+		var toggle   = document.getElementById('aiChatToggle');
+		var chatWin  = document.getElementById('aiChatWindow');
+		var iconOpen = document.getElementById('aiChatIconOpen');
+		var iconClose= document.getElementById('aiChatIconClose');
+		var form     = document.getElementById('aiChatForm');
+		var input    = document.getElementById('aiChatInput');
+		var sendBtn  = document.getElementById('aiChatSend');
+		var messages = document.getElementById('aiChatMessages');
+		var typing   = document.getElementById('aiChatTyping');
+		var clearBtn = document.getElementById('aiChatClear');
+		var statusEl = document.getElementById('aiChatStatus');
+
+		if (!toggle || !chatWin) return;
+
+		var isOpen = false;
+		var connection = null;
+		var isConnected = false;
+		var isSending = false;          // mesaj göndərilir — cavab gözlənilir
+		var sendTimeoutId = null;       // safety timeout
+
+		// Toggle chat window
+		toggle.addEventListener('click', function () {
+			isOpen = !isOpen;
+			chatWin.style.display = isOpen ? 'flex' : 'none';
+			iconOpen.style.display  = isOpen ? 'none' : 'block';
+			iconClose.style.display = isOpen ? 'block' : 'none';
+			if (isOpen) {
+				ensureConnection();
+				input.focus();
+				scrollToBottom();
+			}
+		});
+
+		// Ensure SignalR connection
+		function ensureConnection() {
+			if (connection && isConnected) return;
+			if (connection) {
+				// Əgər əvvəlki connection var amma kəsilib — yenisini yarat
+				try { connection.stop(); } catch(e) {}
+				connection = null;
+			}
+
+			connection = new signalR.HubConnectionBuilder()
+				.withUrl("/aiChatHub")
+				.withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+				.build();
+
+			connection.on("AiResponse", function (response) {
+				// Cavab gəldi — sending state-i sıfırla
+				clearSendTimeout();
+				isSending = false;
+				typing.style.display = 'none';
+				setInputEnabled(true);
+				appendMessage(response, 'bot');
+				scrollToBottom();
+			});
+
+			connection.on("AiTyping", function (show) {
+				typing.style.display = show ? 'block' : 'none';
+				if (show) scrollToBottom();
+				// AiTyping(false) gəldikdə input-u aktiv et
+				if (!show) {
+					isSending = false;
+					clearSendTimeout();
+					setInputEnabled(true);
+				}
+			});
+
+			connection.on("HistoryCleared", function () {
+				messages.innerHTML = '';
+				appendMessage('Söhbət tarixçəsi təmizləndi. Yeni bir sual verə bilərsiniz! 🚗', 'bot');
+			});
+
+			connection.onreconnecting(function () {
+				isConnected = false;
+				statusEl.textContent = 'Yenidən qoşulur...';
+				statusEl.style.color = '#fbbf24';
+				// Reconnect zamanı stuck state-i sıfırla
+				resetSendingState();
+			});
+
+			connection.onreconnected(function () {
+				isConnected = true;
+				statusEl.textContent = 'Online';
+				statusEl.style.color = 'rgba(255,255,255,0.7)';
+				resetSendingState();
+			});
+
+			connection.onclose(function () {
+				isConnected = false;
+				statusEl.textContent = 'Offline';
+				statusEl.style.color = '#f87171';
+				resetSendingState();
+			});
+
+			connection.start().then(function () {
+				isConnected = true;
+				statusEl.textContent = 'Online';
+				statusEl.style.color = 'rgba(255,255,255,0.7)';
+			}).catch(function (err) {
+				console.error('AI Chat connection failed:', err);
+				statusEl.textContent = 'Bağlantı xətası';
+				statusEl.style.color = '#f87171';
+			});
+		}
+
+		// Send message
+		form.addEventListener('submit', function (e) {
+			e.preventDefault();
+			var text = input.value.trim();
+			if (!text) return;
+
+			// Bağlantı yoxdursa yenidən qoşulmağa çalış
+			if (!isConnected) {
+				ensureConnection();
+				appendMessage('Bağlantı qurulur, bir az gözləyin...', 'bot');
+				return;
+			}
+
+			// Artıq göndərilir — təkrar göndərmənin qarşısını al
+			if (isSending) return;
+
+			isSending = true;
+			setInputEnabled(false);
+			typing.style.display = 'block';
+			appendMessage(text, 'user');
+			input.value = '';
+			scrollToBottom();
+
+			// Safety timeout: 45 saniyə ərzində cavab gəlməsə input-u aç
+			sendTimeoutId = setTimeout(function () {
+				if (isSending) {
+					isSending = false;
+					typing.style.display = 'none';
+					setInputEnabled(true);
+					appendMessage('Cavab çox uzun çəkdi. Zəhmət olmasa yenidən cəhd edin.', 'bot');
+					scrollToBottom();
+				}
+			}, 45000);
+
+			connection.invoke("SendMessage", text).catch(function (err) {
+				console.error('Send error:', err);
+				clearSendTimeout();
+				isSending = false;
+				typing.style.display = 'none';
+				setInputEnabled(true);
+				appendMessage('Mesaj göndərilə bilmədi. Yenidən cəhd edin.', 'bot');
+				scrollToBottom();
+			});
+		});
+
+		// Clear history
+		clearBtn.addEventListener('click', function () {
+			if (connection && isConnected) {
+				connection.invoke("ClearHistory").catch(function (err) {
+					console.error('Clear error:', err);
+				});
+			}
+		});
+
+		function appendMessage(text, type) {
+			var div = document.createElement('div');
+			div.className = 'ai-msg ai-msg--' + type;
+
+			var avatar = document.createElement('div');
+			avatar.className = 'ai-msg__avatar';
+			if (type === 'bot') {
+				avatar.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 5.58 2 10c0 2.24 1.12 4.26 2.93 5.72L4 20l4.35-2.18C9.5 18.26 10.72 18.5 12 18.5c5.52 0 10-3.58 10-8S17.52 2 12 2z" fill="#FF5722"/></svg>';
+			} else {
+				avatar.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 15C15.3137 15 18 12.3137 18 9C18 5.68629 15.3137 3 12 3C8.68629 3 6 5.68629 6 9C6 12.3137 8.68629 15 12 15Z" stroke="white" stroke-width="2"/><path d="M3 20.25C4.81594 17.1122 8.11406 15 12 15C15.8859 15 19.1841 17.1122 21 20.25" stroke="white" stroke-width="2"/></svg>';
+			}
+
+			var bubble = document.createElement('div');
+			bubble.className = 'ai-msg__bubble';
+			bubble.textContent = text;
+
+			div.appendChild(avatar);
+			div.appendChild(bubble);
+			messages.appendChild(div);
+		}
+
+		function scrollToBottom() {
+			setTimeout(function () {
+				messages.scrollTop = messages.scrollHeight;
+			}, 50);
+		}
+
+		function setInputEnabled(enabled) {
+			input.disabled   = !enabled;
+			sendBtn.disabled = !enabled;
+			if (enabled) input.focus();
+		}
+
+		function clearSendTimeout() {
+			if (sendTimeoutId) {
+				clearTimeout(sendTimeoutId);
+				sendTimeoutId = null;
+			}
+		}
+
+		function resetSendingState() {
+			clearSendTimeout();
+			isSending = false;
+			typing.style.display = 'none';
+			setInputEnabled(true);
+		}
+	})();
+
+	// ====== Role Selector ======
+	(function () {
+		var userRadio  = document.getElementById('role-user');
+		var agentRadio = document.getElementById('role-agent');
+		var userBox    = document.getElementById('role-user-box');
+		var agentBox   = document.getElementById('role-agent-box');
+
+		if (!userRadio || !agentRadio) return;
+
+		var activeStyle   = 'border:2px solid #FF5722;border-radius:10px;padding:12px 16px;text-align:center;background:#fff5f2;transition:border-color 0.2s,background 0.2s;';
+		var inactiveStyle = 'border:2px solid #e5e7eb;border-radius:10px;padding:12px 16px;text-align:center;transition:border-color 0.2s,background 0.2s;';
+
+		function updateStyles() {
+			if (userRadio.checked) {
+				userBox.setAttribute('style',  activeStyle);
+				agentBox.setAttribute('style', inactiveStyle);
+			} else {
+				agentBox.setAttribute('style', activeStyle);
+				userBox.setAttribute('style',  inactiveStyle);
+			}
+		}
+
+		updateStyles();
+		userRadio.addEventListener('change',  updateStyles);
+		agentRadio.addEventListener('change', updateStyles);
+
+		document.querySelectorAll('.role-selector').forEach(function(label) {
+			label.addEventListener('click', function () {
+				setTimeout(updateStyles, 0);
+			});
+		});
+	})();
+
+	// ====== AJAX Register Form ======
+	$('#registerForm').on('submit', function(e) {
+		e.preventDefault();
+
+		var form = $(this);
+		var url = form.attr('action');
+		var formData = form.serialize();
+
+		$.ajax({
+			type: 'POST',
+			url: url,
+			data: formData,
+			headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			success: function(response) {
+				if (response.success) {
+					var redirectUrl = response.redirectUrl || '/';
+					window.location.href = redirectUrl;
+				} else {
+					$('#registerErrorContainer').html(response.message).show();
+				}
+			},
+			error: function(xhr) {
+				var errorMessage = 'Qeydiyyatda xəta baş verdi. Zəhmət olmasa, yenidən yoxlayın.';
+				$('#registerErrorContainer').html(errorMessage).show();
+			}
+		});
+	});
+
+	// ====== AJAX Login Form ======
+	$('#loginForm').on('submit', function(e) {
+		e.preventDefault();
+
+		var form = $(this);
+		var url = form.attr('action');
+		var formData = form.serialize();
+
+		$.ajax({
+			type: 'POST',
+			url: url,
+			data: formData,
+			headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			success: function(response) {
+				if (response.success) {
+					var redirectUrl = response.redirectUrl || '/';
+					window.location.href = redirectUrl;
+				} else {
+					$('#loginErrorContainer').html(response.message).show();
+				}
+			},
+			error: function(xhr) {
+				var errorMessage = 'Daxil olmada xəta baş verdi. Zəhmət olmasa, yenidən yoxlayın.';
+				$('#loginErrorContainer').html(errorMessage).show();
+			}
+		});
+	});
+
+	// ====== Password Visibility Toggle ======
+	document.querySelectorAll('.password-toggle').forEach(function(toggle) {
+		toggle.addEventListener('click', function() {
+			var input = this.previousElementSibling;
+			var type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+			input.setAttribute('type', type);
+			this.classList.toggle('visible');
+		});
+	});
+
+	// ====== Auto-Toast dismiss ======
+	(function() {
+		var toast = document.getElementById('auth-toast');
+		if (toast) {
+			setTimeout(function() { toast.remove(); }, 5000);
+		}
+	})();
+
+	// ====== Auto-Open Modal (from TempData) ======
+	@if (TempData["OpenModal"] != null)
+	{
+		<text>
+		$(function() {
+			$('@TempData["OpenModal"]').addClass('active');
+		});
+		</text>
+	}
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

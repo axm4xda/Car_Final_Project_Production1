@@ -1,0 +1,129 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="stats-grid">
+    <div class="st-card">
+        <div class="st-ico blue"><i data-lucide="car"></i></div>
+        <div><div class="st-val">@ViewBag.CarCount</div><div >Maşınlar</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico green"><i data-lucide="tag"></i></div>
+        <div><div class="st-val">@ViewBag.BrandCount</div><div >Markalar</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico orange"><i data-lucide="package"></i></div>
+        <div><div class="st-val">@ViewBag.ProductCount</div><div >Məhsullar</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico purple"><i data-lucide="shopping-bag"></i></div>
+        <div><div class="st-val">@ViewBag.OrderCount</div><div >Sifarişlər</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico teal"><i data-lucide="newspaper"></i></div>
+        <div><div class="st-val">@ViewBag.BlogPostCount</div><div >Blog Yazılar</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico blue"><i data-lucide="users"></i></div>
+        <div><div class="st-val">@ViewBag.UserCount</div><div >İstifadəçilər</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico red"><i data-lucide="mail-open"></i></div>
+        <div><div class="st-val">@ViewBag.ContactCount</div><div >Oxunmamış Mesajlar</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico orange"><i data-lucide="file-plus"></i></div>
+        <div><div class="st-val">@ViewBag.SellRequestCount</div><div >Yeni Satış Müraciətləri</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico yellow"><i data-lucide="star"></i></div>
+        <div><div class="st-val">@ViewBag.ReviewCount</div><div >Rəylər</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico purple"><i data-lucide="briefcase"></i></div>
+        <div><div class="st-val">@ViewBag.AgentCount</div><div >Agentlər</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico teal"><i data-lucide="bell"></i></div>
+        <div><div class="st-val">@ViewBag.SubscriberCount</div><div >Abunəçilər</div></div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico pink"><i data-lucide="circle-help"></i></div>
+        <div><div class="st-val">@ViewBag.FAQCount</div><div >FAQ</div></div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div class="a-card">
+        <div class="a-card-head">
+            <div class="a-card-title">Son Sifarişlər</div>
+            <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn-a ghost btn-sm">Hamısı →</a>
+        </div>
+        @if (ViewBag.RecentOrders != null && ((IEnumerable<Order>)ViewBag.RecentOrders).Any())
+        {
+            <div class="tbl-wrap">
+                <table class="a-table">
+                    <thead>
+                        <tr><th>#</th><th>Müştəri</th><th>Cəm</th><th>Status</th><th>Tarix</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Order o in ViewBag.RecentOrders)
+                        {
+                            <tr>
+                                <td>#@o.Id</td>
+                                <td>@o.FirstName @o.LastName</td>
+                                <td>$@o.Total.ToString("N2")</td>
+                                <td>
+                                    <span class="a-badge @(o.Status == OrderStatus.Delivered ? "green" : o.Status == OrderStatus.Cancelled ? "red" : "yellow")">
+                                        @o.Status
+                                    </span>
+                                </td>
+                                <td>@o.CreatedDate.ToString("dd.MM.yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-st"><p>Hələ sifariş yoxdur.</p></div>
+        }
+    </div>
+
+    <div class="a-card">
+        <div class="a-card-head">
+            <div class="a-card-title">Son Mesajlar</div>
+            <a asp-area="Admin" asp-controller="ContactMessage" asp-action="Index" class="btn-a ghost btn-sm">Hamısı →</a>
+        </div>
+        @if (ViewBag.RecentMessages != null && ((IEnumerable<ContactMessage>)ViewBag.RecentMessages).Any())
+        {
+            <div class="tbl-wrap">
+                <table class="a-table">
+                    <thead>
+                        <tr><th>Ad</th><th>Mövzu</th><th>Status</th><th>Tarix</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (ContactMessage m in ViewBag.RecentMessages)
+                        {
+                            <tr>
+                                <td>@m.FullName</td>
+                                <td>@m.Subject</td>
+                                <td>
+                                    <span class="a-badge @(m.IsRead ? "green" : "red")">
+                                        @(m.IsRead ? "Oxunub" : "Yeni")
+                                    </span>
+                                </td>
+                                <td>@m.CreatedDate.ToString("dd.MM.yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-st"><p>Hələ mesaj yoxdur.</p></div>
+        }
+    </div>
+</div>

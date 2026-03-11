@@ -1,0 +1,407 @@
+/* ── News & Reviews – bərabər card hündürlüyü ─────────────────────────── */
+.swiper-news .swiper-slide {
+    height: auto;
+    display: flex;
+}
+
+.swiper-news .swiper-slide .post.post-effect-style-1 {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 360px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.swiper-news .swiper-slide .post.post-effect-style-1 .post__thumb {
+    flex: 1;
+    overflow: hidden;
+    height: 100%;
+}
+
+.swiper-news .swiper-slide .post.post-effect-style-1 .post--img {
+    width: 100%;
+    height: 100%;
+    max-height: 100% !important;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.swiper-news .swiper-slide .post.post-effect-style-1:hover .post--img {
+    transform: scale(1.05);
+    max-height: 100% !important;
+}
+
+/* ── Trending Searches Near You – bərabər card ölçüsü ───────────────── */
+.swiper-card .swiper-slide {
+    height: auto;
+    display: flex;
+    align-items: stretch;
+}
+
+.swiper-card .swiper-slide .card-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+/* Şəkil sabit hündürlük */
+.swiper-card .swiper-slide .card-box .image {
+    height: 240px;
+    min-height: 240px;
+    max-height: 240px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.swiper-card .swiper-slide .card-box .image .card--img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Content flex-column: hər şey eyni səviyyədə düzülsün */
+.swiper-card .swiper-slide .card-box .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* title sabit hündürlük – max 2 sətir */
+.swiper-card .swiper-slide .card-box .content .card-box__title {
+    flex-shrink: 0;
+    min-height: 52px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* tag (specs) – sabit 2 sətir grid layout, hər sətirdə 2 element */
+.swiper-card .swiper-slide .card-box .content .tag {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    min-height: 48px;
+}
+
+.swiper-card .swiper-slide .card-box .content .tag li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.swiper-card .swiper-slide .card-box .content .tag li span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* price həmişə tag-dən sonra auto margin ilə aşağı itələnir */
+.swiper-card .swiper-slide .card-box .content .card-box__price {
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+/* divider həmişə price-dən dərhal sonra */
+.swiper-card .swiper-slide .card-box .content .divider-blur {
+    flex-shrink: 0;
+}
+
+/* Compare/ViewDetails sırası həmişə card altında */
+.swiper-card .swiper-slide .card-box .content > .flex.justify-between {
+    flex-shrink: 0;
+}
+
+/* ── List Page Grid – bərabər card ölçüsü ────────────────────────────── */
+.card-box.card-box-style-1 {
+    display: flex;
+    flex-direction: column;
+    height: 100% !important; /* override base .card-box { height: fit-content } */
+}
+
+.card-box.card-box-style-1 .image {
+    height: 220px;
+    min-height: 220px;
+    max-height: 220px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.card-box.card-box-style-1 .image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.card-box.card-box-style-1 .image .card--img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.card-box.card-box-style-1 .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-box.card-box-style-1 .content .card-box__title {
+    flex-shrink: 0;
+    min-height: 48px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-box.card-box-style-1 .content .tag {
+    flex-shrink: 0;
+}
+
+.card-box.card-box-style-1 .content .card-box__price {
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+/* Ensure the grid stretches cards equally */
+.card-box.card-box-style-1 .content .divider {
+    flex-shrink: 0;
+}
+
+.card-box.card-box-style-1 .content > .flex.justify-between:last-child {
+    flex-shrink: 0;
+}
+
+/* Grid items should stretch to equal height */
+.grid > .card-box.card-box-style-1,
+.grid > [class*="wow"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid > [class*="wow"] .card-box.card-box-style-1 {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100% !important;
+}
+
+/* ── Financing Calculator (Detail page) ──────────────────────────────── */
+.fc-wrapper {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 28px 32px;
+    background: #fff;
+}
+
+.fc-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    align-items: end;
+}
+
+.fc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fc-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c1c1c;
+}
+
+.fc-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    color: #1c1c1c;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.fc-input::-webkit-outer-spin-button,
+.fc-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.fc-input:focus {
+    border-color: #1c1c1c;
+    box-shadow: 0 0 0 2px rgba(28, 28, 28, 0.08);
+}
+
+select.fc-input {
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+}
+
+.fc-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.fc-actions .btn-primary {
+    background: #1c1c1c;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.fc-actions .btn-primary:hover {
+    background: #333;
+}
+
+.fc-actions .btn-primary:active {
+    transform: scale(0.98);
+}
+
+.fc-actions .btn-line {
+    background: transparent;
+    color: #1c1c1c;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.fc-actions .btn-line:hover {
+    border-color: #1c1c1c;
+    background: #f9fafb;
+}
+
+/* Results row */
+.fc-results {
+    display: none;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.fc-results[style*="display: block"],
+.fc-results[style*="display:block"] {
+    display: grid !important;
+}
+
+.fc-result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fc-result-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.fc-result-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1c1c1c;
+}
+
+.fc-result-value.fc-highlight {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+/* Responsive: stack fields on smaller screens */
+@media (max-width: 992px) {
+    .fc-fields {
+        grid-template-columns: 1fr 1fr;
+    }
+    .fc-results {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .fc-wrapper {
+        padding: 20px 16px;
+    }
+    .fc-fields {
+        grid-template-columns: 1fr;
+    }
+    .fc-results {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .fc-actions {
+        flex-direction: column;
+    }
+    .fc-actions .btn-primary,
+    .fc-actions .btn-line {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ── Sort Vehicles select (List page) ────────────────────────────────── */
+.sort-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 10px 40px 10px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1c1c1c;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 7L11 1' stroke='%231C1C1C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-width: 160px;
+}
+
+.sort-select:hover {
+    border-color: #1c1c1c;
+}
+
+.sort-select:focus {
+    border-color: #1c1c1c;
+    box-shadow: 0 0 0 2px rgba(28, 28, 28, 0.08);
+}

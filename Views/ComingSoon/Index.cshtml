@@ -1,0 +1,137 @@
+﻿@{
+    ViewData["Title"] = "Coming Soon";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon | Aurexo</title>
+    <link rel="stylesheet" href="~/assets/scss/swiper/swiper-bundle.min.css">
+    <link rel="stylesheet" href="~/assets/app.css">
+    <link rel="shortcut icon" href="~/assets/images/favicon.png">
+    <style>
+        /* Hide preloader on this page – countdown script is not loaded */
+        .preload {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="inner-page">
+
+    <div id="wrapper">
+
+        <section class="bg-white coming-soon-page">
+            <div class="overlay-parallax"></div>
+            <div class="overlay image">
+                <img class="lazyload parallax" src="~/assets/images/banner/comming-soon.jpg" alt="Coming Soon">
+            </div>
+
+            <div class="coming-soon-page-blur"></div>
+            <div class="max-w-1600 w-full mx-auto coming-soon-container">
+                <div class="grid grid-cols-2 lg-grid-cols-1">
+
+                    <!-- Left Content -->
+                    <div class="coming-soon-content">
+                        <h1 class="text-white mb-40 md-mb-16">Coming Soon</h1>
+                        <p class="h4 capitalize mb-20 text-white">Subscribe to enter the waitlist</p>
+
+                        <form class="coming-soon-form mb-12" action="#">
+                            <input type="email" placeholder="Enter your email address"
+                                   name="emailcoming-soon" id="emailcoming-soon">
+                            <button type="submit">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19.1279 6V15.75C19.1279 16.0484 19.0094 16.3345 18.7984 16.5455C18.5874 16.7565 18.3013 16.875 18.0029 16.875C17.7045 16.875 17.4184 16.7565 17.2074 16.5455C16.9964 16.3345 16.8779 16.0484 16.8779 15.75V8.71875L6.79883 18.7959C6.58748 19.0073 6.30084 19.126 6.00195 19.126C5.70307 19.126 5.41642 19.0073 5.20508 18.7959C4.99373 18.5846 4.875 18.2979 4.875 17.9991C4.875 17.7002 4.99373 17.4135 5.20508 17.2022L15.2841 7.125H8.25289C7.95452 7.125 7.66837 7.00647 7.45739 6.7955C7.24642 6.58452 7.12789 6.29837 7.12789 6C7.12789 5.70163 7.24642 5.41548 7.45739 5.2045C7.66837 4.99353 7.95452 4.875 8.25289 4.875H18.0029C18.3013 4.875 18.5874 4.99353 18.7984 5.2045C19.0094 5.41548 19.1279 5.70163 19.1279 6Z" fill="#1C1C1C" />
+                                </svg>
+                            </button>
+                        </form>
+
+                        <p class="text-white mb-40">Be the first to know when we launch.</p>
+
+                        <div class="clients md-flex-col gap-20 flex items-center">
+                            <div class="clients--images">
+                                <img src="~/assets/images/avatar/client-1.png" alt="client">
+                                <img src="~/assets/images/avatar/client-2.png" alt="client">
+                                <img src="~/assets/images/avatar/client-3.png" alt="client">
+                                <img src="~/assets/images/avatar/client-4.png" alt="client">
+                            </div>
+                            <p class="font-weight-500 text-white flex gap-8 h7 line-height-28">
+                                <span class="font-bold text-white">4k+</span> clients already subscribed
+                            </p>
+                        </div>
+
+                        <div class="mt-40">
+                            <a asp-controller="Home" asp-action="Index"
+                               class="btn btn-primary btn-large font-weight-600">
+                                Back To Homepage
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Countdown -->
+                    <div class="coming-soon-time">
+                        <div class="featured-countdown">
+                            <span class="slogan"></span>
+                            <div id="countdown" class="js-countdown"></div>
+                            <ul class="desc">
+                                <li>Days</li>
+                                <li>Hours</li>
+                                <li>Min</li>
+                                <li>Sec</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Go Top Button -->
+    <div class="progress-wrap active-progress">
+        <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
+                  style="transition: stroke-dashoffset 10ms linear 0s; stroke-dasharray: 307.919, 307.919; stroke-dashoffset: 286.138;"></path>
+        </svg>
+        <img class="progress-wrap-icon" src="~/assets/icons/top.svg" alt="top">
+    </div>
+
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/swiper-bundle.min.js"></script>
+    <script src="~/assets/js/app.js"></script>
+
+    <!-- Inline countdown: counts down from ~12 days (1065550 seconds) -->
+    <script>
+        (function () {
+            var seconds = 1065550;
+            var el = document.getElementById('countdown');
+            if (!el) return;
+
+            function pad(n) {
+                return n < 10 ? '0' + n : n;
+            }
+
+            function tick() {
+                if (seconds <= 0) {
+                    el.textContent = '00 : 00 : 00 : 00';
+                    return;
+                }
+                var d = Math.floor(seconds / 86400);
+                var h = Math.floor((seconds % 86400) / 3600);
+                var m = Math.floor((seconds % 3600) / 60);
+                var s = seconds % 60;
+                el.textContent = pad(d) + ' : ' + pad(h) + ' : ' + pad(m) + ' : ' + pad(s);
+                seconds--;
+                setTimeout(tick, 1000);
+            }
+            tick();
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,344 @@
+﻿@model Car_Project.ViewModels.Calculator.CalculatorIndexViewModel
+
+<!-- breadcrumb -->
+<section class="background-light">
+	<div class="container">
+		<ul class="breadcrumb">
+			<li><a asp-controller="Home" asp-action="Index">Home</a></li>
+			<li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+			<li><span>Calculator</span></li>
+		</ul>
+	</div>
+</section>
+
+<!-- Calculator -->
+<section class="pb-100">
+	<div class="tf-spacing-style3"></div>
+
+	<div class="container">
+		<h2 class="text-center mb-12">Car Payment Calculator</h2>
+		<p class="mb-40 text-center text-secondary h7 line-height-28">Estimate your monthly payments and budget for your next car with ease.</p>
+
+		<div class="grid grid-cols-2 gap-40 lg-grid-cols-1">
+
+			<!-- LEFT: Form -->
+			<div class="border-box">
+				<p class="h3 mb-28">Calculate Your Estimated Monthly</p>
+				<form method="post" asp-controller="Calculator" asp-action="Index" class="calculate-form">
+					@Html.AntiForgeryToken()
+					<div class="grid grid-cols-1 gap-15">
+
+						<div>
+							<p class="mb-8">Car Price ($)</p>
+							<input class="input-large"
+								   asp-for="Form.CarPrice"
+								   type="number"
+								   step="1"
+								   min="1"
+								   placeholder="46300" />
+							<span asp-validation-for="Form.CarPrice" class="text-xs text-danger"></span>
+						</div>
+
+						<div>
+							<p class="mb-8">Down Payment ($)</p>
+							<input class="input-large"
+								   asp-for="Form.DownPayment"
+								   type="number"
+								   step="1"
+								   min="0"
+								   placeholder="0" />
+						</div>
+
+						<div>
+							<p class="mb-8">Trade In Value ($) <span class="text-muted">(Optional)</span></p>
+							<input class="input-large"
+								   asp-for="Form.TradeInValue"
+								   type="number"
+								   step="1"
+								   min="0"
+								   placeholder="0" />
+						</div>
+
+						<div>
+							<p class="mb-8">Loan Term <span class="text-muted">(months)</span></p>
+							<select asp-for="Form.LoanTermMonths" class="input-large"
+									asp-items="@(new SelectList(Model.Form.AvailableTerms.Select(t => new { Value = t, Text = t % 12 == 0 ? $"{t} months ({t/12} years)" : $"{t} months ({t/12} yr {t%12} mo)" }), "Value", "Text", Model.Form.LoanTermMonths))">
+							</select>
+						</div>
+
+						<div>
+							<p class="mb-8">Interest Rate <span class="text-muted">(%)</span></p>
+							<input class="input-large"
+								   asp-for="Form.InterestRate"
+								   type="number"
+								   step="0.01"
+								   min="0"
+								   max="100"
+								   placeholder="1.20" />
+						</div>
+
+						<div>
+							<p class="mb-8">Sales Tax <span class="text-muted">(%)</span></p>
+							<input class="input-large"
+								   asp-for="Form.SalesTax"
+								   type="number"
+								   step="0.01"
+								   min="0"
+								   max="100"
+								   placeholder="3.00" />
+						</div>
+
+						<div class="mt-8">
+							<button type="submit" class="btn btn-primary btn-large font-weight-600 w-full">
+								Calculate
+							</button>
+						</div>
+
+					</div>
+				</form>
+			</div>
+
+			<!-- RIGHT: Result -->
+			<div class="border-box">
+				@if (Model.HasResult && Model.Result != null)
+				{
+					var r = Model.Result;
+					<p class="h3 mb-8">Estimated Monthly Payment*</p>
+					<p class="mb-10">
+						<span class="text-56 font-weight-600">$@r.MonthlyPayment.ToString("N2")</span>
+						<span class="h3 font-weight-600">/Month</span>
+					</p>
+					<p class="h5 mb-28 capitalize">
+						for
+						@if (r.LoanTermYears > 0)
+						{
+							@($"{r.LoanTermYears} year{(r.LoanTermYears > 1 ? "s" : "")}")
+						}
+						@if (r.LoanTermRemainderMonths > 0)
+						{
+							@($" {r.LoanTermRemainderMonths} month{(r.LoanTermRemainderMonths > 1 ? "s" : "")}")
+						}
+					</p>
+
+					<div class="divider mb-28 w-full"></div>
+					<p class="h4 mb-20">Loan Summary</p>
+
+					<div class="flex flex-col gap-18 mb-28">
+						<p class="flex justify-between gap-8">
+							<span class="h7 text-secondary">Car Price</span>
+							<span class="h7">$@r.CarPrice.ToString("N2")</span>
+						</p>
+						<p class="flex justify-between gap-8">
+							<span class="h7 text-secondary">Down Payment</span>
+							<span class="h7 text-danger">-$@r.DownPayment.ToString("N2")</span>
+						</p>
+						<p class="flex justify-between gap-8">
+							<span class="h7 text-secondary">Trade In Value</span>
+							<span class="h7 text-danger">-$@r.TradeInValue.ToString("N2")</span>
+						</p>
+						<p class="flex justify-between gap-8">
+							<span class="h7 text-secondary">Est. Interest (@r.InterestRate.ToString("0.##")%)</span>
+							<span class="h7 text-success">+$@r.TotalInterestPayment.ToString("N2")</span>
+						</p>
+						<p class="flex justify-between gap-8">
+							<span class="h7 text-secondary">Est. Sales Tax (@r.SalesTax.ToString("0.##")%)</span>
+							<span class="h7 text-success">+$@r.SalesTaxAmount.ToString("N2")</span>
+						</p>
+						<p class="flex justify-between gap-8">
+							<span class="h7 text-secondary">Other Fees</span>
+							<span class="h7">Not Included</span>
+						</p>
+					</div>
+
+					<div class="divider mb-28 w-full"></div>
+
+					<div class="flex justify-between gap-8 mb-16">
+						<p class="h4">Total Loan Amount</p>
+						<p class="h4">$@r.TotalLoanAmount.ToString("N2")</p>
+					</div>
+
+					<div class="flex justify-between gap-8">
+						<p class="h4">Monthly Payment</p>
+						<p class="h4 text-highlight">$@r.MonthlyPayment.ToString("N2")</p>
+					</div>
+				}
+				else
+				{
+					<div class="flex flex-col items-center justify-center h-full gap-16 py-40">
+						<p class="h5 text-secondary text-center">Fill in the form and click <strong>Calculate</strong> to see your estimated monthly payment.</p>
+					</div>
+				}
+			</div>
+
+		</div>
+	</div>
+
+	<div class="tf-spacing"></div>
+
+	<h2 class="text-center mb-40 capitalize">Browse by Price</h2>
+
+	<div class="container">
+		<div class="grid grid-cols-5 lg-grid-cols-3 md-grid-cols-2 smb-grid-cols-1 gap-20 mb-40 padding-box-20">
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="15000" class="h7 font-weight-500 mb-8 text-underline">Used Popular</a>
+				<p class="h4">Under $15k</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="30000" class="h7 font-weight-500 mb-8 text-underline">Used Subaru Forester</a>
+				<p class="h4">Under $30K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="100000" class="h7 font-weight-500 mb-8 text-underline">Used Porsche Coupe</a>
+				<p class="h4">Under $100K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="60000" class="h7 font-weight-500 mb-8 text-underline">Used Toyota Highlander</a>
+				<p class="h4">Under $60K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="60000" class="h7 font-weight-500 mb-8 text-underline">Used Toyota Highlander</a>
+				<p class="h4">Under $60K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="15000" class="h7 font-weight-500 mb-8 text-underline">Used Honda</a>
+				<p class="h4">Under $15k</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="30000" class="h7 font-weight-500 mb-8 text-underline">Used SUV</a>
+				<p class="h4">Under $30K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="80000" class="h7 font-weight-500 mb-8 text-underline">Used Lexus</a>
+				<p class="h4">Under $80K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="40000" class="h7 font-weight-500 mb-8 text-underline">Used Truck</a>
+				<p class="h4">Under $40K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="60000" class="h7 font-weight-500 mb-8 text-underline">Used BMW</a>
+				<p class="h4">Under $60K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="100000" class="h7 font-weight-500 mb-8 text-underline">Used Mercedes</a>
+				<p class="h4">Under $100k</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="70000" class="h7 font-weight-500 mb-8 text-underline">Used Volvo</a>
+				<p class="h4">Under $70K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="20000" class="h7 font-weight-500 mb-8 text-underline">Used Sedan</a>
+				<p class="h4">Under $20K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="30000" class="h7 font-weight-500 mb-8 text-underline">Used Electric</a>
+				<p class="h4">Under $30K</p>
+			</div>
+			<div class="price-box">
+				<a asp-controller="List" asp-action="Index" asp-route-maxPrice="25000" class="h7 font-weight-500 mb-8 text-underline">Used Hatchback</a>
+				<p class="h4">Under $25K</p>
+			</div>
+		</div>
+
+		<div class="flex justify-center">
+			<a asp-controller="List" asp-action="Index" class="btn btn-line-hover effect-line-primary btn-large font-weight-600 hover-fill-white">
+				View All
+				<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<g clip-path="url(#clip0_13439_106990)">
+						<path d="M10 1.875C8.39303 1.875 6.82214 2.35152 5.486 3.24431C4.14985 4.1371 3.10844 5.40605 2.49348 6.8907C1.87852 8.37535 1.71762 10.009 2.03112 11.5851C2.34463 13.1612 3.11846 14.6089 4.25476 15.7452C5.39106 16.8815 6.8388 17.6554 8.4149 17.9689C9.99099 18.2824 11.6247 18.1215 13.1093 17.5065C14.594 16.8916 15.8629 15.8502 16.7557 14.514C17.6485 13.1779 18.125 11.607 18.125 10C18.1227 7.84581 17.266 5.78051 15.7427 4.25727C14.2195 2.73403 12.1542 1.87727 10 1.875ZM13.5672 10.4422L11.0672 12.9422C10.9499 13.0595 10.7909 13.1253 10.625 13.1253C10.4592 13.1253 10.3001 13.0595 10.1828 12.9422C10.0655 12.8249 9.99966 12.6659 9.99966 12.5C9.99966 12.3341 10.0655 12.1751 10.1828 12.0578L11.6164 10.625H6.875C6.70924 10.625 6.55027 10.5592 6.43306 10.4419C6.31585 10.3247 6.25 10.1658 6.25 10C6.25 9.83424 6.31585 9.67527 6.43306 9.55806C6.55027 9.44085 6.70924 9.375 6.875 9.375H11.6164L10.1828 7.94219C10.0655 7.82491 9.99966 7.66585 9.99966 7.5C9.99966 7.33415 10.0655 7.17509 10.1828 7.05781C10.3001 6.94054 10.4592 6.87465 10.625 6.87465C10.7909 6.87465 10.9499 6.94054 11.0672 7.05781L13.5672 9.55781C13.6253 9.61586 13.6714 9.68479 13.7029 9.76066C13.7343 9.83654 13.7505 9.91787 13.7505 10C13.7505 10.0821 13.7343 10.1635 13.7029 10.2393C13.6714 10.3152 13.6253 10.3841 13.5672 10.4422Z" fill="#1C1C1C" />
+					</g>
+				</svg>
+			</a>
+		</div>
+	</div>
+</section>
+
+<!-- FAQ -->
+<section class="background-light py-100">
+	<div class="container">
+		<h2 class="mb-40 text-center">Calculator FAQ</h2>
+		<div class="max-width-930 mx-auto w-full">
+			<div class="flat-accordion flex flex-col gap-18 max-width-930 wow fadeIn" data-wow-delay=".3s">
+				<div class="flat-toggle bg-white active">
+					<div class="toggle-title active">
+						<p class="h5 title">What is an Auto Loan?</p>
+						<span class="icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M20 15L12 7L4 15" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</div>
+					<div class="toggle-content">
+						<p class="mb-8 h7 text-secondary line-height-28">An auto loan is a sum of money that you borrow in order to buy a car. The borrower agrees to pay back the full amount plus interest via monthly payments.</p>
+					</div>
+				</div>
+				<div class="flat-toggle bg-white">
+					<div class="toggle-title">
+						<p class="h5 title">How to Calculate an Auto Loan?</p>
+						<span class="icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M20 15L12 7L4 15" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</div>
+					<div class="toggle-content">
+						<p class="h7 text-secondary line-height-28">Enter the car price, down payment, trade-in value, loan term, interest rate, and sales tax. Click Calculate to see your estimated monthly payment and full loan summary.</p>
+					</div>
+				</div>
+				<div class="flat-toggle bg-white">
+					<div class="toggle-title">
+						<p class="h5 title">Down Payment?</p>
+						<span class="icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M20 15L12 7L4 15" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</div>
+					<div class="toggle-content">
+						<p class="h7 text-secondary line-height-28">A down payment is the amount you pay upfront. A higher down payment reduces your monthly payment and total interest paid.</p>
+					</div>
+				</div>
+				<div class="flat-toggle bg-white">
+					<div class="toggle-title">
+						<p class="h5 title">Trade-In Value?</p>
+						<span class="icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M20 15L12 7L4 15" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</div>
+					<div class="toggle-content">
+						<p class="h7 text-secondary line-height-28">The trade-in value is the amount your current vehicle is worth and applied as a credit toward your new car purchase, reducing the loan principal.</p>
+					</div>
+				</div>
+				<div class="flat-toggle bg-white">
+					<div class="toggle-title">
+						<p class="h5 title">Sales Tax?</p>
+						<span class="icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M20 15L12 7L4 15" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</div>
+					<div class="toggle-content">
+						<p class="h7 text-secondary line-height-28">Sales tax is a percentage added on top of the car price. It is typically included in the financed amount unless paid separately at signing.</p>
+					</div>
+				</div>
+				<div class="flat-toggle bg-white">
+					<div class="toggle-title">
+						<p class="h5 title">Interest Rate?</p>
+						<span class="icon">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M20 15L12 7L4 15" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</div>
+					<div class="toggle-content">
+						<p class="h7 text-secondary line-height-28">The interest rate is the annual cost of borrowing the loan expressed as a percentage. A lower rate means lower total interest paid over the loan term.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

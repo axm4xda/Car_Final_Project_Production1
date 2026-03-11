@@ -1,0 +1,127 @@
+@model AppUser
+@{
+    ViewData["Title"] = "İstifadəçi Detalları";
+    var role = ViewBag.UserRole as string ?? "User";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div class="a-card-title">İstifadəçi: @Model.FullName</div>
+        <div class="act-btns">
+            <a asp-action="Index" class="btn-a ghost">← Geri</a>
+            @if (role != "SuperAdmin")
+            {
+                <form asp-action="Delete" method="post" class="del-form" onsubmit="return confirm('Bu istifadəçini silmək istədiyinizdən əminsiniz?')">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="userId" value="@Model.Id" />
+                    <button class="btn-a danger">🗑 Sil</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+    {
+        <div class="fg" style="margin-bottom:20px;">
+            <label>Profil Şəkli</label>
+            <div style="margin-top:8px;">
+                <img src="@Model.AvatarUrl" alt="Avatar" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb;">
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="fg" style="margin-bottom:20px;">
+            <label>Profil Şəkli</label>
+            <div style="margin-top:8px;width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#FF5722,#ff8a65);display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px;font-weight:700;">
+                @(Model.FullName.Length > 0 ? Model.FullName[0].ToString().ToUpper() : "?")
+            </div>
+        </div>
+    }
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Ad Soyad</label>
+            <p style="font-size:15px;font-weight:600;">@Model.FullName</p>
+        </div>
+        <div class="fg">
+            <label>Email</label>
+            <p style="font-size:15px;"><a href="mailto:@Model.Email" style="color:#2563eb;text-decoration:underline;">@Model.Email</a></p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>İstifadəçi Adı</label>
+            <p style="font-size:15px;">@(Model.UserName ?? "—")</p>
+        </div>
+        <div class="fg">
+            <label>Telefon</label>
+            <p style="font-size:15px;">@(Model.PhoneNumber ?? "—")</p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Rol</label>
+            <p style="font-size:15px;">
+                @if (role == "SuperAdmin")
+                {
+                    <span class="a-badge" style="background:#f5f3ff;color:#7c3aed;">SuperAdmin</span>
+                }
+                else if (role == "Admin")
+                {
+                    <span class="a-badge blue">Admin</span>
+                }
+                else if (role == "Agent")
+                {
+                    <span class="a-badge yellow">Agent</span>
+                }
+                else
+                {
+                    <span class="a-badge gray">User</span>
+                }
+            </p>
+        </div>
+        <div class="fg">
+            <label>Email Təsdiqlənib?</label>
+            <p style="font-size:15px;">
+                @if (Model.EmailConfirmed)
+                {
+                    <span class="a-badge green">Bəli</span>
+                }
+                else
+                {
+                    <span class="a-badge red">Xeyr</span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Qeydiyyat Tarixi</label>
+            <p style="font-size:14px;color:#6b7280;">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+        </div>
+        <div class="fg">
+            <label>İstifadəçi ID</label>
+            <p style="font-size:13px;color:#9ca3af;font-family:monospace;">@Model.Id</p>
+        </div>
+    </div>
+
+    @if (role != "SuperAdmin")
+    {
+        <div class="fg" style="margin-top:24px;padding-top:20px;border-top:1px solid #e5e7eb;">
+            <label style="margin-bottom:12px;">Rol Dəyiş</label>
+            <form asp-action="ChangeRole" method="post" style="display:flex;align-items:center;gap:10px;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="userId" value="@Model.Id" />
+                <select name="newRole" class="fc" style="width:auto;min-width:120px;">
+                    <option value="User" selected="@(role == "User" ? "selected" : null)">User</option>
+                    <option value="Agent" selected="@(role == "Agent" ? "selected" : null)">Agent</option>
+                    <option value="Admin" selected="@(role == "Admin" ? "selected" : null)">Admin</option>
+                </select>
+                <button type="submit" class="btn-a primary">Təyin Et</button>
+            </form>
+        </div>
+    }
+</div>

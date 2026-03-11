@@ -1,0 +1,363 @@
+﻿<!-- ==================== MODALS ==================== -->
+
+<!-- LoginModal -->
+<div id="LoginModal" class="modal modal-login">
+	<div class="bg-modal"></div>
+	<div class="modal-content modal-sm">
+		<button class="close-modal" type="button">
+			<img src="~/assets/icons/close-modal.svg" alt="close">
+		</button>
+		<div class="modal-container">
+			<div class="modal-inner">
+				<h2 class="mb-20 text-center">Daxil Ol</h2>
+
+				<div id="loginErrorContainer" class="mb-16 p-12" style="background:#fee2e2;color:#dc2626;border-radius:8px;display:none;"></div>
+
+				<form asp-controller="Account" asp-action="Login" method="post" id="loginForm">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+					<label for="email-login" class="mb-20 px-2">
+						<span class="mb-8 flex">Email*</span>
+						<input class="input-large" type="email" id="email-login" name="Email"
+							   placeholder="Email daxil edin" required autocomplete="email">
+					</label>
+
+					<label for="Password-login" class="mb-24 px-2">
+						<span class="flex mb-8">┼₧ifr╔Ö*</span>
+						<input class="input-large password-input is-hidden" type="password"
+							   id="Password-login" name="Password"
+							   placeholder="┼₧ifr╔Ö" required minlength="8" autocomplete="current-password">
+					</label>
+
+					<div class="flex justify-between gap-12 mb-20">
+						<label class="filter-checkbox style-5">
+							<input type="checkbox" name="RememberMe" value="true">
+							<span class="text-sm">M╔Öni xat─▒rla</span>
+						</label>
+						<span class="text-sm font-bold text-underline open-modal cursor-pointer"
+							  data-modal-id="#ForgotPasswordModal">┼₧ifr╔Öni unutdunuz?</span>
+					</div>
+
+					<button type="submit" class="btn btn-primary btn-large w-full mb-12 font-weight-600">
+						Daxil Ol
+					</button>
+				</form>
+
+				<p class="text-sm text-secondary flex gap-8 justify-center">
+					Qeydiyyatdan ke├ºm╔Ömisiniz?
+					<span class="text-sm font-weight-600 text-underline open-modal cursor-pointer"
+						  data-modal-id="#SignUpModal">Qeydiyyat</span>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /LoginModal -->
+
+<!-- ForgotPasswordModal -->
+<div id="ForgotPasswordModal" class="modal modal-login">
+	<div class="bg-modal"></div>
+	<div class="modal-content modal-sm">
+		<button class="close-modal" type="button">
+			<img src="~/assets/icons/close-modal.svg" alt="close">
+		</button>
+		<div class="modal-container">
+			<div class="modal-inner">
+				<h2 class="mt-20 mb-20 text-center">┼₧ifr╔Öni Unutdunuz?</h2>
+				<form action="#" id="forgotPasswordForm">
+					<label for="email-forgot-password" class="mb-20 px-2">
+						<span class="mb-8 flex">Email *</span>
+						<input class="input-large" type="email" id="email-forgot-password"
+							   name="email-forgot-password" placeholder="Email daxil edin" required>
+					</label>
+					<button type="submit" class="btn btn-primary btn-large w-full mb-12 font-weight-600">
+						S─▒f─▒rlama Kodu G├╢nd╔Ör
+					</button>
+				</form>
+				<p class="text-sm text-secondary flex gap-8 justify-center">
+					Qeydiyyatdan ke├ºm╔Ömisiniz?
+					<span class="text-sm font-weight-600 text-underline open-modal cursor-pointer"
+						  data-modal-id="#SignUpModal">Qeydiyyat</span>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /ForgotPasswordModal -->
+
+<!-- Search Modal -->
+<div id="SearchModal" class="search-modal">
+	<div class="search-modal__overlay"></div>
+	<div class="search-modal__content">
+		<button class="search-modal__close" id="searchModalClose" type="button">
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+		</button>
+		<h2 class="search-modal__title">WHAT ARE YOU LOOKING FOR?</h2>
+		<form class="search-modal__form" action="#" method="get">
+			<div class="search-modal__input-wrapper">
+				<input type="text" class="search-modal__input" placeholder="Search for anything" autocomplete="off">
+				<button type="submit" class="search-modal__submit" aria-label="Search">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+						<path d="M15.8047 15.8047L21.0012 21.0012" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+					</svg>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+<!-- /Search Modal -->
+
+<!-- SignUpModal -->
+<div id="SignUpModal" class="modal modal-login">
+	<div class="bg-modal"></div>
+	<div class="modal-content modal-sm">
+		<button class="close-modal" type="button">
+			<img src="~/assets/icons/close-modal.svg" alt="close">
+		</button>
+		<div class="modal-container">
+			<div class="modal-inner">
+				<h2 class="mb-20 text-center">Qeydiyyat</h2>
+
+				<div id="registerErrorContainer" class="mb-16 p-12" style="background:#fee2e2;color:#dc2626;border-radius:8px;display:none;"></div>
+
+				<form asp-controller="Account" asp-action="Register" method="post" id="registerForm">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+					<!-- Rol Se├ºimi -->
+					<div class="flex gap-12 mb-20 px-2">
+						<label class="role-selector flex-1" style="cursor:pointer;">
+							<input type="radio" name="Role" id="role-user" value="User" checked style="display:none;">
+							<div id="role-user-box" style="border:2px solid #FF5722;border-radius:10px;padding:12px 16px;text-align:center;background:#fff5f2;transition:border-color 0.2s,background 0.2s;">
+								<p style="font-size:22px;margin-bottom:4px;">≡ƒæñ</p>
+								<p style="font-size:13px;font-weight:600;margin:0;">─░stifad╔Ö├ºi</p>
+								<p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">Avtomobil al / sat</p>
+							</div>
+						</label>
+						<label class="role-selector flex-1" style="cursor:pointer;">
+							<input type="radio" name="Role" id="role-agent" value="Agent" style="display:none;">
+							<div id="role-agent-box" style="border:2px solid #e5e7eb;border-radius:10px;padding:12px 16px;text-align:center;transition:border-color 0.2s,background 0.2s;">
+								<p style="font-size:22px;margin-bottom:4px;">≡ƒÅó</p>
+								<p style="font-size:13px;font-weight:600;margin:0;">Agent</p>
+								<p style="font-size:11px;color:#9ca3af;margin:2px 0 0;">Elanlar idar╔Ö et</p>
+							</div>
+						</label>
+					</div>
+
+					<label for="FullName-SignUp" class="mb-16 px-2">
+						<span class="mb-8 flex">Ad Soyad*</span>
+						<input class="input-large" type="text" id="FullName-SignUp" name="FullName"
+							   placeholder="Ad Soyad─▒n─▒z─▒ daxil edin" required autocomplete="name">
+					</label>
+
+					<label for="SignUp-email" class="mb-16 px-2">
+						<span class="mb-8 flex">Email*</span>
+						<input class="input-large" type="email" id="SignUp-email" name="Email"
+							   placeholder="Email daxil edin" required autocomplete="email">
+					</label>
+
+					<label for="Password-SignUp" class="mb-16 px-2">
+						<span class="mb-8 flex">
+							┼₧ifr╔Ö*
+							<small class="text-secondary ml-8" style="font-size:11px;">(min. 8 simvol, b├╢y├╝k h╔Örf + r╔Öq╔Öm)</small>
+						</span>
+						<input class="input-large password-input is-hidden" type="password"
+							   id="Password-SignUp" name="Password"
+							   placeholder="┼₧ifr╔Ö" required minlength="8" autocomplete="new-password">
+					</label>
+
+					<label for="ConfirmPassword-SignUp" class="mb-16 px-2">
+						<span class="mb-8 flex">┼₧ifr╔Öni T╔Ökrarla*</span>
+						<input class="input-large password-input is-hidden" type="password"
+							   id="ConfirmPassword-SignUp" name="ConfirmPassword"
+							   placeholder="┼₧ifr╔Öni t╔Ökrarlay─▒n" required minlength="8" autocomplete="new-password">
+					</label>
+
+					<div class="flex gap-12 mb-20">
+						<label class="filter-checkbox style-5">
+							<input type="checkbox" name="AgreeToTerms" id="AgreeToTerms" value="true">
+							<span class="text-sm">
+								┼₧╔Örtl╔Öri q╔Öbul edir╔Öm
+								<a asp-controller="Termsofuse" asp-action="Index"
+								   class="text-underline font-bold text-sm pl-4"
+								   target="_blank">─░stifad╔Ö├ºi ┼₧╔Örtl╔Öri</a>
+							</span>
+						</label>
+					</div>
+
+					<button type="submit" class="btn btn-primary btn-large w-full mb-12 font-weight-600">
+						Qeydiyyatdan Ke├º
+					</button>
+				</form>
+
+				<p class="text-sm text-secondary flex gap-8 justify-center mb-16">
+					Art─▒q hesab─▒n─▒z var?
+					<span class="text-sm font-weight-600 text-underline cursor-pointer open-modal"
+						  data-modal-id="#LoginModal">Daxil Ol</span>
+				</p>
+
+				<div class="flex justify-center items-center gap-20 mb-16">
+					<p class="text-sm divider w-full"></p>
+					<p class="text-sm text-secondary text-center min-w-max">v╔Ö ya</p>
+					<p class="text-sm divider w-full"></p>
+				</div>
+
+				<div class="flex flex-col gap-12 social-login">
+					<a href="#" class="font-weight-500 flex items-center gap-8">
+						<img src="~/assets/icons/Google.svg" alt="google"> Google
+					</a>
+					<a href="#" class="font-weight-500 flex items-center gap-8">
+						<img src="~/assets/icons/facebook.svg" alt="facebook"> Facebook
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /SignUpModal -->
+
+<!-- ==================== END MODALS ==================== -->
+
+<!-- Scripts -->
+<script src="~/assets/js/jquery.min.js"></script>
+<script src="~/assets/js/jquery.cookie.min.js"></script>
+<script src="~/assets/js/swiper-bundle.min.js"></script>
+<script src="~/assets/js/wow.min.js"></script>
+<script src="~/assets/js/jquery.fancybox.js"></script>
+<script src="~/assets/js/simpleParallaxVanilla.umd.js"></script>
+<script src="~/assets/js/app.js"></script>
+<script src="~/assets/js/swiper.js"></script>
+
+<script>
+	// ====== Role Selector ======
+	(function () {
+		var userRadio  = document.getElementById('role-user');
+		var agentRadio = document.getElementById('role-agent');
+		var userBox    = document.getElementById('role-user-box');
+		var agentBox   = document.getElementById('role-agent-box');
+
+		if (!userRadio || !agentRadio) return;
+
+		var activeStyle   = 'border:2px solid #FF5722;border-radius:10px;padding:12px 16px;text-align:center;background:#fff5f2;transition:border-color 0.2s,background 0.2s;';
+		var inactiveStyle = 'border:2px solid #e5e7eb;border-radius:10px;padding:12px 16px;text-align:center;transition:border-color 0.2s,background 0.2s;';
+
+		function updateStyles() {
+			if (userRadio.checked) {
+				userBox.setAttribute('style',  activeStyle);
+				agentBox.setAttribute('style', inactiveStyle);
+			} else {
+				agentBox.setAttribute('style', activeStyle);
+				userBox.setAttribute('style',  inactiveStyle);
+			}
+		}
+
+		updateStyles();
+		userRadio.addEventListener('change',  updateStyles);
+		agentRadio.addEventListener('change', updateStyles);
+
+		// B├╝t├╝n label-╔Ö klik i┼ƒl╔Önsin
+		document.querySelectorAll('.role-selector').forEach(function(label) {
+			label.addEventListener('click', function () {
+				setTimeout(updateStyles, 0);
+			});
+		});
+	})();
+
+	// ====== AJAX Register Form ======
+	$('#registerForm').on('submit', function(e) {
+		e.preventDefault();
+
+		var form = $(this);
+		var url = form.attr('action');
+
+		// Forma daxil edilmi┼ƒ b├╝t├╝n m╔Ölumatlar─▒ toplay─▒r (serialize il╔Ö antiforgery token d╔Ö daxil olur)
+		var formData = form.serialize();
+
+		// AJAX POST sor─ƒusu g├╢nd╔Örir
+		$.ajax({
+			type: 'POST',
+			url: url,
+			data: formData,
+			headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			success: function(response) {
+				if (response.success) {
+					var redirectUrl = response.redirectUrl || '/';
+					window.location.href = redirectUrl;
+				} else {
+					$('#registerErrorContainer').html(response.message).show();
+				}
+			},
+			error: function(xhr) {
+				var errorMessage = 'Qeydiyyatda x╔Öta ba┼ƒ verdi. Z╔Öhm╔Öt olmasa, yenid╔Ön yoxlay─▒n.';
+				$('#registerErrorContainer').html(errorMessage).show();
+			}
+		});
+	});
+
+	// ====== AJAX Login Form ======
+	$('#loginForm').on('submit', function(e) {
+		e.preventDefault();
+
+		var form = $(this);
+		var url = form.attr('action');
+
+		// Forma daxil edilmi┼ƒ b├╝t├╝n m╔Ölumatlar─▒ toplay─▒r (serialize il╔Ö antiforgery token d╔Ö daxil olur)
+		var formData = form.serialize();
+
+		// AJAX POST sor─ƒusu g├╢nd╔Örir
+		$.ajax({
+			type: 'POST',
+			url: url,
+			data: formData,
+			headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			success: function(response) {
+				if (response.success) {
+					var redirectUrl = response.redirectUrl || '/';
+					window.location.href = redirectUrl;
+				} else {
+					$('#loginErrorContainer').html(response.message).show();
+				}
+			},
+			error: function(xhr) {
+				var errorMessage = 'Daxil olmada x╔Öta ba┼ƒ verdi. Z╔Öhm╔Öt olmasa, yenid╔Ön yoxlay─▒n.';
+				$('#loginErrorContainer').html(errorMessage).show();
+			}
+		});
+	});
+
+	// ====== Password Visibility Toggle ======
+	document.querySelectorAll('.password-toggle').forEach(function(toggle) {
+		toggle.addEventListener('click', function() {
+			var input = this.previousElementSibling;
+			var type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+			input.setAttribute('type', type);
+			this.classList.toggle('visible');
+		});
+	});
+
+	// ====== Auto-Toast dismiss ======
+	(function() {
+		var toast = document.getElementById('auth-toast');
+		if (toast) {
+			setTimeout(function() { toast.remove(); }, 5000);
+		}
+	})();
+
+	// ====== Auto-Open Modal (from TempData) ======
+	@if (TempData["OpenModal"] != null)
+	{
+		<text>
+		$(function() {
+			$('@TempData["OpenModal"]').addClass('active');
+		});
+		</text>
+	}
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

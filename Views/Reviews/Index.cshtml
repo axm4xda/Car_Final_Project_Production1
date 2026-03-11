@@ -1,0 +1,317 @@
+﻿@{
+    ViewData["Title"] = "Rəylər";
+    var reviews = (List<Review>)ViewBag.Reviews;
+    var currentPage = (int)ViewBag.CurrentPage;
+    var totalPages = (int)ViewBag.TotalPages;
+    var totalCount = (int)ViewBag.TotalCount;
+    var selectedRating = (int?)ViewBag.SelectedRating;
+    var selectedSort = (string)ViewBag.SelectedSort;
+    var searchQuery = (string?)ViewBag.SearchQuery;
+}
+
+<style>
+    .dash-sidebar {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 24px 0;
+        position: sticky;
+        top: 100px;
+    }
+    .dash-sidebar .dash-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #4b5563;
+        text-decoration: none;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+    .dash-sidebar .dash-nav-item:hover { background: #f9fafb; color: #1c1c1c; }
+    .dash-sidebar .dash-nav-item.active { background: #fff5f2; color: #FF5722; border-left-color: #FF5722; font-weight: 600; }
+    .dash-sidebar .dash-nav-item svg { flex-shrink: 0; }
+
+    /* Reviews */
+    .rv-toolbar {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+    }
+    .rv-toolbar select, .rv-toolbar input {
+        padding: 10px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .rv-toolbar select:focus, .rv-toolbar input:focus { border-color: #FF5722; }
+    .rv-toolbar .rv-count {
+        font-size: 14px;
+        color: #6b7280;
+        margin-left: auto;
+    }
+    .rv-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 24px;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .rv-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+    .rv-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    .rv-avatar-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #FF5722, #ff8a65);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    .rv-stars { color: #f59e0b; font-size: 14px; }
+    .rv-content {
+        font-size: 14px;
+        color: #4b5563;
+        line-height: 1.6;
+        margin-top: 12px;
+    }
+    .rv-date {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 12px;
+    }
+    /* Pagination */
+    .rv-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 32px;
+    }
+    .rv-pagination a, .rv-pagination span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .rv-pagination a {
+        background: #fff;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+    }
+    .rv-pagination a:hover { border-color: #FF5722; color: #FF5722; }
+    .rv-pagination .active {
+        background: #FF5722;
+        color: #fff;
+        border: 1px solid #FF5722;
+    }
+    .rv-empty {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+    }
+    .rv-empty-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 28px;
+    }
+</style>
+
+<!-- Breadcrumb -->
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Rəylər</span></li>
+        </ul>
+    </div>
+</section>
+
+<section class="pb-100">
+    <div class="tf-spacing-style3"></div>
+    <div class="container">
+        <div style="display:grid;grid-template-columns:260px 1fr;gap:30px;align-items:start;">
+
+            <!-- Sidebar -->
+            <div class="dash-sidebar">
+                <a asp-controller="UserProfil" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15C15.3137 15 18 12.3137 18 9C18 5.68629 15.3137 3 12 3C8.68629 3 6 5.68629 6 9C6 12.3137 8.68629 15 12 15Z"/><path d="M3 20.25C4.81594 17.1122 8.11406 15 12 15C15.8859 15 19.1841 17.1122 21 20.25"/></svg>
+                    Profil
+                </a>
+                <a asp-controller="UserListing" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6H21"/><path d="M8 12H21"/><path d="M8 18H21"/><circle cx="3" cy="6" r="0.5"/><circle cx="3" cy="12" r="0.5"/><circle cx="3" cy="18" r="0.5"/></svg>
+                    Elanlarım
+                </a>
+                <a asp-controller="Reviews" asp-action="Index" class="dash-nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    Rəylər
+                </a>
+                <a asp-controller="Message" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"/></svg>
+                    Mesajlar
+                </a>
+                <a asp-controller="ChangePassword" asp-action="Index" class="dash-nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7C7 5.67 7.53 4.4 8.46 3.46C9.4 2.53 10.67 2 12 2C13.33 2 14.6 2.53 15.54 3.46C16.47 4.4 17 5.67 17 7V11"/></svg>
+                    Şifrə Dəyiş
+                </a>
+            </div>
+
+            <!-- Main Content -->
+            <div>
+                <!-- Toolbar -->
+                <form asp-controller="Reviews" asp-action="Index" method="get" class="rv-toolbar">
+                    <input type="text" name="search" value="@searchQuery" placeholder="🔍 Rəy axtar..." style="min-width:200px;flex:1;" />
+
+                    <select name="rating" onchange="this.form.submit()">
+                        <option value="">Bütün reytinqlər</option>
+                        @for (int i = 5; i >= 1; i--)
+                        {
+                            <option value="@i" selected="@(selectedRating == i)">@(new string('★', i))@(new string('☆', 5 - i)) (@i)</option>
+                        }
+                    </select>
+
+                    <select name="sort" onchange="this.form.submit()">
+                        <option value="desc" selected="@(selectedSort == "desc")">Ən yeni</option>
+                        <option value="asc" selected="@(selectedSort == "asc")">Ən köhnə</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-primary btn-medium font-weight-600">Axtar</button>
+
+                    <span class="rv-count">@totalCount rəy tapıldı</span>
+                </form>
+
+                @if (reviews.Any())
+                {
+                    <!-- Reviews Grid -->
+                    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:20px;">
+                        @foreach (var review in reviews)
+                        {
+                            <div class="rv-card">
+                                <div style="display:flex;align-items:center;gap:12px;">
+                                    @if (!string.IsNullOrEmpty(review.AvatarUrl))
+                                    {
+                                        <img src="@review.AvatarUrl" alt="@review.AuthorName" class="rv-avatar" />
+                                    }
+                                    else
+                                    {
+                                        <div class="rv-avatar-placeholder">
+                                            @(review.AuthorName.Length > 0 ? review.AuthorName[0].ToString().ToUpper() : "?")
+                                        </div>
+                                    }
+                                    <div>
+                                        <p style="font-weight:600;font-size:14px;margin:0;">@review.AuthorName</p>
+                                        @if (!string.IsNullOrEmpty(review.AuthorTitle))
+                                        {
+                                            <p style="font-size:12px;color:#9ca3af;margin:2px 0 0;">@review.AuthorTitle</p>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="rv-stars" style="margin-top:12px;">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        @(i <= review.Rating ? "★" : "☆")
+                                    }
+                                </div>
+
+                                <div class="rv-content">
+                                    @(review.Content.Length > 150 ? review.Content.Substring(0, 150) + "..." : review.Content)
+                                </div>
+
+                                <div class="rv-date">
+                                    📅 @review.CreatedDate.ToString("dd MMM yyyy")
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (totalPages > 1)
+                    {
+                        <div class="rv-pagination">
+                            @if (currentPage > 1)
+                            {
+                                <a asp-controller="Reviews" asp-action="Index"
+                                   asp-route-page="@(currentPage - 1)"
+                                   asp-route-rating="@selectedRating"
+                                   asp-route-sort="@selectedSort"
+                                   asp-route-search="@searchQuery">‹</a>
+                            }
+
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                if (i == currentPage)
+                                {
+                                    <span class="active">@i</span>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Reviews" asp-action="Index"
+                                       asp-route-page="@i"
+                                       asp-route-rating="@selectedRating"
+                                       asp-route-sort="@selectedSort"
+                                       asp-route-search="@searchQuery">@i</a>
+                                }
+                            }
+
+                            @if (currentPage < totalPages)
+                            {
+                                <a asp-controller="Reviews" asp-action="Index"
+                                   asp-route-page="@(currentPage + 1)"
+                                   asp-route-rating="@selectedRating"
+                                   asp-route-sort="@selectedSort"
+                                   asp-route-search="@searchQuery">›</a>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="rv-empty">
+                        <div class="rv-empty-icon">⭐</div>
+                        <h3 style="margin-bottom:8px;">Rəy tapılmadı</h3>
+                        <p style="color:#6b7280;font-size:14px;">Axtarış kriteriyalarınıza uyğun rəy mövcud deyil</p>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</section>

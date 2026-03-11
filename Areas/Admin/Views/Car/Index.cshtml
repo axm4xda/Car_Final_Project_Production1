@@ -1,0 +1,74 @@
+@model IEnumerable<Car>
+@{
+    ViewData["Title"] = "Maşınlar";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Bütün Maşınlar (@Model.Count()) — Təsdiq gözləyən: @Model.Count(c => !c.IsApproved)</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Maşın</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr><th>Şəkil</th><th>Ad</th><th>Marka</th><th>Qiymət</th><th>İl</th><th>Yürüş</th><th>Status</th><th>Əməliyyat</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var car in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(car.ThumbnailUrl))
+                                {<img src="@car.ThumbnailUrl" class="thumb" alt="">}
+                                else if (car.Images.Any())
+                                {<img src="@car.Images.First().ImageUrl" class="thumb" alt="">}
+                                else{<span class="a-badge gray">Yoxdur</span>}
+                            </td>
+                            <td><strong>@car.Title</strong></td>
+                            <td>@car.Brand?.Name</td>
+                            <td>$@car.Price.ToString("N0")</td>
+                            <td>@car.Year</td>
+                            <td>@car.Mileage.ToString("N0") km</td>
+                            <td>
+                                @if (car.IsApproved)
+                                {
+                                    <span class="a-badge green">✅ Təsdiqlənib</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge yellow">⏳ Gözləyir</span>
+                                }
+                            </td>
+                            <td class="act-btns">
+                                @if (!car.IsApproved)
+                                {
+                                    <form asp-action="Approve" asp-route-id="@car.Id" method="post" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn-a success btn-sm" title="Təsdiqlə" onclick="return confirm('Bu elanı təsdiqləmək istəyirsiniz?')">✅</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Reject" asp-route-id="@car.Id" method="post" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn-a warning btn-sm" title="Təsdiqi ləğv et" onclick="return confirm('Bu elanın təsdiqini ləğv etmək istəyirsiniz?')">⛔</button>
+                                    </form>
+                                }
+                                <a asp-action="Edit" asp-route-id="@car.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@car.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ maşın əlavə edilməyib.</p></div>
+    }
+</div>

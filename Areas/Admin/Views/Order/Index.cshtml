@@ -1,0 +1,42 @@
+@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "Sifarişlər";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Sifarişlər (@Model.Count())</div>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead><tr><th>#</th><th>Müştəri</th><th>Email</th><th>Cəm</th><th>Status</th><th>Tarix</th><th>Əməliyyat</th></tr></thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td><strong>#@o.Id</strong></td>
+                            <td>@o.FirstName @o.LastName</td>
+                            <td>@o.Email</td>
+                            <td>$@o.Total.ToString("N2")</td>
+                            <td>
+                                <span class="a-badge @(o.Status == OrderStatus.Delivered ? "green" : o.Status == OrderStatus.Cancelled ? "red" : o.Status == OrderStatus.Pending ? "yellow" : "blue")">
+                                    @o.Status
+                                </span>
+                            </td>
+                            <td>@o.CreatedDate.ToString("dd.MM.yyyy")</td>
+                            <td class="act-btns">
+                                <a asp-action="Details" asp-route-id="@o.Id" class="btn-a info btn-sm">👁</a>
+                                <form asp-action="Delete" asp-route-id="@o.Id" method="post" class="del-form" onsubmit="return confirm('Sifarişi silmək istəyirsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else{<div class="empty-st"><p>Hələ sifariş yoxdur.</p></div>}
+</div>

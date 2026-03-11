@@ -1,0 +1,72 @@
+@model Car_Project.ViewModels.Payment.PaymentResultViewModel
+@{
+    ViewData["Title"] = Model.IsSuccess ? "Payment Successful" : "Payment Failed";
+}
+
+<!-- breadcrumb -->
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Payment Result</span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- Payment Result -->
+<section class="bg-white pb-100">
+    <div class="container">
+        <div class="flex flex-col items-center text-center py-80">
+
+            @if (Model.IsSuccess)
+            {
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none"
+                     xmlns="http://www.w3.org/2000/svg" class="mb-24">
+                    <circle cx="40" cy="40" r="40" fill="#22c55e" fill-opacity="0.12" />
+                    <path d="M24 40L35 51L56 29" stroke="#22c55e" stroke-width="4"
+                          stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <h2 class="mb-12">Payment Successful!</h2>
+                <p class="text-secondary mb-8">
+                    Order: <strong>@Model.OrderCode</strong>
+                </p>
+                <p class="text-secondary mb-8">
+                    Transaction ID: <strong>@Model.TransactionId</strong>
+                </p>
+                <p class="text-secondary mb-8">
+                    Amount: <strong>$@Model.Amount.ToString("F2")</strong>
+                </p>
+                <p class="text-secondary mb-30">
+                    Method: <strong>@Model.Method</strong> &nbsp;|&nbsp;
+                    Date: <strong>@Model.PaidAt.ToString("dd MMM yyyy HH:mm")</strong>
+                </p>
+            }
+            else
+            {
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none"
+                     xmlns="http://www.w3.org/2000/svg" class="mb-24">
+                    <circle cx="40" cy="40" r="40" fill="#ef4444" fill-opacity="0.12" />
+                    <path d="M28 28L52 52M52 28L28 52" stroke="#ef4444" stroke-width="4"
+                          stroke-linecap="round" />
+                </svg>
+                <h2 class="mb-12">Payment Failed</h2>
+                <p class="text-secondary mb-30">@Model.ErrorMessage</p>
+            }
+
+            <div class="flex gap-12">
+                <a asp-controller="Product" asp-action="Index"
+                   class="btn btn-primary btn-large">
+                    Continue Shopping
+                </a>
+                @if (!Model.IsSuccess)
+                {
+                    <a asp-controller="Checkout" asp-action="Index"
+                       class="btn btn-large" style="border:1px solid #1C1C1C">
+                        Try Again
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>

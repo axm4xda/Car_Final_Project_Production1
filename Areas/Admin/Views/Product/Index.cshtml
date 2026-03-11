@@ -1,0 +1,53 @@
+@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Məhsullar";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Məhsullar (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Məhsul</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr><th>Şəkil</th><th>Ad</th><th>Kateqoriya</th><th>Qiymət</th><th>Stok</th><th>Status</th><th>Əməliyyat</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(p.ThumbnailUrl))
+                                { <img src="@p.ThumbnailUrl" class="thumb" alt=""> }
+                                else
+                                { <span class="a-badge gray">Yoxdur</span> }
+                            </td>
+                            <td><strong>@p.Name</strong></td>
+                            <td>@p.Category?.Name</td>
+                            <td>
+                                $@p.Price.ToString("N2")
+                                @if (p.OldPrice.HasValue)
+                                { <span style="text-decoration:line-through;color:#9ca3af;font-size:12px"> $@p.OldPrice.Value.ToString("N2")</span> }
+                            </td>
+                            <td>@p.Stock</td>
+                            <td><span class="a-badge @(p.IsActive ? "green" : "red")">@(p.IsActive ? "Aktiv" : "Deaktiv")</span></td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@p.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@p.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ məhsul əlavə edilməyib.</p></div>
+    }
+</div>

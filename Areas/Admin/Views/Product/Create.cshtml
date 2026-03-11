@@ -1,0 +1,40 @@
+@model Product
+@{
+    ViewData["Title"] = "Yeni Məhsul";
+    var categories = ViewBag.Categories as SelectList;
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Yeni Məhsul Əlavə Et</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="f-row">
+            <div class="fg"><label>Ad</label><input asp-for="Name" class="fc" required></div>
+            <div class="fg"><label>Kateqoriya</label><select asp-for="CategoryId" asp-items="@categories" class="fc"><option value="">Seçin</option></select></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Qiymət ($)</label><input asp-for="Price" class="fc" type="number" step="0.01" required></div>
+            <div class="fg"><label>Köhnə Qiymət ($)</label><input asp-for="OldPrice" class="fc" type="number" step="0.01"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Stok</label><input asp-for="Stock" class="fc" type="number" required></div>
+            <div class="fg"><label>Slug (URL)</label><input asp-for="Slug" class="fc" placeholder="otomatik-yaranir"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Badge</label><input asp-for="Badge" class="fc" placeholder="New, Sale, Hot"></div>
+            <div class="fg"><label>Badge Rəngi</label><input asp-for="BadgeColor" class="fc" placeholder="bg-primary-2"></div>
+        </div>
+        <div class="fg"><label>Təsvir</label><textarea asp-for="Description" class="fc" rows="4"></textarea></div>
+        <div class="f-row">
+            <div class="fg"><label>Thumbnail</label><input type="file" name="thumbnailFile" class="fc" accept="image/*"></div>
+            <div class="fg"><label>Əlavə Şəkillər</label><input type="file" name="imageFiles" class="fc" accept="image/*" multiple></div>
+        </div>
+        <div style="display:flex;gap:20px;margin-bottom:18px">
+            <label class="f-chk"><input asp-for="IsActive" type="checkbox"> Aktiv</label>
+            <label class="f-chk"><input asp-for="IsFeatured" type="checkbox"> Seçilmiş</label>
+        </div>
+        <button class="btn-a primary" type="submit">Əlavə Et</button>
+    </form>
+</div>

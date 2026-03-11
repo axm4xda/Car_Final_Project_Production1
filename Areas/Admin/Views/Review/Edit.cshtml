@@ -1,0 +1,30 @@
+@model Review
+@{
+    ViewData["Title"] = "Rəy Redaktə Et";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Rəy Redaktə Et – @Model.AuthorName</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="f-row">
+            <div class="fg"><label>Müəllif Adı</label><input asp-for="AuthorName" class="fc" required></div>
+            <div class="fg"><label>Müəllif Vəzifəsi</label><input asp-for="AuthorTitle" class="fc"></div>
+        </div>
+        <div class="fg"><label>Rəy Mətni</label><textarea asp-for="Content" class="fc" required></textarea></div>
+        <div class="f-row">
+            <div class="fg"><label>Reytinq (1-5)</label><input asp-for="Rating" class="fc" type="number" min="1" max="5"></div>
+            <div class="fg">
+                <label>Avatar (dəyişmək üçün seçin)</label>
+                <input type="file" name="avatarFile" class="fc" accept="image/*">
+                @if (!string.IsNullOrEmpty(Model.AvatarUrl)){<div style="margin-top:6px"><img src="@Model.AvatarUrl" style="height:50px;border-radius:50%"></div>}
+            </div>
+        </div>
+        <div class="fg">
+            <label class="f-chk"><input asp-for="IsApproved" type="checkbox"> Təsdiqlənmiş</label>
+        </div>
+        <button class="btn-a primary" type="submit">Yadda Saxla</button>
+    </form>
+</div>

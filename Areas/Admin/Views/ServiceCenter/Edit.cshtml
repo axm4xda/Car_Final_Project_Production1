@@ -1,0 +1,61 @@
+@model ServiceCenter
+@{
+    ViewData["Title"] = "Servis Mərkəzini Redaktə Et";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Servis Mərkəzini Redaktə Et</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="f-row">
+            <div class="fg">
+                <label>Ad *</label>
+                <input asp-for="Name" class="fc" required placeholder="Servis mərkəzinin adı">
+            </div>
+            <div class="fg">
+                <label>Ünvan *</label>
+                <input asp-for="Address" class="fc" required placeholder="Ünvan">
+            </div>
+        </div>
+        <div class="f-row">
+            <div class="fg">
+                <label>Telefon</label>
+                <input asp-for="Phone" class="fc" placeholder="Telefon nömrəsi">
+            </div>
+            <div class="fg">
+                <label>Email</label>
+                <input asp-for="Email" class="fc" type="email" placeholder="Email ünvanı">
+            </div>
+        </div>
+        <div class="fg">
+            <label>İş Saatları</label>
+            <input asp-for="WorkingHours" class="fc" placeholder="Məs: Bazar ertəsi - Cümə: 09:00 - 18:00">
+        </div>
+        <div class="f-row">
+            <div class="fg">
+                <label>Enlik (Latitude)</label>
+                <input asp-for="Latitude" class="fc" type="number" step="any" placeholder="Məs: 40.4093">
+            </div>
+            <div class="fg">
+                <label>Uzunluq (Longitude)</label>
+                <input asp-for="Longitude" class="fc" type="number" step="any" placeholder="Məs: 49.8671">
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="fg">
+                <label>Hazırkı Şəkil</label>
+                <div style="margin-top:8px;">
+                    <img src="@Model.ImageUrl" alt="Servis mərkəzi" style="max-width:200px;border-radius:10px;border:1px solid #e5e7eb;">
+                </div>
+            </div>
+        }
+        <div class="fg">
+            <label>Yeni Şəkil (dəyişmək istəyirsinizsə)</label>
+            <input type="file" name="imageFile" class="fc" accept="image/*">
+        </div>
+        <button class="btn-a primary" type="submit">Yadda Saxla</button>
+    </form>
+</div>

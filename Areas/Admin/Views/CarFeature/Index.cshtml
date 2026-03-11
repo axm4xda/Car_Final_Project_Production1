@@ -1,0 +1,35 @@
+@model IEnumerable<CarFeature>
+@{
+    ViewData["Title"] = "Xüsusiyyətlər";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Xüsusiyyətlər (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Xüsusiyyət</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead><tr><th>Ad</th><th>Maşın Sayı</th><th>Əməliyyat</th></tr></thead>
+                <tbody>
+                    @foreach (var f in Model)
+                    {
+                        <tr>
+                            <td><strong>@f.Name</strong></td>
+                            <td>@f.Cars.Count</td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@f.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@f.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istəyirsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else{<div class="empty-st"><p>Hələ xüsusiyyət yoxdur.</p></div>}
+</div>

@@ -1,0 +1,187 @@
+@model SellCarRequest
+@using Car_Project.Models
+@{
+    ViewData["Title"] = "Satış Müraciəti Detalları";
+    var brands = ViewBag.Brands as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div class="a-card-title">Müraciət #@Model.Id</div>
+        <div class="act-btns">
+            <a asp-action="Index" class="btn-a ghost">← Geri</a>
+            @if (Model.Status != SellCarRequestStatus.Trashed)
+            {
+                <form asp-action="MoveToTrash" asp-route-id="@Model.Id" method="post" class="del-form" onsubmit="return confirm('Zibil qutusuna göndərmək istəyirsiniz?')">
+                    @Html.AntiForgeryToken()
+                    <button class="btn-a danger">🗑 Zibil Qutusu</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @* Status Badge *@
+    <div style="margin-bottom:24px;">
+        @switch (Model.Status)
+        {
+            case SellCarRequestStatus.Pending:
+                <span class="a-badge yellow" style="font-size:13px;padding:6px 14px;">⏳ Gözləyir — Nəzərdən keçirilməyib</span>
+                break;
+            case SellCarRequestStatus.Approved:
+                <span class="a-badge green" style="font-size:13px;padding:6px 14px;">✅ Təsdiqləndi — List səhifəsinə əlavə edildi</span>
+                @if (Model.ApprovedCarId.HasValue)
+                {
+                    <a asp-area="Admin" asp-controller="Car" asp-action="Edit" asp-route-id="@Model.ApprovedCarId" class="btn-a info btn-sm" style="margin-left:8px;">
+                        🚗 Maşını Gör
+                    </a>
+                }
+                break;
+            case SellCarRequestStatus.Rejected:
+                <span class="a-badge red" style="font-size:13px;padding:6px 14px;">❌ Rədd edildi</span>
+                break;
+            case SellCarRequestStatus.Trashed:
+                <span class="a-badge gray" style="font-size:13px;padding:6px 14px;">🗑 Zibil qutusunda</span>
+                break;
+        }
+    </div>
+
+    @* Admin Qeydi *@
+    @if (!string.IsNullOrEmpty(Model.AdminNote))
+    {
+        <div style="padding:14px 18px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;margin-bottom:20px;font-size:14px;">
+            <strong>Admin qeydi:</strong> @Model.AdminNote
+        </div>
+    }
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Sahibinin Adı</label>
+            <p style="font-size:15px;font-weight:500;">@Model.OwnerName</p>
+        </div>
+        <div class="fg">
+            <label>Email</label>
+            <p style="font-size:15px;"><a href="mailto:@Model.Email" style="color:#2563eb;text-decoration:underline;">@Model.Email</a></p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Telefon</label>
+            <p style="font-size:15px;">@Model.Phone</p>
+        </div>
+        <div class="fg">
+            <label>Göndərilmə tarixi</label>
+            <p style="font-size:14px;color:#6b7280;">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+        </div>
+    </div>
+
+    <div style="border-top:1px solid #e5e7eb;margin:24px 0;"></div>
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Maşın Məlumatları</h3>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Maşın</label>
+            <p style="font-size:15px;font-weight:600;">@Model.CarTitle</p>
+        </div>
+        <div class="fg">
+            <label>İl</label>
+            <p style="font-size:15px;">@Model.Year</p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Yürüş (km)</label>
+            <p style="font-size:15px;">@Model.Mileage.ToString("N0") km</p>
+        </div>
+        <div class="fg">
+            <label>İstənilən Qiymət</label>
+            <p style="font-size:15px;font-weight:600;color:#059669;">$@Model.AskingPrice.ToString("N0")</p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Yanacaq Növü</label>
+            <p style="font-size:15px;">@(Model.FuelType ?? "—")</p>
+        </div>
+        <div class="fg">
+            <label>Ötürücü</label>
+            <p style="font-size:15px;">@(Model.Transmission ?? "—")</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <div class="fg" style="margin-bottom:20px;">
+            <label>Əlavə Məlumat</label>
+            <div style="padding:16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;line-height:1.7;white-space:pre-wrap;">@Model.Description</div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <div class="fg" style="margin-bottom:20px;">
+            <label>Şəkil</label>
+            <div style="margin-top:8px;">
+                <img src="@Model.ImageUrl" alt="Maşın şəkli" style="max-width:400px;border-radius:12px;border:1px solid #e5e7eb;">
+            </div>
+        </div>
+    }
+</div>
+
+@* ===== Təsdiq / Rədd Paneli ===== *@
+@if (Model.Status == SellCarRequestStatus.Pending)
+{
+    <div class="a-card" style="border:2px solid #e5e7eb;">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">Qərar Verin</h3>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            @* Təsdiq et formu *@
+            <div style="padding:20px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;">
+                <h4 style="font-size:14px;font-weight:700;color:#059669;margin-bottom:12px;">✅ Təsdiq Et</h4>
+                <p style="font-size:12px;color:#065f46;margin-bottom:16px;">Müraciəti təsdiq etdikdə maşın avtomatik olaraq List səhifəsinə əlavə ediləcək.</p>
+                <form asp-action="Approve" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <div class="fg">
+                        <label style="color:#065f46;">Marka seçin *</label>
+                        <select name="brandId" class="fc" required>
+                            <option value="">— Marka seçin —</option>
+                            @if (brands != null)
+                            {
+                                @foreach (var item in brands)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="fg">
+                        <label style="color:#065f46;">Admin Qeydi (isteğe bağlı)</label>
+                        <textarea name="adminNote" class="fc" rows="2" placeholder="Qeyd yazın..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-a success" style="width:100%;justify-content:center;" onclick="return confirm('Təsdiq etmək istədiyinizdən əminsiniz?')">
+                        ✅ Təsdiq Et — List-ə Əlavə Et
+                    </button>
+                </form>
+            </div>
+
+            @* Rədd et formu *@
+            <div style="padding:20px;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;">
+                <h4 style="font-size:14px;font-weight:700;color:#dc2626;margin-bottom:12px;">❌ Rədd Et</h4>
+                <p style="font-size:12px;color:#991b1b;margin-bottom:16px;">Müraciəti rədd etdikdə maşın List səhifəsinə düşməyəcək. Sonradan zibil qutusuna göndərə bilərsiniz.</p>
+                <form asp-action="Reject" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <div class="fg">
+                        <label style="color:#991b1b;">Rədd səbəbi (isteğe bağlı)</label>
+                        <textarea name="adminNote" class="fc" rows="2" placeholder="Rədd səbəbini yazın..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-a danger" style="width:100%;justify-content:center;" onclick="return confirm('Rədd etmək istədiyinizdən əminsiniz?')">
+                        ❌ Rədd Et
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+}

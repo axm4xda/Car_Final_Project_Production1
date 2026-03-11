@@ -1,0 +1,40 @@
+@model IEnumerable<Coupon>
+@{
+    ViewData["Title"] = "Kuponlar";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Kuponlar (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Kupon</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead><tr><th>Kod</th><th>Endirim %</th><th>Sabit Endirim</th><th>Min. Məbləğ</th><th>İstifadə</th><th>Bitmə Tarixi</th><th>Status</th><th>Əməliyyat</th></tr></thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td><strong>@c.Code</strong></td>
+                            <td>@c.DiscountPercent%</td>
+                            <td>@(c.DiscountAmount.HasValue ? "$" + c.DiscountAmount.Value.ToString("N2") : "—")</td>
+                            <td>$@c.MinOrderAmount.ToString("N2")</td>
+                            <td>@c.UsedCount / @c.UsageLimit</td>
+                            <td>@(c.ExpiresAt.HasValue ? c.ExpiresAt.Value.ToString("dd.MM.yyyy") : "Limitsiz")</td>
+                            <td><span class="a-badge @(c.IsActive ? "green" : "red")">@(c.IsActive ? "Aktiv" : "Deaktiv")</span></td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@c.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istəyirsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else{<div class="empty-st"><p>Hələ kupon yoxdur.</p></div>}
+</div>

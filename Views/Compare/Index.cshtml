@@ -1,0 +1,253 @@
+﻿@model Car_Project.ViewModels.Compare.CompareIndexViewModel
+
+@Html.AntiForgeryToken()
+
+<!-- breadcrumb -->
+<section class="background-light">
+	<div class="container">
+		<ul class="breadcrumb">
+			<li><a asp-controller="Home" asp-action="Index">Home</a></li>
+			<li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+			<li><a asp-controller="Home" asp-action="Index">Pages</a></li>
+			<li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+			<li><span>Compare</span></li>
+		</ul>
+	</div>
+</section>
+
+<section class="pb-100">
+	<div class="tf-spacing-style3"></div>
+
+	<div class="container">
+		<h2 class="text-center mb-12 capitalize">Compare Cars Side-by-Side</h2>
+		<p class="mb-40 text-center text-secondary h7 line-height-28">Compare features, performance, and pricing to choose the perfect car.</p>
+
+		@if (!Model.Cars.Any())
+		{
+			<!-- Empty state -->
+			<div class="text-center py-60" id="compareEmptyState">
+				<p class="h4 text-secondary mb-24">Your compare list is empty.</p>
+				<a asp-controller="List" asp-action="Index" class="btn btn-primary btn-large font-weight-600">Browse Cars</a>
+			</div>
+		}
+		else
+		{
+			<!-- Content -->
+			<div id="compareContent">
+				<div class="flex justify-end mb-20" id="compareClearWrapper">
+					<button type="button" id="clearAllCompare" class="btn btn-line btn-large font-weight-600">Clear All</button>
+				</div>
+
+				<div class="card-details" id="compareTableWrapper">
+					<table class="card-details--table">
+						<!-- Car images & titles -->
+						<tr>
+							<td></td>
+							@foreach (var car in Model.Cars)
+							{
+								<td data-compare-car-id="@car.Id">
+									<div class="relative top">
+										<button type="button" class="compare-remove-btn" data-car-id="@car.Id" style="position:absolute;top:0;right:0;z-index:10;background:transparent;border:none;cursor:pointer;padding:8px;">
+											<img src="~/assets/icons/close-modal.svg" alt="Remove" style="width:24px;height:24px;">
+										</button>
+										@if (!string.IsNullOrEmpty(car.ThumbnailUrl))
+										{
+											<img class="mb-10 radius-16 image" src="@car.ThumbnailUrl" alt="@car.Title">
+										}
+										else
+										{
+											<img class="mb-10 radius-16 image" src="~/assets/images/card/card-1.jpg" alt="@car.Title">
+										}
+										<p class="h4 text-center">@car.Title</p>
+										<p class="text-center text-secondary text-sm mb-8">@car.BrandName</p>
+										<p class="h5 text-center text-highlight">$@car.Price.ToString("N2")</p>
+									</div>
+								</td>
+							}
+							@for (int i = Model.Cars.Count; i < 4; i++)
+							{
+								<td>
+									<div class="top text-center" style="min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #e7e7e7;border-radius:16px;padding:20px;">
+										<p class="text-secondary mb-16">Add a car to compare</p>
+										<a asp-controller="List" asp-action="Index" class="btn btn-primary btn-small-2 font-weight-600">Browse Cars</a>
+									</div>
+								</td>
+							}
+						</tr>
+
+						<!-- Mileage -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/mileage.svg" alt="mileage"><span>Mileage:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@car.Mileage.ToString("N0") km</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Year -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/years.svg" alt="year"><span>Year:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@car.Year</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Fuel -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/fuel.svg" alt="fuel"><span>Fuel:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@car.FuelType</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Transmission -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/transmission.svg" alt="transmission"><span>Transmission:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@car.Transmission</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Color -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/color.svg" alt="color"><span>Color:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@(car.Color ?? "—")</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Body Style -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/interior.svg" alt="body"><span>Body Style:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@(car.BodyStyle ?? "—")</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Drive Type -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/engine.svg" alt="drive"><span>Drive:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@(car.DriveType ?? "—")</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Cylinders -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/engine.svg" alt="cylinders"><span>Cylinders:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@(car.Cylinders.HasValue ? car.Cylinders.Value.ToString() : "—")</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Condition -->
+						<tr>
+							<td><div class="flex items-center gap-8"><img src="~/assets/icons/QrCode.svg" alt="condition"><span>Condition:</span></div></td>
+							@foreach (var car in Model.Cars) { <td>@car.Condition</td> }
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+						</tr>
+
+						<!-- Features -->
+						@if (Model.AllFeatures.Any())
+						{
+							@foreach (var feature in Model.AllFeatures)
+							{
+								<tr>
+									<td><span>@feature</span></td>
+									@foreach (var car in Model.Cars)
+									{
+										<td>
+											@if (car.Features.Contains(feature))
+											{
+												<img src="~/assets/icons/SealCheck.svg" alt="yes" style="width:20px;height:20px;">
+											}
+											else
+											{
+												<span class="text-secondary">—</span>
+											}
+										</td>
+									}
+									@for (int i = Model.Cars.Count; i < 4; i++) { <td>—</td> }
+								</tr>
+							}
+						}
+
+						<!-- View Detail links -->
+						<tr>
+							<td></td>
+							@foreach (var car in Model.Cars)
+							{
+								<td>
+									<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="btn btn-primary btn-small-2 font-weight-600 w-full">View Details</a>
+								</td>
+							}
+							@for (int i = Model.Cars.Count; i < 4; i++) { <td></td> }
+						</tr>
+					</table>
+				</div>
+			</div>
+		}
+	</div>
+</section>
+
+@section Scripts {
+<script>
+// ====== Remove single compare item (AJAX — reload page) ======
+$(document).on('click', '.compare-remove-btn', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $btn = $(this);
+    var carId = $btn.data('car-id');
+    if (!carId) return;
+
+    $.ajax({
+        type: 'POST',
+        url: '/Compare/Remove/' + carId,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                updateNavBadge('#compareNavCount', res.count);
+                showToast('Removed from compare.', 'success');
+                // Reload so Razor re-renders the correct state
+                window.location.reload();
+            }
+        },
+        error: function() { showToast('Error removing from compare.', 'error'); }
+    });
+});
+
+// ====== Clear all compare (AJAX) ======
+$(document).on('click', '#clearAllCompare', function(e) {
+    e.preventDefault();
+    $.ajax({
+        type: 'POST',
+        url: '/Compare/Clear',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                updateNavBadge('#compareNavCount', 0);
+                showToast('Compare list cleared.', 'success');
+                window.location.reload();
+            }
+        },
+        error: function() { showToast('Error clearing compare list.', 'error'); }
+    });
+});
+
+// ====== Helpers ======
+function updateNavBadge(selector, count) {
+    var $badge = $(selector);
+    if (count > 0) {
+        $badge.text(count).show();
+    } else {
+        $badge.text('0').hide();
+    }
+}
+
+function showToast(msg, type) {
+    var existing = $('#action-toast');
+    if (existing.length) existing.remove();
+    var cls = type === 'success' ? 'auth-toast--success' : 'auth-toast--error';
+    var $toast = $('<div id="action-toast" class="auth-toast ' + cls + '"><span>' + msg + '</span><button onclick="$(\'#action-toast\').remove()">✕</button></div>');
+    $('body').append($toast);
+    setTimeout(function() { $toast.fadeOut(300, function() { $(this).remove(); }); }, 3000);
+}
+</script>
+}

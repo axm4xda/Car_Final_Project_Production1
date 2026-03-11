@@ -1,0 +1,75 @@
+﻿@model Car_Project.ViewModels.TermsOfUseViewModel
+@{
+    ViewData["Title"] = "Terms of Use";
+}
+
+<!-- breadcrumb -->
+<section class="background-light mb-32">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li>
+                <a asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li>
+                <img src="~/assets/icons/right.svg" alt="chevron-right">
+            </li>
+            <li>
+                <span>Pages</span>
+            </li>
+            <li>
+                <img src="~/assets/icons/right.svg" alt="chevron-right">
+            </li>
+            <li>
+                <span class="capitalize">Terms of Use</span>
+            </li>
+        </ul>
+    </div>
+</section>
+<!-- breadcrumb -->
+
+<section class="bg-white pb-100">
+    <div class="container">
+        <h2 class="capitalize">Terms of Use</h2>
+        <div class="tf-spacing-style3"></div>
+
+        <div class="term-page" id="scrollContainer">
+            <!-- Sidebar Navigation -->
+            <div class="term-page--nav-container">
+                <ul class="term-page--nav" id="sidebarSticky">
+                    @foreach (var ts in Model.Sections)
+                    {
+                        <li>
+                            <a href="#@ts.AnchorId">@ts.Title</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                @foreach (var ts in Model.Sections)
+                {
+                    <div class="section" id="@ts.AnchorId">
+                        <p class="h4 mb-12 capitalize">@ts.Title</p>
+
+                        @for (int i = 0; i < ts.Paragraphs.Count; i++)
+                        {
+                            bool isLastPara = (i == ts.Paragraphs.Count - 1) && !ts.BulletPoints.Any();
+                            <p class="text-body-style-2 @(isLastPara ? "" : "mb-12")">@ts.Paragraphs[i]</p>
+                        }
+
+                        @if (ts.BulletPoints.Any())
+                        {
+                            <ul class="list-style">
+                                @foreach (var bullet in ts.BulletPoints)
+                                {
+                                    <li class="mb-12 text-body-style-2">@bullet</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

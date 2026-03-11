@@ -1,0 +1,156 @@
+@model IList<Car_Project.Models.Notification>
+@{
+    ViewData["Title"] = "Bildirişlər";
+    ViewData["ActivePage"] = "Notifications";
+}
+
+<div class="a-card">
+    <div class="a-card-head">
+        <div class="a-card-title">Bildirişlər (@Model.Count)</div>
+        <div style="display:flex;gap:8px;">
+            @if (Model.Any(n => !n.IsRead))
+            {
+                <form asp-area="Admin" asp-controller="Notification" asp-action="MarkAllAsRead" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-a success btn-sm">
+                        <i data-lucide="check-check" style="width:14px;height:14px"></i>
+                        Hamısını oxunmuş et
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-st">
+            <i data-lucide="bell-off" style="width:48px;height:48px;color:#d1d5db;margin-bottom:12px;"></i>
+            <p>Hələ heç bir bildiriş yoxdur</p>
+        </div>
+    }
+    else
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px;"></th>
+                        <th>Başlıq</th>
+                        <th>Mesaj</th>
+                        <th>Növ</th>
+                        <th>Tarix</th>
+                        <th>Status</th>
+                        <th style="width:140px;">Əməliyyatlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var n in Model)
+                    {
+                        <tr style="@(n.IsRead ? "" : "background:#fffbf5;")">
+                            <td>
+                                @if (!n.IsRead)
+                                {
+                                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF5722;"></span>
+                                }
+                            </td>
+                            <td style="font-weight:@(n.IsRead ? "400" : "600");">@n.Title</td>
+                            <td>
+                                <span style="font-size:13px;color:#6b7280;">
+                                    @(n.Message.Length > 80 ? n.Message[..80] + "…" : n.Message)
+                                </span>
+                            </td>
+                            <td>
+                                <span class="a-badge @GetBadgeClass(n.Type)">@GetTypeName(n.Type)</span>
+                            </td>
+                            <td style="white-space:nowrap;font-size:12px;color:#9ca3af;">@n.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @if (n.IsRead)
+                                {
+                                    <span class="a-badge gray">Oxunmuş</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge yellow">Yeni</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="act-btns">
+                                    @if (!n.IsRead)
+                                    {
+                                        <form asp-area="Admin" asp-controller="Notification" asp-action="MarkAsRead" asp-route-id="@n.Id" method="post" class="del-form">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn-a success btn-sm" title="Oxunmuş et">
+                                                <i data-lucide="check" style="width:14px;height:14px"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (!string.IsNullOrEmpty(n.Link))
+                                    {
+                                        <a href="@n.Link" class="btn-a info btn-sm" title="Keçid et">
+                                            <i data-lucide="external-link" style="width:14px;height:14px"></i>
+                                        </a>
+                                    }
+                                    <form asp-area="Admin" asp-controller="Notification" asp-action="Delete" asp-route-id="@n.Id" method="post" class="del-form"
+                                          onsubmit="return confirm('Bildirişi silmək istədiyinizə əminsiniz?')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn-a danger btn-sm" title="Sil">
+                                            <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>lucide.createIcons();</script>
+}
+
+@functions {
+    string GetBadgeClass(Car_Project.Models.NotificationType type)
+    {
+        return type switch
+        {
+            Car_Project.Models.NotificationType.Success or
+            Car_Project.Models.NotificationType.CarApproved or
+            Car_Project.Models.NotificationType.SellRequestApproved => "green",
+
+            Car_Project.Models.NotificationType.Warning => "yellow",
+
+            Car_Project.Models.NotificationType.CarRejected or
+            Car_Project.Models.NotificationType.SellRequestRejected => "red",
+
+            Car_Project.Models.NotificationType.NewContactMessage or
+            Car_Project.Models.NotificationType.NewSellRequest or
+            Car_Project.Models.NotificationType.NewCarListing => "blue",
+
+            Car_Project.Models.NotificationType.AdminReply => "blue",
+
+            _ => "gray"
+        };
+    }
+
+    string GetTypeName(Car_Project.Models.NotificationType type)
+    {
+        return type switch
+        {
+            Car_Project.Models.NotificationType.Info => "Məlumat",
+            Car_Project.Models.NotificationType.Success => "Uğurlu",
+            Car_Project.Models.NotificationType.Warning => "Xəbərdarlıq",
+            Car_Project.Models.NotificationType.CarApproved => "Elan Təsdiqləndi",
+            Car_Project.Models.NotificationType.CarRejected => "Elan Rədd Edildi",
+            Car_Project.Models.NotificationType.SellRequestApproved => "Müraciət Təsdiqləndi",
+            Car_Project.Models.NotificationType.SellRequestRejected => "Müraciət Rədd Edildi",
+            Car_Project.Models.NotificationType.NewContactMessage => "Yeni Mesaj",
+            Car_Project.Models.NotificationType.NewSellRequest => "Yeni Müraciət",
+            Car_Project.Models.NotificationType.NewCarListing => "Yeni Elan",
+            Car_Project.Models.NotificationType.AdminReply => "Admin Cavabı",
+            _ => type.ToString()
+        };
+    }
+}

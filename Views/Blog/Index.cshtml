@@ -1,0 +1,94 @@
+﻿@model Car_Project.ViewModels.Blog.BlogIndexViewModel
+
+<!-- breadcrumb -->
+<section class="background-light mb-32">
+	<div class="container">
+		<ul class="breadcrumb">
+			<li>
+				<a asp-controller="Home" asp-action="Index">Home</a>
+			</li>
+			<li>
+				<img src="~/assets/icons/right.svg" alt="chevron-right">
+			</li>
+			<li>
+				<span>News</span>
+			</li>
+		</ul>
+	</div>
+</section>
+<!-- breadcrumb -->
+<!-- New Cars -->
+<section class="pb-100">
+	<div class="container">
+		<h2>Blog</h2>
+	</div>
+	<div class="tf-spacing-style3"></div>
+
+	<div class="container">
+
+		<div class="grid grid-cols-2 sm-grid-cols-1 gap-y-40 gap-x-30 mb-40">
+			@if (Model.Posts != null && Model.Posts.Any())
+			{
+				@foreach (var post in Model.Posts)
+				{
+					<a asp-controller="Blog" asp-action="Detail" asp-route-slug="@post.Slug" class="post-style-9 overflow-hidden">
+						<div class="image">
+							<img class="post--img flex" src="@(post.ThumbnailUrl ?? "~/assets/images/blog/post-33.jpg")" alt="@post.Title">
+						</div>
+						<div class="content">
+							<p class="h5 title capitalize mb-12 text-white mb-8">
+								@post.Title
+							</p>
+							<div class="flex gap-12 justify-start">
+								<span class="text-xs text-white">by @(post.AuthorName ?? "Admin")</span>
+								<span class="text-xs text-white">@(post.PublishedAt?.ToString("MMM. dd, yyyy") ?? "")</span>
+								<span class="text-xs text-highlight uppercase text-underline">@post.CategoryName</span>
+							</div>
+						</div>
+					</a>
+				}
+			}
+			else
+			{
+				<p>No blog posts found.</p>
+			}
+		</div>
+
+		@if (Model.TotalPages > 1)
+		{
+			<ul class="pagination justify-center">
+				@for (int i = 1; i <= Model.TotalPages; i++)
+				{
+					<li>
+						<a asp-controller="Blog" asp-action="Index"
+						   asp-route-page="@i"
+						   asp-route-category="@Model.SelectedCategory"
+						   asp-route-tag="@Model.SelectedTag"
+						   asp-route-q="@Model.SearchQuery"
+						   class="pagination__link @(i == Model.CurrentPage ? "active" : "")">
+							@i
+						</a>
+					</li>
+				}
+				@if (Model.CurrentPage < Model.TotalPages)
+				{
+					<li>
+						<a asp-controller="Blog" asp-action="Index"
+						   asp-route-page="@(Model.CurrentPage + 1)"
+						   asp-route-category="@Model.SelectedCategory"
+						   asp-route-tag="@Model.SelectedTag"
+						   asp-route-q="@Model.SearchQuery"
+						   class="pagination__link">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M14.1925 10.4423L7.94254 16.6923C7.88447 16.7504 7.81553 16.7964 7.73966 16.8278C7.66379 16.8593 7.58247 16.8755 7.50035 16.8755C7.41823 16.8755 7.33691 16.8593 7.26104 16.8278C7.18517 16.7964 7.11623 16.7504 7.05816 16.6923C7.00009 16.6342 6.95403 16.5653 6.9226 16.4894C6.89117 16.4135 6.875 16.3322 6.875 16.2501C6.875 16.168 6.89117 16.0867 6.9226 16.0108C6.95403 15.9349 7.00009 15.866 7.05816 15.8079L12.8668 10.0001L7.05816 4.19229C6.94088 4.07502 6.875 3.91596 6.875 3.7501C6.875 3.58425 6.94088 3.42519 7.05816 3.30792C7.17544 3.19064 7.3345 3.12476 7.50035 3.12476C7.6662 3.12476 7.82526 3.19064 7.94254 3.30792L14.1925 9.55791C14.2506 9.61596 14.2967 9.68489 14.3282 9.76077C14.3597 9.83664 14.3758 9.91797 14.3758 10.0001C14.3758 10.0822 14.3597 10.1636 14.3282 10.2394C14.2967 10.3153 14.2506 10.3842 14.1925 10.4423Z" fill="#9FA1A4" />
+							</svg>
+						</a>
+					</li>
+				}
+			</ul>
+		}
+	</div>
+</section>
+<!-- New Cars -->
+<!-- Filter Sidebar -->
+<!-- Filter Sidebar -->

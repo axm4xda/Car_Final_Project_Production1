@@ -1,0 +1,276 @@
+@model Car_Project.Models.Order
+@{
+    ViewData["Title"] = "Order Confirmed";
+    var orderCode = $"ORD-{Model.Id:D6}";
+    var payment   = Model.Payment;
+    var cardInfo  = !string.IsNullOrEmpty(payment?.CardLastFour)
+                        ? $"**** **** **** {payment.CardLastFour}"
+                        : null;
+    var paidAt    = payment?.PaidAt ?? Model.CreatedDate;
+    var method    = payment?.Method.ToString() ?? "—";
+}
+
+<style>
+    /* ── Success page ── */
+    .order-success-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    /* Checkmark circle animation */
+    .success-circle {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: #ecfdf5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 28px;
+        animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    @@keyframes successPop {
+        from { transform: scale(0.4); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
+    }
+    .success-circle svg {
+        animation: checkDraw 0.45s 0.3s ease both;
+        stroke-dasharray: 60;
+        stroke-dashoffset: 60;
+    }
+    @@keyframes checkDraw {
+        to { stroke-dashoffset: 0; }
+    }
+
+    /* Email toast banner */
+    .email-sent-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 12px;
+        padding: 14px 20px;
+        margin-bottom: 32px;
+        font-size: 14px;
+        color: #065f46;
+        max-width: 520px;
+        width: 100%;
+        animation: fadeSlideIn 0.5s 0.8s ease both;
+    }
+    @@keyframes fadeSlideIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Order detail card */
+    .order-detail-card {
+        max-width: 520px;
+        width: 100%;
+        text-align: left;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 32px;
+        animation: fadeSlideIn 0.5s 0.6s ease both;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .order-detail-card__header {
+        background: linear-gradient(135deg, #FF5722, #e64a19);
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .order-detail-card__header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+    }
+    .order-detail-card__header span {
+        font-size: 13px;
+        color: rgba(255,255,255,0.85);
+    }
+    .order-detail-card__body {
+        padding: 20px 24px;
+    }
+    .order-detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 9px 0;
+        font-size: 14px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .order-detail-row:last-child {
+        border-bottom: none;
+    }
+    .order-detail-row .label {
+        color: #6b7280;
+    }
+    .order-detail-row .value {
+        font-weight: 600;
+        color: #1c1c1c;
+    }
+    .order-detail-row .value.total-amount {
+        font-size: 20px;
+        font-weight: 800;
+        color: #FF5722;
+    }
+
+    /* Products list inside card */
+    .order-products-list {
+        border-top: 1px solid #f3f4f6;
+        padding-top: 14px;
+        margin-top: 4px;
+    }
+    .order-product-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #374151;
+        padding: 5px 0;
+    }
+    .order-product-item .qty {
+        color: #9ca3af;
+        margin-left: 4px;
+    }
+
+    /* CTA buttons */
+    .success-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+        animation: fadeSlideIn 0.5s 1s ease both;
+    }
+</style>
+
+<!-- breadcrumb -->
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Order Confirmed</span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- Order Success -->
+<section class="bg-white pb-100">
+    <div class="container">
+        <div class="order-success-wrapper">
+
+            <!-- Animated checkmark -->
+            <div class="success-circle">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 24L21 33L36 15" stroke="#22c55e" stroke-width="4"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <h2 class="mb-8" style="animation:fadeSlideIn 0.4s 0.4s ease both;opacity:0;">
+                Payment Successful! 🎉
+            </h2>
+            <p class="text-secondary mb-28" style="animation:fadeSlideIn 0.4s 0.55s ease both;opacity:0;font-size:15px;">
+                Your order has been placed and confirmed.
+            </p>
+
+            <!-- Email confirmation banner -->
+            @if (!string.IsNullOrWhiteSpace(Model.Email))
+            {
+                <div class="email-sent-banner">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 6l-10 7L2 6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>
+                        A payment confirmation email has been sent to <strong>@Model.Email</strong>
+                    </span>
+                </div>
+            }
+
+            <!-- Order Detail Card -->
+            <div class="order-detail-card">
+                <div class="order-detail-card__header">
+                    <h3>@orderCode</h3>
+                    <span>@paidAt.ToString("dd MMM yyyy, HH:mm") UTC</span>
+                </div>
+                <div class="order-detail-card__body">
+
+                    <!-- Payment meta -->
+                    <div class="order-detail-row">
+                        <span class="label">Payment Method</span>
+                        <span class="value">@method</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(cardInfo))
+                    {
+                        <div class="order-detail-row">
+                            <span class="label">Card</span>
+                            <span class="value">@cardInfo</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(payment?.TransactionId))
+                    {
+                        <div class="order-detail-row">
+                            <span class="label">Transaction ID</span>
+                            <span class="value" style="font-size:12px;font-family:monospace;">@payment.TransactionId</span>
+                        </div>
+                    }
+
+                    <!-- Products -->
+                    @if (Model.Items.Any())
+                    {
+                        <div class="order-products-list">
+                            <p style="font-size:13px;font-weight:600;color:#374151;margin:0 0 8px;">Items Purchased</p>
+                            @foreach (var item in Model.Items)
+                            {
+                                <div class="order-product-item">
+                                    <span>@(item.Product?.Name ?? "Product")<span class="qty">× @item.Quantity</span></span>
+                                    <span style="font-weight:600;">$@item.TotalPrice.ToString("F2")</span>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div style="height:1px;background:#f3f4f6;margin:14px 0;"></div>
+
+                    @if (Model.Discount > 0)
+                    {
+                        <div class="order-detail-row">
+                            <span class="label">Discount</span>
+                            <span class="value" style="color:#22c55e;">-$@Model.Discount.ToString("F2")</span>
+                        </div>
+                    }
+                    <div class="order-detail-row">
+                        <span class="label">Shipping</span>
+                        <span class="value">@(Model.ShippingCost == 0 ? "Free" : "$" + Model.ShippingCost.ToString("F2"))</span>
+                    </div>
+                    <div class="order-detail-row" style="padding-top:14px;border-top:2px solid #f3f4f6;margin-top:4px;">
+                        <span style="font-size:15px;font-weight:700;color:#1c1c1c;">Total Paid</span>
+                        <span class="value total-amount">$@Model.Total.ToString("F2")</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="success-actions">
+                <a asp-controller="Product" asp-action="Index"
+                   class="btn btn-primary btn-large">
+                    Continue Shopping
+                </a>
+                <a asp-controller="Home" asp-action="Index"
+                   class="btn btn-large" style="border:1.5px solid #e5e7eb;color:#1c1c1c;">
+                    Back to Home
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>

@@ -1,0 +1,118 @@
+@model IList<Car_Project.ViewModels.Account.UserWithRoleViewModel>
+@{
+    ViewData["Title"] = "İstifadəçilər";
+}
+
+<div class="stats-grid">
+    <div class="st-card">
+        <div class="st-ico blue"><i data-lucide="users"></i></div>
+        <div>
+            <div class="st-val">@Model.Count</div>
+            <div class="st-lbl">Ümumi İstifadəçi</div>
+        </div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico purple"><i data-lucide="shield"></i></div>
+        <div>
+            <div class="st-val">@Model.Count(u => u.Role == "Admin" || u.Role == "SuperAdmin")</div>
+            <div class="st-lbl">Adminlər</div>
+        </div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico orange"><i data-lucide="briefcase"></i></div>
+        <div>
+            <div class="st-val">@Model.Count(u => u.Role == "Agent")</div>
+            <div class="st-lbl">Agentlər</div>
+        </div>
+    </div>
+    <div class="st-card">
+        <div class="st-ico green"><i data-lucide="user"></i></div>
+        <div>
+            <div class="st-val">@Model.Count(u => u.Role == "User")</div>
+            <div class="st-lbl">Adi İstifadəçilər</div>
+        </div>
+    </div>
+</div>
+
+<div class="a-card">
+    <div class="a-card-head">
+        <div class="a-card-title">Bütün İstifadəçilər (@Model.Count)</div>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr>
+                        <th>Ad Soyad</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Qeydiyyat Tarixi</th>
+                        <th>Əməliyyat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td><strong>@user.FullName</strong></td>
+                            <td>@user.Email</td>
+                            <td>
+                                @if (user.Role == "SuperAdmin")
+                                {
+                                    <span class="a-badge" style="background:#f5f3ff;color:#7c3aed;">SuperAdmin</span>
+                                }
+                                else if (user.Role == "Admin")
+                                {
+                                    <span class="a-badge blue">Admin</span>
+                                }
+                                else if (user.Role == "Agent")
+                                {
+                                    <span class="a-badge yellow">Agent</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge gray">User</span>
+                                }
+                            </td>
+                            <td>@user.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="act-btns">
+                                <a asp-action="Details" asp-route-id="@user.Id" class="btn-a info btn-sm">👁</a>
+                                @if (user.Role != "SuperAdmin")
+                                {
+                                    <form asp-action="ChangeRole" method="post" style="display:inline-flex;align-items:center;gap:4px;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <select name="newRole" class="fc" style="padding:4px 8px;font-size:12px;width:auto;min-width:80px;">
+                                            <option value="User" selected="@(user.Role == "User" ? "selected" : null)">User</option>
+                                            <option value="Agent" selected="@(user.Role == "Agent" ? "selected" : null)">Agent</option>
+                                            <option value="Admin" selected="@(user.Role == "Admin" ? "selected" : null)">Admin</option>
+                                        </select>
+                                        <button type="submit" class="btn-a primary btn-sm">Təyin et</button>
+                                    </form>
+                                    <form asp-action="Delete" method="post" class="del-form" onsubmit="return confirm('Bu istifadəçini silmək istədiyinizdən əminsiniz?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button class="btn-a danger btn-sm">🗑</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="font-size:12px;color:#9ca3af;">—</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ istifadəçi yoxdur.</p></div>
+    }
+</div>
+
+@section Scripts {
+    <script>lucide.createIcons();</script>
+}

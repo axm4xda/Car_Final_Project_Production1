@@ -1,0 +1,782 @@
+@model Car_Project.ViewModels.Home.HomeIndexViewModel
+@using Car_Project.ViewModels.Home
+
+@Html.AntiForgeryToken()
+
+<!-- page-title -->
+<form asp-controller="List" asp-action="Index" method="get">
+	<section class="page-title flex h-706">
+		<div class="swiper-container page-title--slider sw-single">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide">
+					<div class="tp-showcase-slider-bg" data-background="/assets/images/page-title/banner-1.jpg"></div>
+				</div>
+				<div class="swiper-slide">
+					<div class="tp-showcase-slider-bg" data-background="/assets/images/page-title/banner-2.jpg"></div>
+				</div>
+				<div class="swiper-slide">
+					<div class="tp-showcase-slider-bg" data-background="/assets/images/page-title/banner-3.jpg"></div>
+				</div>
+				<div class="swiper-slide">
+					<div class="tp-showcase-slider-bg" data-background="/assets/images/page-title/banner-5.jpg"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Search Cars Section -->
+		<div class="search-cars container margin-top-auto margin-bottom-auto">
+			<h1 class="search-cars__title wow fadeInUp" data-wow-delay="0.1s">Search Cars Near You - Buy Today!</h1>
+
+			<div class="flat-tabs mb-16 wow fadeInUp" data-wow-delay="0.3s">
+				<div class="overflow-x-auto">
+					<ul class="menu-tab menu-tab-style1 text-white">
+						<li class="active"><span class="text-white font-weight-600">All Car</span></li>
+						<li><span class="text-white font-weight-600">New Car</span></li>
+					</ul>
+				</div>
+			</div>
+
+			<!-- Primary Search Filters -->
+			<div class="search-cars__filters wow fadeInUp" data-wow-delay="0.5s">
+				<div class="search-cars__select-wrapper">
+					<div class="search-cars__select bg-white filter-select-dropdown" data-name="Brand">
+						<label for="BrandSelectToggle" class="search-cars__label">Select Brand</label>
+						<input type="checkbox" id="BrandSelectToggle" class="filter-select-dropdown__toggle">
+						<label for="BrandSelectToggle" class="filter-select-dropdown__text">
+							<span>All Brand</span>
+						</label>
+						<div class="filter-select-dropdown__menu">
+							<div class="filter-select-dropdown__list">
+								<label class="filter-checkbox">
+									<input type="checkbox" name="Brand" value="all" checked>
+									<span>All Brand</span>
+								</label>
+								@foreach (var brand in Model.BrandNames)
+								{
+									<label class="filter-checkbox">
+										<input type="checkbox" name="Brand" value="@brand">
+										<span>@brand</span>
+									</label>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="search-cars__select-wrapper">
+					<div class="search-cars__select bg-white filter-select-dropdown" data-name="FuelType">
+						<label for="FuelTypeSelectToggle" class="search-cars__label">Fuel Type</label>
+						<input type="checkbox" id="FuelTypeSelectToggle" class="filter-select-dropdown__toggle">
+						<label for="FuelTypeSelectToggle" class="filter-select-dropdown__text">
+							<span>All Fuel</span>
+						</label>
+						<div class="filter-select-dropdown__menu">
+							<div class="filter-select-dropdown__list">
+								<label class="filter-checkbox">
+									<input type="checkbox" name="FuelType" value="all" checked>
+									<span>All Fuel</span>
+								</label>
+								@foreach (var fuel in Model.FuelTypes)
+								{
+									<label class="filter-checkbox">
+										<input type="checkbox" name="FuelType" value="@fuel">
+										<span>@fuel</span>
+									</label>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="search-cars__select-wrapper">
+					<div class="search-cars__select bg-white filter-select-dropdown" data-name="Transmission">
+						<label for="TransmissionSelectToggle" class="search-cars__label">Transmission</label>
+						<input type="checkbox" id="TransmissionSelectToggle" class="filter-select-dropdown__toggle">
+						<label for="TransmissionSelectToggle" class="filter-select-dropdown__text">
+							<span>All</span>
+						</label>
+						<div class="filter-select-dropdown__menu">
+							<div class="filter-select-dropdown__list">
+								<label class="filter-checkbox">
+									<input type="checkbox" name="Transmission" value="all" checked>
+									<span>All</span>
+								</label>
+								@foreach (var t in Model.Transmissions)
+								{
+									<label class="filter-checkbox">
+										<input type="checkbox" name="Transmission" value="@t">
+										<span>@t</span>
+									</label>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Filter Icon Button -->
+				<div class="search-cars__filter" id="filterToggle">
+					<img src="~/assets/icons/filter.svg" alt="Filter">
+				</div>
+
+				<button type="submit" class="search-cars__search flex items-center gap-8 justify-center md-w-full">
+					<img src="~/assets/icons/search.svg" alt="search">
+					Show @Model.TotalMatchCount.ToString("N0") Matches
+				</button>
+			</div>
+		</div>
+		<!-- Search Cars Section -->
+
+		<div class="swiper-pagination pagination-white pagination-style pagination-page-title--slider-1 mt-38"></div>
+	</section>
+</form>
+<!-- page-title -->
+
+<!-- New Cars -->
+<section class="container py-100 flat-tabs">
+	<div class="title-section mb-30 gap-8 wow fadeInUp" data-wow-delay="0.1s">
+		<ul class="menu-tab menu-tab-style2 text-white gap-40 md-gap-12">
+			<li class="active"><h2 class="text">New Cars</h2></li>
+		</ul>
+		<a asp-controller="List" asp-action="Index" class="btn btn-line-style-2 effect-line-primary hover-fill-white effect-line-primary btn-large">
+			View All
+			<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M8.125 0C6.51803 0 4.94714 0.476523 3.611 1.36931C2.27485 2.2621 1.23344 3.53105 0.618482 5.0157C0.00352044 6.50035 -0.157382 8.13401 0.156123 9.71011C0.469628 11.2862 1.24346 12.7339 2.37976 13.8702C3.51606 15.0065 4.9638 15.7804 6.5399 16.0939C8.11599 16.4074 9.74966 16.2465 11.2343 15.6315C12.719 15.0166 13.9879 13.9752 14.8807 12.639C15.7735 11.3029 16.25 9.73197 16.25 8.125C16.2477 5.97081 15.391 3.90551 13.8677 2.38227C12.3445 0.85903 10.2792 0.00227486 8.125 0ZM11.6922 8.56719L9.19219 11.0672C9.07492 11.1845 8.91586 11.2503 8.75 11.2503C8.58415 11.2503 8.42509 11.1845 8.30782 11.0672C8.19054 10.9499 8.12466 10.7909 8.12466 10.625C8.12466 10.4591 8.19054 10.3001 8.30782 10.1828L9.74141 8.75H5C4.83424 8.75 4.67527 8.68415 4.55806 8.56694C4.44085 8.44973 4.375 8.29076 4.375 8.125C4.375 7.95924 4.44085 7.80027 4.55806 7.68306C4.67527 7.56585 4.83424 7.5 5 7.5H9.74141L8.30782 6.06719C8.19054 5.94991 8.12466 5.79085 8.12466 5.625C8.12466 5.45915 8.19054 5.30009 8.30782 5.18281C8.42509 5.06554 8.58415 4.99965 8.75 4.99965C8.91586 4.99965 9.07492 5.06554 9.19219 5.18281L11.6922 7.68281C11.7503 7.74086 11.7964 7.80979 11.8279 7.88566C11.8593 7.96154 11.8755 8.04287 11.8755 8.125C11.8755 8.20713 11.8593 8.28846 11.8279 8.36434C11.7964 8.44021 11.7503 8.50914 11.6922 8.56719Z" fill="#1C1C1C" />
+			</svg>
+		</a>
+	</div>
+	<div class="content-tab">
+		<div class="content-inner active">
+			<div class="swiper-container swiper-card-7" data-pagination=".pagination-swiper-card-7-1">
+				<div class="swiper-wrapper">
+					@for (int i = 0; i < Model.NewCars.Count; i++)
+					{
+						var car = Model.NewCars[i];
+						var delays = new[] { "0.1s", "0.2s", "0.3s", "0.4s" };
+						var delay = delays[i % delays.Length];
+						<div class="swiper-slide">
+							<div class="card-box card-box-style-1 mt-10 wow fadeIn" data-wow-delay="@delay">
+								<div class="top">
+									@if (!string.IsNullOrEmpty(car.Badge))
+									{
+										<p class="@car.BadgeColor text-white highlight">@car.Badge</p>
+									}
+									else
+									{
+										<p></p>
+									}
+									<p class="heart" data-car-id="@car.Id">
+										<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<g clip-path="url(#clip0_13399_19510)">
+												<path d="M8 14C8 14 1.5 10.5 1.5 6.375C1.5 5.47989 1.85558 4.62145 2.48851 3.98851C3.12145 3.35558 3.97989 3 4.875 3C6.28688 3 7.49625 3.76937 8 5C8.50375 3.76937 9.71312 3 11.125 3C12.0201 3 12.8785 3.35558 13.5115 3.98851C14.1444 4.62145 14.5 5.47989 14.5 6.375C14.5 10.5 8 14 8 14Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+										</g>
+										</svg>
+									</p>
+								</div>
+								<div class="image">
+									<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id">
+										<img class="card--img" src="@car.ThumbnailUrl" alt="@car.Title">
+									</a>
+								</div>
+								<div class="content border-light border-top-none">
+									<div class="bottom">
+										<p class="category uppercase text-white">
+											<a asp-controller="List" asp-action="Index" asp-route-brand="@car.BrandName" class="text-white uppercase text-xs">@car.BrandName</a>
+										</p>
+										<div class="flex items-center gap-8">
+											<p class="category uppercase text-white">
+												<img src="~/assets/icons/picture.svg" alt="picture">
+												@car.ImageCount
+											</p>
+											<p class="category uppercase text-white">
+												<img src="~/assets/icons/play.svg" alt="play">
+												@car.VideoCount
+											</p>
+										</div>
+									</div>
+									<p class="card-box__title mb-8 h6">
+										<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id">@car.Title</a>
+									</p>
+									<ul class="tag mb-10">
+										<li>
+											<img src="~/assets/icons/icon-gauge.svg" alt="mileage">
+											<span>@car.Mileage.ToString("N0") miles</span>
+										</li>
+										<li>
+											<img src="~/assets/icons/calendar.svg" alt="year">
+											<span>@car.Year</span>
+										</li>
+										<li>
+											<img src="~/assets/icons/gaspump.svg" alt="fuel">
+											<span>@car.FuelType</span>
+										</li>
+										<li>
+											<img src="~/assets/icons/manual.svg" alt="transmission">
+											<span>@car.Transmission</span>
+										</li>
+									</ul>
+									@if (car.MonthlyPayment.HasValue)
+									{
+										<p class="h6 card-box__price mb-15 flex justify-between gap-8 items-center">
+											$@car.Price.ToString("N2")
+											<span class="text-sm">
+												$@car.MonthlyPayment.Value.ToString("N0")/mo
+												<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="text-underline ml-2 text-muted text-xs">See Finance</a>
+											</span>
+										</p>
+									}
+									else
+									{
+										<p class="card-box__price mb-15">$@car.Price.ToString("N2")</p>
+									}
+									<div class="divider mb-15"></div>
+									<div class="flex justify-between">
+										<p class="compare-details btn btn-small" data-car-id="@car.Id">
+											<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<g clip-path="url(#clip0_13399_19575)">
+													<path d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+													<path d="M6.875 10H13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+													<path d="M10 6.875V13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												</g>
+											</svg>
+											Compare
+										</p>
+										<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="view-details">
+											View details
+											<img class="ml-4" src="~/assets/icons/CaretCircleRight.svg" alt="CaretCircleRight.svg">
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+				<div class="swiper-pagination pagination-dark pagination-style pagination-swiper-card-7-1 mt-38"></div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- New Cars -->
+
+<!-- Browse By Type (static SVG iconlar saxlanıldı) -->
+<section class="py-100 relative">
+	<div class="overlay image">
+		<img class="lazyload parallax" data-src="images/banner/cd-phonecase.jpg" src="~/assets/images/brand/banner-brand.png" alt="">
+	</div>
+	<div class="container wow fadeIn relative" data-wow-delay="0.2s">
+		<div class="title-section mb-40">
+			<h2 class="text-white text-center">Browse By Type</h2>
+			<a asp-controller="List" asp-action="Index" class="btn btn-blur hover-fill-primary font-weight-600 btn-large">
+				Check All Car Type
+				<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_16987_736)"><path d="M10 1.875C8.39303 1.875 6.82214 2.35152 5.486 3.24431C4.14985 4.1371 3.10844 5.40605 2.49348 6.8907C1.87852 8.37535 1.71762 10.009 2.03112 11.5851C2.34463 13.1612 3.11846 14.6089 4.25476 15.7452C5.39106 16.8815 6.8388 17.6554 8.4149 17.9689C9.99099 18.2824 11.6247 18.1215 13.1093 17.5065C14.594 16.8916 15.8629 15.8502 16.7557 14.514C17.6485 13.1779 18.125 11.607 18.125 10C18.1227 7.84581 17.266 5.78051 15.7427 4.25727C14.2195 2.73403 12.1542 1.87727 10 1.875ZM13.5672 10.4422L11.0672 12.9422C10.9499 13.0595 10.7909 13.1253 10.625 13.1253C10.4592 13.1253 10.3001 13.0595 10.1828 12.9422C10.0655 12.8249 9.99966 12.6659 9.99966 12.5C9.99966 12.3341 10.0655 12.1751 10.1828 12.0578L11.6164 10.625H6.875C6.70924 10.625 6.55027 10.5592 6.43306 10.4419C6.31585 10.3247 6.25 10.1658 6.25 10C6.25 9.83424 6.31585 9.67527 6.43306 9.55806C6.55027 9.44085 6.70924 9.375 6.875 9.375H11.6164L10.1828 7.94219C10.0655 7.82491 9.99966 7.66585 9.99966 7.5C9.99966 7.33415 10.0655 7.17509 10.1828 7.05781C10.3001 6.94054 10.4592 6.87465 10.625 6.87465C10.7909 6.87465 10.9499 6.94054 11.0672 7.05781L13.5672 9.55781C13.6253 9.61586 13.6714 9.68479 13.7029 9.76066C13.7343 9.83654 13.7505 9.91787 13.7505 10C13.7505 10.0821 13.7343 10.1635 13.7029 10.2393C13.6714 10.3152 13.6253 10.3841 13.5672 10.4422Z" fill="white"></path></g></svg>
+			</a>
+		</div>
+		<div class="swiper-brand-wrapper">
+			<div class="swiper-container swiper-brand">
+				<div class="swiper-wrapper timing-function">
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Electric">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M6.95237 27.1027C8.73393 27.1027 10.1782 25.6585 10.1782 23.8769C10.1782 22.0954 8.73393 20.6511 6.95237 20.6511C5.17081 20.6511 3.72656 22.0954 3.72656 23.8769C3.72656 25.6585 5.17081 27.1027 6.95237 27.1027Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M30.175 27.1027C31.9566 27.1027 33.4008 25.6585 33.4008 23.8769C33.4008 22.0954 31.9566 20.6511 30.175 20.6511C28.3935 20.6511 26.9492 22.0954 26.9492 23.8769C26.9492 25.6585 28.3935 27.1027 30.175 27.1027Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M26.95 24.5222H10.1758" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M33.4032 24.5217H37.9194L39.8548 23.2314L39.2097 22.5862V20.6508L40.5 20.0056L40.2419 19.8766C37.0161 17.812 32.629 16.7798 28.8871 16.7798C28.8871 16.7798 28.2419 15.8766 26.9516 14.9734C25.6613 14.0701 23.7258 13.0379 21.1452 12.9088C16.1129 12.6508 6.30645 16.7798 6.30645 16.7798H1.79032C1.01613 16.7798 0.5 17.425 0.5 18.0701V23.2314L3.72581 23.8766" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M35.3398 19.3621L37.2753 20.0072" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M11.4699 18.7155L6.30859 16.78" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M14.6914 20.0072L21.7882 21.8137C22.1753 21.9427 22.5624 21.8137 22.8204 21.5556L25.5301 19.3621" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M28.8881 16.78H20.501C17.5333 16.78 14.5655 16.1348 11.7268 14.9735L11.4688 14.8445" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M0.5 20.6511H1.01612C2.17741 20.6511 3.33871 19.8769 3.72581 18.7156H0.5" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Electric
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Sedan">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M8.88597 28.3879C10.6675 28.3879 12.1118 26.9437 12.1118 25.1621C12.1118 23.3805 10.6675 21.9363 8.88597 21.9363C7.1044 21.9363 5.66016 23.3805 5.66016 25.1621C5.66016 26.9437 7.1044 28.3879 8.88597 28.3879Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M31.468 28.3879C33.2496 28.3879 34.6938 26.9437 34.6938 25.1621C34.6938 23.3805 33.2496 21.9363 31.468 21.9363C29.6864 21.9363 28.2422 23.3805 28.2422 25.1621C28.2422 26.9437 29.6864 28.3879 31.468 28.3879Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M12.1094 25.1606H28.2385" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M34.6936 25.1598H40.5001V20.6436C37.5324 18.5791 34.0485 17.4178 30.4356 17.4178H29.5323L25.7904 12.6436C25.2743 11.9984 24.5001 11.6113 23.7259 11.6113H10.6936C10.4355 11.6113 10.0484 11.7404 9.79034 11.8694L5.6613 15.4823H3.08065C2.30646 15.4823 1.79033 15.9984 1.79033 16.7726V20.6436L0.5 21.9339V23.8694L5.6613 25.1598" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M14.6927 19.3511H13.4023" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M21.1458 19.3511H19.8555" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M29.5313 17.4178H12.1119L9.53125 16.1275V14.8371L13.4022 11.6113" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M1.78906 20.6427H3.07939C3.85358 20.6427 4.36971 20.1265 4.36971 19.3523C4.36971 18.5781 3.85358 18.062 3.07939 18.062H1.78906" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M36.6328 18.7065V20.642C36.6328 21.4162 37.1489 21.9324 37.9231 21.9324H40.5038" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M17.9219 11.6113V17.4178" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Sedan
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Hatchback">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M7.5969 27.2678C9.37846 27.2678 10.8227 25.8235 10.8227 24.042C10.8227 22.2604 9.37846 20.8162 7.5969 20.8162C5.81534 20.8162 4.37109 22.2604 4.37109 24.042C4.37109 25.8235 5.81534 27.2678 7.5969 27.2678Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M16.6289 11.1387V15.0096" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M30.8241 16.3L10.8241 15.6548L6.95312 14.3645L9.53377 11.1387" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M4.37097 24.0424L0.5 23.3972V20.1714L1.79032 18.8811L1.14516 16.9456L5.66129 11.7843L4.37097 11.1392L14.5645 10.7521C20.5 10.494 26.3065 12.5585 30.8226 16.3005C30.8226 16.3005 37.0161 16.9456 40.5 19.5263V24.6876H35.3387" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M32.1125 27.2678C33.8941 27.2678 35.3383 25.8235 35.3383 24.042C35.3383 22.2604 33.8941 20.8162 32.1125 20.8162C30.331 20.8162 28.8867 22.2604 28.8867 24.042C28.8867 25.8235 30.331 27.2678 32.1125 27.2678Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M2.43422 15.6548L5.66003 16.9451C4.88584 18.1064 3.46648 18.8806 2.04712 18.8806H1.78906" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M40.4972 21.4614C38.8198 21.0743 37.1424 20.3001 35.8521 19.2679L35.3359 18.8808L38.3037 18.2356" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M12.1106 18.2356H10.8203" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M19.8567 18.2356H18.5664" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M10.8203 24.042H28.8848" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Hatchback
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="SUV">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M29.6618 25.8069H11.9844" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M35.8548 25.8068H37.2742L40.5 24.5165V19.3552L30.1774 16.7746L26.5645 13.1617C25.5323 12.1294 24.2419 11.6133 22.9516 11.6133H7.59677C4.75806 12.9036 2.30644 15.0972 1.01612 18.0649L0.5 19.3552V23.8713L5.01613 25.8068H5.79033" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M40.4992 20.6455H37.2734L37.9186 23.2262H40.4992" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M0.5 19.3552H3.72581L3.20969 20.7746C2.82259 21.8068 1.66129 22.581 0.5 22.581" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M10.8228 11.6133L8.24219 15.4842L9.53251 16.7746H30.1777" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M8.88987 28.3874C10.6714 28.3874 12.1157 26.9432 12.1157 25.1616C12.1157 23.38 10.6714 21.9358 8.88987 21.9358C7.10831 21.9358 5.66406 23.38 5.66406 25.1616C5.66406 26.9432 7.10831 28.3874 8.88987 28.3874Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M32.7571 28.3874C34.5386 28.3874 35.9829 26.9432 35.9829 25.1616C35.9829 23.38 34.5386 21.9358 32.7571 21.9358C30.9755 21.9358 29.5312 23.38 29.5312 25.1616C29.5312 26.9432 30.9755 28.3874 32.7571 28.3874Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M7.59551 11.6133L4.36971 16.7746H1.78906" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M19.2109 16.7746V11.6133" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M12.1106 19.3552H10.8203" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M19.8555 19.3552H21.791" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							SUV
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Crossover">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9.53049 26.0959C11.3121 26.0959 12.7563 24.6517 12.7563 22.8701C12.7563 21.0885 11.3121 19.6443 9.53049 19.6443C7.74893 19.6443 6.30469 21.0885 6.30469 22.8701C6.30469 24.6517 7.74893 26.0959 9.53049 26.0959Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M32.7571 26.0959C34.5386 26.0959 35.9829 24.6517 35.9829 22.8701C35.9829 21.0885 34.5386 19.6443 32.7571 19.6443C30.9755 19.6443 29.5312 21.0885 29.5312 22.8701C29.5312 24.6517 30.9755 26.0959 32.7571 26.0959Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M6.30645 22.8701L0.5 21.5798V18.354L1.79032 17.7088L0.5 15.7733C0.5 15.7733 5.91935 11.9023 12.1129 11.9023C17.0161 11.9023 21.7903 11.9023 23.5968 11.9023C24.1129 11.9023 24.629 12.0314 25.0161 12.2894L30.1774 15.7733C30.1774 15.7733 36.5 16.1604 40.5 17.0636L39.8548 18.354L40.5 19.6443V22.2249L35.9839 22.8701" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M12.7578 22.8701H29.532" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M30.1777 15.7733H10.8228L8.24219 15.1282C9.14541 13.8378 10.3067 12.9346 11.7261 12.2894L12.7583 11.9023" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M13.4023 17.7087H14.6927" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M21.1445 17.7087H22.4349" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M1.79032 17.7087H4.37097L3.72581 15.7732H0.5" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M37.9219 18.354H39.8574" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M18.5664 15.7733V11.9023" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Crossover
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Pickup">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M10.8235 28.3874C12.605 28.3874 14.0493 26.9432 14.0493 25.1616C14.0493 23.38 12.605 21.9358 10.8235 21.9358C9.0419 21.9358 7.59766 23.38 7.59766 25.1616C7.59766 26.9432 9.0419 28.3874 10.8235 28.3874Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M33.4055 28.3874C35.1871 28.3874 36.6313 26.9432 36.6313 25.1616C36.6313 23.38 35.1871 21.9358 33.4055 21.9358C31.6239 21.9358 30.1797 23.38 30.1797 25.1616C30.1797 26.9432 31.6239 28.3874 33.4055 28.3874Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M7.59677 25.1617H1.79032L0.5 23.8713V16.7746H13.4032V11.6133H24.1129C24.7581 11.6133 25.2742 11.8713 25.6613 12.1294L31.4677 16.7746L39.3387 17.9359C39.9839 18.0649 40.5 18.581 40.5 19.2262V23.8713C40.5 24.6455 39.9839 25.1617 39.2097 25.1617H36.629" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M30.1759 25.1616H14.0469" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M21.1445 11.6133V16.7746" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M22.4349 19.3552H21.1445" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M0.5 18.71H4.37097L3.46774 20.1293C3.20968 20.3874 2.95161 20.6454 2.56452 20.6454H0.629033" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M40.4992 21.2907H37.9219V19.3552H40.4992" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M14.6927 19.3552H13.4023" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M15.9844 11.6133V15.4842C15.9844 16.2584 16.5005 16.7746 17.2747 16.7746H31.4682" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Pickup
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Coupe">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M9.875 25.937C11.6009 25.937 13 24.5379 13 22.812C13 21.0861 11.6009 19.687 9.875 19.687C8.14911 19.687 6.75 21.0861 6.75 22.812C6.75 24.5379 8.14911 25.937 9.875 25.937Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M34 23.9375L40.5 22.8125V20.3125L39.75 19.5625C38.75 18.5625 37.75 17.9375 36.5 17.4375C35.625 17.1875 34.875 16.9375 33.875 16.8125L29.125 16.4375H28.625H23.625H16.75L15.5 12.0625C6.125 12.8125 0.5 17.6875 0.5 17.6875V22.0625L6.75 23.3125" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M28.25 24.062L12.875 23.437" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M18.625 18.437H16.75" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M22.375 12.812L28.625 16.562" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M36.4995 17.563C36.1245 18.063 36.6245 19.188 37.6245 20.063C38.6245 20.938 39.8745 21.313 40.3745 20.813C40.4995 20.688 40.4995 20.563 40.4995 20.438" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M0.5 17.812H3.625V15.937" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M13.625 14.687L14.25 16.562H23.625" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M31.125 25.937C32.8509 25.937 34.25 24.5379 34.25 22.812C34.25 21.0861 32.8509 19.687 31.125 19.687C29.3991 19.687 28 21.0861 28 22.812C28 24.5379 29.3991 25.937 31.125 25.937Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Coupe
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Convertible">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M29.8359 22.9993H11.8359" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M9.83332 13.666H1.83333L1.16667 15.666V17.666L0.5 18.9993L1.16667 22.3327L5.16666 22.866" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M36.5026 22.9993H40.5026V19.666V18.9993C40.5026 18.9993 40.6359 16.3327 28.5026 15.666C27.1693 14.3327 23.8359 11.666 23.8359 11.666" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M8.49739 26.3327C10.3383 26.3327 11.8307 24.8403 11.8307 22.9993C11.8307 21.1584 10.3383 19.666 8.49739 19.666C6.65644 19.666 5.16406 21.1584 5.16406 22.9993C5.16406 24.8403 6.65644 26.3327 8.49739 26.3327Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M33.1693 26.3327C35.0102 26.3327 36.5026 24.8403 36.5026 22.9993C36.5026 21.1584 35.0102 19.666 33.1693 19.666C31.3283 19.666 29.8359 21.1584 29.8359 22.9993C29.8359 24.8403 31.3283 26.3327 33.1693 26.3327Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M1.16406 15.666H4.49739L4.09739 16.466C3.56405 17.5327 2.36406 18.066 1.16406 17.666" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M9.83594 13.666C10.6359 14.7327 11.9693 15.666 13.1693 15.666H28.5026" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M17.8333 17.666H16.5" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M36.5 16.9993L37.0333 18.0659C37.5667 18.9993 38.5 19.6659 39.5667 19.6659H40.5" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M17.8359 13.666V15.666" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M27.8359 20.9993H17.8359" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Convertible
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Wagon">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M10.1553 26.5865C12.0597 26.5865 13.6036 25.0426 13.6036 23.1382C13.6036 21.2338 12.0597 19.6899 10.1553 19.6899C8.25088 19.6899 6.70703 21.2338 6.70703 23.1382C6.70703 25.0426 8.25088 26.5865 10.1553 26.5865Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M36.3614 23.1382C36.3614 23.4141 36.3614 23.552 36.2235 23.8279C35.9476 25.3451 34.5683 26.5865 32.9131 26.5865C31.2579 26.5865 29.8786 25.3451 29.6028 23.8279C29.6028 23.552 29.4648 23.4141 29.4648 23.1382C29.4648 21.2072 30.9821 19.6899 32.9131 19.6899C34.8442 19.6899 36.3614 21.2072 36.3614 23.1382Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M29.6067 23.8279H13.4688" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M36.2241 23.8279H40.5V19.6899C39.3966 18.4485 38.0173 17.3451 36.5 16.6554C34.9828 15.9658 33.3276 15.552 31.6724 15.552H27.3966L22.569 11.4141L17.8793 11.6899C13.1897 11.9658 8.63793 13.3451 4.63793 15.552H1.18966L1.87931 16.9313L0.5 19.0003L1.87931 22.4485L6.7069 23.8279H6.84484" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M18.4305 18.3105H15.6719" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M27.3968 15.5521H18.4313C16.2244 15.5521 14.1554 14.5866 12.9141 12.7935" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M0.5 19.0004H3.94828L5.32759 17.6211L1.87931 16.9314" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M37.7422 17.6208V18.4484C37.7422 19.5519 38.5698 20.3795 39.6732 20.3795H40.5008" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Wagon
+						</a>
+					</div>
+					<div class="swiper-slide">
+						<a class="brand-item" asp-controller="List" asp-action="Index" asp-route-bodyStyle="Minivan">
+							<svg width="41" height="40" viewBox="0 0 41 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M10.8235 27.3874C12.605 27.3874 14.0493 25.9432 14.0493 24.1616C14.0493 22.38 12.605 20.9358 10.8235 20.9358C9.0419 20.9358 7.59766 22.38 7.59766 24.1616C7.59766 25.9432 9.0419 27.3874 10.8235 27.3874Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M33.4055 27.3874C35.1871 27.3874 36.6313 25.9432 36.6313 24.1616C36.6313 22.38 35.1871 20.9358 33.4055 20.9358C31.6239 20.9358 30.1797 22.38 30.1797 24.1616C30.1797 25.9432 31.6239 27.3874 33.4055 27.3874Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M7.59677 24.1617H1.79032L0.5 22.8713V15.7746L2.69354 11.3875C2.95161 11.0004 3.33872 10.6133 3.85485 10.6133H13.4032H24.1129C24.7581 10.6133 25.2742 10.8713 25.6613 11.1294L31.4677 15.7746L39.3387 16.9359C39.9839 17.0649 40.5 17.581 40.5 18.2262V22.8713C40.5 23.6455 39.9839 24.1617 39.2097 24.1617H36.629" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M30.1759 24.1616H14.0469" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M21.1445 10.6133V15.7746" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M22.4349 18.3552H21.1445" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M0.5 17.71H4.37097L3.46775 19.1293C3.20968 19.3874 2.95162 19.6454 2.56452 19.6454H0.62904" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M40.4992 20.2907H39.9831C38.8218 20.2907 37.6605 19.5165 37.2734 18.3552H40.4992" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M14.6927 18.3552H13.4023" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M13.4023 10.6133V15.7746H31.4669" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M10.8226 10.6133L9.53226 15.7746H0.5" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+							Minivan
+						</a>
+					</div>
+				</div>
+		</div>
+		<!-- Browse By Type bölməsi static SVG iconlarla saxlanılır (bunlar dizayn elementidir) -->
+	</div>
+	<div class="swiper-pagination pagination-white pagination-style pagination-absolute pagination-swiper-brand"></div>
+</section>
+<!-- Browse By Type -->
+
+<!-- Trending Searches Near You -->
+<section class="py-100 bg-primary">
+	<div class="container wow fadeIn" data-wow-delay="0.3s">
+		<div class="title-section mb-40 wow fadeInUp" data-wow-delay="0.1s">
+			<h2 class="text-white">Trending Searches Near You</h2>
+			<a asp-controller="List" asp-action="Index" class="btn btn-line-blur effect-line-white hover-fill-primary font-weight-600 btn-large">
+				View All
+				<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_16987_736)"><path d="M10 1.875C8.39303 1.875 6.82214 2.35152 5.486 3.24431C4.14985 4.1371 3.10844 5.40605 2.49348 6.8907C1.87852 8.37535 1.71762 10.009 2.03112 11.5851C2.34463 13.1612 3.11846 14.6089 4.25476 15.7452C5.39106 16.8815 6.8388 17.6554 8.4149 17.9689C9.99099 18.2824 11.6247 18.1215 13.1093 17.5065C14.594 16.8916 15.8629 15.8502 16.7557 14.514C17.6485 13.1779 18.125 11.607 18.125 10C18.1227 7.84581 17.266 5.78051 15.7427 4.25727C14.2195 2.73403 12.1542 1.87727 10 1.875ZM13.5672 10.4422L11.0672 12.9422C10.9499 13.0595 10.7909 13.1253 10.625 13.1253C10.4592 13.1253 10.3001 13.0595 10.1828 12.9422C10.0655 12.8249 9.99966 12.6659 9.99966 12.5C9.99966 12.3341 10.0655 12.1751 10.1828 12.0578L11.6164 10.625H6.875C6.70924 10.625 6.55027 10.5592 6.43306 10.4419C6.31585 10.3247 6.25 10.1658 6.25 10C6.25 9.83424 6.31585 9.67527 6.43306 9.55806C6.55027 9.44085 6.70924 9.375 6.875 9.375H11.6164L10.1828 7.94219C10.0655 7.82491 9.99966 7.66585 9.99966 7.5C9.99966 7.33415 10.0655 7.17509 10.1828 7.05781C10.3001 6.94054 10.4592 6.87465 10.625 6.87465C10.7909 6.87465 10.9499 6.94054 11.0672 7.05781L13.5672 9.55781C13.6253 9.61586 13.6714 9.68479 13.7029 9.76066C13.7343 9.83654 13.7505 9.91787 13.7505 10C13.7505 10.0821 13.7343 10.1635 13.7029 10.2393C13.6714 10.3152 13.6253 10.3841 13.5672 10.4422Z" fill="white"></path></g></svg>
+			</a>
+		</div>
+		<div class="swiper-container swiper-card">
+			<div class="swiper-wrapper">
+				@foreach (var car in Model.TrendingCars)
+				{
+					<div class="swiper-slide">
+						<div class="card-box card-box-style-2">
+							<div class="top">
+								@if (!string.IsNullOrEmpty(car.Badge))
+								{
+									<p class="@car.BadgeColor text-white highlight">@car.Badge</p>
+								}
+								else
+								{
+									<p></p>
+								}
+								<p class="heart" data-car-id="@car.Id">
+									<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<g clip-path="url(#clip0_13399_19510)">
+											<path d="M8 14C8 14 1.5 10.5 1.5 6.375C1.5 5.47989 1.85558 4.62145 2.48851 3.98851C3.12145 3.35558 3.97989 3 4.875 3C6.28688 3 7.49625 3.76937 8 5C8.50375 3.76937 9.71312 3 11.125 3C12.0201 3 12.8785 3.35558 13.5115 3.98851C14.1444 4.62145 14.5 5.47989 14.5 6.375C14.5 10.5 8 14 8 14Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+										</g>
+									</svg>
+								</p>
+							</div>
+							<div class="image">
+								<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id">
+									<img class="card--img" src="@car.ThumbnailUrl" alt="@car.Title">
+								</a>
+							</div>
+							<div class="content border-top-none bg-blur border-light">
+								<div class="bottom">
+									<p class="category uppercase text-white">
+										<a asp-controller="List" asp-action="Index" asp-route-brand="@car.BrandName" class="text-white">@car.BrandName</a>
+									</p>
+									<div class="flex items-center gap-8">
+										<p class="category uppercase text-white">
+											<img src="~/assets/icons/picture.svg" alt="picture">
+											@car.ImageCount
+										</p>
+										<p class="category uppercase text-white">
+											<img src="~/assets/icons/play.svg" alt="play">
+											@car.VideoCount
+										</p>
+									</div>
+								</div>
+								<p class="card-box__title mb-8 h6">
+									<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="text-white">@car.Title</a>
+								</p>
+								<ul class="tag mb-10">
+									<li>
+										<img src="~/assets/icons/icon-gauge-2.svg" alt="mileage">
+										<span>@car.Mileage.ToString("N0") miles</span>
+									</li>
+									<li>
+										<img src="~/assets/icons/calendar-2.svg" alt="year">
+										<span>@car.Year</span>
+									</li>
+									<li>
+										<img src="~/assets/icons/gaspump-2.svg" alt="fuel">
+										<span>@car.FuelType</span>
+									</li>
+									<li>
+										<img src="~/assets/icons/auto-2.svg" alt="transmission">
+										<span>@car.Transmission</span>
+									</li>
+								</ul>
+								<p class="card-box__price mb-15 text-white">$@car.Price.ToString("N2")</p>
+								<div class="divider-blur mb-16"></div>
+								<div class="flex justify-between">
+									<p class="compare-details btn btn-small" data-car-id="@car.Id">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+											<g clip-path="url(#clip0_14901_19088)">
+												<path d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												<path d="M6.875 10H13.125" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												<path d="M10 6.875V13.125" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+											</g>
+										</svg>
+										Compare
+									</p>
+									<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="view-details text-white">
+										View details
+										<img class="ml-4" src="~/assets/icons/CaretCircleRight.svg" alt="CaretCircleRight.svg">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+			<div class="swiper-pagination pagination-white pagination-style pagination-swiper-card mt-38"></div>
+		</div>
+	</div>
+</section>
+<!-- Trending Searches Near You -->
+
+<!-- Clients Reviews -->
+<section class="py-100">
+	<div class="container wow fadeIn" data-wow-delay="0.3s">
+		<div class="title-section mb-40">
+			<h2 class="">Clients Reviews</h2>
+			<a asp-controller="ClientsReviews" asp-action="Index" class="btn btn-line-style-2 effect-line-primary hover-fill-white btn-large">
+				View All
+				<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M8.125 0C6.51803 0 4.94714 0.476523 3.611 1.36931C2.27485 2.2621 1.23344 3.53105 0.618482 5.0157C0.00352044 6.50035 -0.157382 8.13401 0.156123 9.71011C0.469628 11.2862 1.24346 12.7339 2.37976 13.8702C3.51606 15.0065 4.9638 15.7804 6.5399 16.0939C8.11599 16.4074 9.74966 16.2465 11.2343 15.6315C12.719 15.0166 13.9879 13.9752 14.8807 12.639C15.7735 11.3029 16.25 9.73197 16.25 8.125C16.2477 5.97081 15.391 3.90551 13.8677 2.38227C12.3445 0.85903 10.2792 0.00227486 8.125 0ZM11.6922 8.56719L9.19219 11.0672C9.07492 11.1845 8.91586 11.2503 8.75 11.2503C8.58415 11.2503 8.42509 11.1845 8.30782 11.0672C8.19054 10.9499 8.12466 10.7909 8.12466 10.625C8.12466 10.4591 8.19054 10.3001 8.30782 10.1828L9.74141 8.75H5C4.83424 8.75 4.67527 8.68415 4.55806 8.56694C4.44085 8.44973 4.375 8.29076 4.375 8.125C4.375 7.95924 4.44085 7.80027 4.55806 7.68306C4.67527 7.56585 4.83424 7.5 5 7.5H9.74141L8.30782 6.06719C8.19054 5.94991 8.12466 5.79085 8.12466 5.625C8.12466 5.45915 8.19054 5.30009 8.30782 5.18281C8.42509 5.06554 8.58415 4.99965 8.75 4.99965C8.91586 4.99965 9.07492 5.06554 9.19219 5.18281L11.6922 7.68281C11.7503 7.74086 11.7964 7.80979 11.8279 7.88566C11.8593 7.96154 11.8755 8.04287 11.8755 8.125C11.8755 8.20713 11.8593 8.28846 11.8279 8.36434C11.7964 8.44021 11.7503 8.50914 11.6922 8.56719Z" fill="#1C1C1C" />
+				</svg>
+			</a>
+		</div>
+		<div class="swiper-container swiper-testimonior swiper-container-visible" data-initial-slide="3">
+			<div class="swiper-wrapper">
+				@foreach (var review in Model.Reviews)
+				{
+					<div class="swiper-slide">
+						<div class="testimonior-box">
+							<div class="flex items-center gap-4 mb-16">
+								@for (int s = 0; s < review.Rating; s++)
+								{
+									<img src="~/assets/icons/star.svg" alt="star">
+								}
+							</div>
+							<p class="testimonior-box--desc mb-16">@review.Content</p>
+							<div class="testimonior-box--user">
+								<img class="testimonior--img" src="@review.AvatarUrl" alt="avatar">
+								<div class="testimonior-box--user-content">
+									<p class="title">@review.AuthorName</p>
+									<p class="desc">@review.AuthorTitle</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+			<div class="swiper-pagination pagination-dark pagination-style pagination-swiper-testimonior mt-35"></div>
+		</div>
+	</div>
+</section>
+<!-- Clients Reviews -->
+
+<!-- Explore Our Brands -->
+<section class="background-light py-100">
+	<div class="container wow fadeIn" data-wow-delay="0.3s">
+		<div class="title-section mb-40">
+			<h2 class="">Explore Our Brands</h2>
+			<a asp-controller="List" asp-action="Index" class="btn btn-line-style-2 effect-line-primary hover-fill-white btn-large">
+				View All Brand
+				<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M8.125 0C6.51803 0 4.94714 0.476523 3.611 1.36931C2.27485 2.2621 1.23344 3.53105 0.618482 5.0157C0.00352044 6.50035 -0.157382 8.13401 0.156123 9.71011C0.469628 11.2862 1.24346 12.7339 2.37976 13.8702C3.51606 15.0065 4.9638 15.7804 6.5399 16.0939C8.11599 16.4074 9.74966 16.2465 11.2343 15.6315C12.719 15.0166 13.9879 13.9752 14.8807 12.639C15.7735 11.3029 16.25 9.73197 16.25 8.125C16.2477 5.97081 15.391 3.90551 13.8677 2.38227C12.3445 0.85903 10.2792 0.00227486 8.125 0ZM11.6922 8.56719L9.19219 11.0672C9.07492 11.1845 8.91586 11.2503 8.75 11.2503C8.58415 11.2503 8.42509 11.1845 8.30782 11.0672C8.19054 10.9499 8.12466 10.7909 8.12466 10.625C8.12466 10.4591 8.19054 10.3001 8.30782 10.1828L9.74141 8.75H5C4.83424 8.75 4.67527 8.68415 4.55806 8.56694C4.44085 8.44973 4.375 8.29076 4.375 8.125C4.375 7.95924 4.44085 7.80027 4.55806 7.68306C4.67527 7.56585 4.83424 7.5 5 7.5H9.74141L8.30782 6.06719C8.19054 5.94991 8.12466 5.79085 8.12466 5.625C8.12466 5.45915 8.19054 5.30009 8.30782 5.18281C8.42509 5.06554 8.58415 4.99965 8.75 4.99965C8.91586 4.99965 9.07492 5.06554 9.19219 5.18281L11.6922 7.68281C11.7503 7.74086 11.7964 7.80979 11.8279 7.88566C11.8593 7.96154 11.8755 8.04287 11.8755 8.125C11.8755 8.20713 11.8593 8.28846 11.8279 8.36434C11.7964 8.44021 11.7503 8.50914 11.6922 8.56719Z" fill="#1C1C1C" />
+				</svg>
+			</a>
+		</div>
+		<div class="swiper-container swiper-outbrand">
+			<div class="swiper-wrapper">
+				@foreach (var brand in Model.Brands)
+				{
+					<div class="swiper-slide">
+						<a asp-controller="List" asp-action="Index" asp-route-brand="@brand.Name" class="out-brand">
+							<img class="out-brand--img mb-8" src="@brand.LogoUrl" alt="@brand.Name">
+							<p class="h5">@brand.Name</p>
+							<p class="text-muted text-sm">@brand.VehicleCount Vehicles</p>
+						</a>
+					</div>
+				}
+			</div>
+		</div>
+		<div class="swiper-pagination pagination-dark pagination-style pagination-swiper-outbrand mt-38"></div>
+	</div>
+</section>
+<!-- Explore Our Brands -->
+
+<!-- Find Your Perfect Used Car (static content) -->
+<section class="bg-primary py-100">
+	<div class="container">
+		<div class="grid grid-cols-2 xl-grid-cols-2 lg-grid-cols-1 gap-30">
+			<div class="flex flex-col justify-center pr-100 wow fadeInUp" data-wow-delay="0.1s">
+				<h2 class="text-white mb-12">Find Your Perfect Used Car Anytime, Anywhere!</h2>
+				<p class="text-white mb-40">Experience hassle-free car shopping with our app. Browse, compare, and buy used cars wherever you are – it's fast, simple, and convenient.</p>
+				<div class="flex items-center gap-12">
+					<a href="#"><img class="h-40" src="~/assets/images/brand/app-store.png" alt="app-store"></a>
+					<a href="#"><img class="h-40" src="~/assets/images/brand/google-play.png" alt="google-play"></a>
+				</div>
+			</div>
+			<div class="image-effect-scale flex md-ml-0 ml-24 radius-20 overflow-hidden wow fadeInUp hover-this img-animation animated" data-wow-delay="0.3s">
+				<img class="w-full" src="~/assets/images/home/banner-download-app.jpg" alt="banner-download-app">
+			</div>
+		</div>
+	</div>
+</section>
+<!-- News & Reviews -->
+<section class="py-100">
+	<div class="container wow fadeIn" data-wow-delay="0.3s">
+		<div class="title-section mb-28 wow fadeInUp">
+			<h2 class="">News & Reviews</h2>
+			<a asp-controller="Blog" asp-action="Index" class="btn btn-line-style-2 effect-line-primary hover-fill-white btn-large">
+				View All
+				<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M8.125 0C6.51803 0 4.94714 0.476523 3.611 1.36931C2.27485 2.2621 1.23344 3.53105 0.618482 5.0157C0.00352044 6.50035 -0.157382 8.13401 0.156123 9.71011C0.469628 11.2862 1.24346 12.7339 2.37976 13.8702C3.51606 15.0065 4.9638 15.7804 6.5399 16.0939C8.11599 16.4074 9.74966 16.2465 11.2343 15.6315C12.719 15.0166 13.9879 13.9752 14.8807 12.639C15.7735 11.3029 16.25 9.73197 16.25 8.125C16.2477 5.97081 15.391 3.90551 13.8677 2.38227C12.3445 0.85903 10.2792 0.00227486 8.125 0ZM11.6922 8.56719L9.19219 11.0672C9.07492 11.1845 8.91586 11.2503 8.75 11.2503C8.58415 11.2503 8.42509 11.1845 8.30782 11.0672C8.19054 10.9499 8.12466 10.7909 8.12466 10.625C8.12466 10.4591 8.19054 10.3001 8.30782 10.1828L9.74141 8.75H5C4.83424 8.75 4.67527 8.68415 4.55806 8.56694C4.44085 8.44973 4.375 8.29076 4.375 8.125C4.375 7.95924 4.44085 7.80027 4.55806 7.68306C4.67527 7.56585 4.83424 7.5 5 7.5H9.74141L8.30782 6.06719C8.19054 5.94991 8.12466 5.79085 8.12466 5.625C8.12466 5.45915 8.19054 5.30009 8.30782 5.18281C8.42509 5.06554 8.58415 4.99965 8.75 4.99965C8.91586 4.99965 9.07492 5.06554 9.19219 5.18281L11.6922 7.68281C11.7503 7.74086 11.7964 7.80979 11.8279 7.88566C11.8593 7.96154 11.8755 8.04287 11.8755 8.125C11.8755 8.20713 11.8593 8.28846 11.8279 8.36434C11.7964 8.44021 11.7503 8.50914 11.6922 8.56719Z" fill="#1C1C1C" />
+				</svg>
+			</a>
+		</div>
+		<div class="swiper-container swiper-news">
+			<div class="swiper-wrapper news-equal-cards">
+				@foreach (var post in Model.LatestNews)
+				{
+					<div class="swiper-slide">
+						<a asp-controller="Blog" asp-action="Detail" asp-route-slug="@post.Slug" class="post post-effect-style-1 overflow-hidden">
+							<div class="post__thumb">
+								<img class="post--img" src="@post.ThumbnailUrl" alt="@post.Title">
+							</div>
+							<div class="content border-top-none border-light">
+								<p class="h5 mb-4 title 600 clamp clamp-2">@post.Title</p>
+								<div class="tags clamp clamp-1">
+									<span>by @post.AuthorName</span>
+									<span>@post.PublishedAt?.ToString("MMM. d, yyyy")</span>
+									<span class="text-highlight uppercase">@post.CategoryName</span>
+								</div>
+							</div>
+						</a>
+					</div>
+				}
+			</div>
+			<div class="swiper-pagination pagination-dark pagination-style pagination-swiper-news mt-35"></div>
+		</div>
+	</div>
+</section>
+<!-- News & Reviews -->
+
+@section Scripts {
+<script>
+// ====== Wishlist Heart (AJAX) ======
+$(document).on('click', '.heart', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $btn = $(this);
+    var carId = $btn.data('car-id');
+    if (!carId) return;
+
+    $.ajax({
+        type: 'POST',
+        url: '/Wishlist/Toggle/' + carId,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                $('.heart[data-car-id="' + carId + '"]').toggleClass('active', res.isInWishlist);
+                updateNavBadge('#wishlistNavCount', res.count);
+                showToast(res.isInWishlist ? 'Added to wishlist!' : 'Removed from wishlist.', 'success');
+            }
+        },
+        error: function() { showToast('Error updating wishlist.', 'error'); }
+    });
+});
+
+// ====== Compare Button (AJAX) ======
+$(document).on('click', '.compare-details', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $btn = $(this);
+    var carId = $btn.data('car-id');
+    if (!carId) return;
+
+    if ($btn.hasClass('active')) {
+        $.ajax({
+            type: 'POST',
+            url: '/Compare/Remove/' + carId,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+            },
+            success: function(res) {
+                if (res.success) {
+                    $btn.removeClass('active');
+                    updateNavBadge('#compareNavCount', res.count);
+                    showToast('Removed from compare.', 'success');
+                }
+            },
+            error: function() { showToast('Error removing from compare.', 'error'); }
+        });
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: '/Compare/Add/' + carId,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                $btn.addClass('active');
+                updateNavBadge('#compareNavCount', res.count);
+                showToast('Added to compare!', 'success');
+            } else {
+                showToast(res.message || 'Could not add to compare.', 'error');
+            }
+        },
+        error: function() { showToast('Error adding to compare.', 'error'); }
+    });
+});
+
+// ====== Helpers ======
+function updateNavBadge(selector, count) {
+    var $badge = $(selector);
+    if (count > 0) {
+        $badge.text(count).show();
+    } else {
+        $badge.text('0').hide();
+    }
+}
+
+function showToast(msg, type) {
+    var existing = $('#action-toast');
+    if (existing.length) existing.remove();
+    var cls = type === 'success' ? 'auth-toast--success' : 'auth-toast--error';
+    var $toast = $('<div id="action-toast" class="auth-toast ' + cls + '"><span>' + msg + '</span><button onclick="$(\'#action-toast\').remove()">✕</button></div>');
+    $('body').append($toast);
+    setTimeout(function() { $toast.fadeOut(300, function() { $(this).remove(); }); }, 3000);
+}
+</script>
+}

@@ -1,0 +1,54 @@
+@model BlogPost
+@{
+    ViewData["Title"] = "Blog Yazısı Redaktə Et";
+    var categories = ViewBag.Categories as SelectList;
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Redaktə Et – @Model.Title</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="f-row">
+            <div class="fg"><label>Başlıq</label><input asp-for="Title" class="fc" required></div>
+            <div class="fg"><label>Slug (URL)</label><input asp-for="Slug" class="fc"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Kateqoriya</label><select asp-for="CategoryId" asp-items="@categories" class="fc"></select></div>
+            <div class="fg"><label>Müəllif</label><input asp-for="AuthorName" class="fc"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg">
+                <label>Müəllif Şəkli (dəyişmək üçün seçin)</label>
+                <input type="file" name="authorAvatarFile" class="fc" accept="image/*">
+                @if (!string.IsNullOrEmpty(Model.AuthorAvatarUrl))
+                {
+                    <div style="margin-top:6px">
+                        <img src="@Model.AuthorAvatarUrl" style="height:50px;width:50px;border-radius:50%;object-fit:cover;">
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Facebook (optional)</label><input asp-for="AuthorFacebookUrl" class="fc" placeholder="https://facebook.com/..."></div>
+            <div class="fg"><label>X / Twitter (optional)</label><input asp-for="AuthorTwitterUrl" class="fc" placeholder="https://x.com/..."></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Instagram (optional)</label><input asp-for="AuthorInstagramUrl" class="fc" placeholder="https://instagram.com/..."></div>
+            <div class="fg"><label>LinkedIn (optional)</label><input asp-for="AuthorLinkedInUrl" class="fc" placeholder="https://linkedin.com/in/..."></div>
+        </div>
+        <div class="fg"><label>Qısa Xülasə</label><textarea asp-for="Summary" class="fc" rows="2"></textarea></div>
+        <div class="fg"><label>Məzmun</label><textarea asp-for="Content" class="fc" rows="8"></textarea></div>
+        <div class="f-row">
+            <div class="fg">
+                <label>Thumbnail (dəyişmək üçün seçin)</label>
+                <input type="file" name="thumbnailFile" class="fc" accept="image/*">
+                @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+                {<div style="margin-top:6px"><img src="@Model.ThumbnailUrl" style="height:60px;border-radius:8px"></div>}
+            </div>
+            <div class="fg"><label>Status</label><select asp-for="Status" asp-items="Html.GetEnumSelectList<BlogStatus>()" class="fc"></select></div>
+        </div>
+        <button class="btn-a primary" type="submit">Yadda Saxla</button>
+    </form>
+</div>

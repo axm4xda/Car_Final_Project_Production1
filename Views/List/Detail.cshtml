@@ -1,0 +1,947 @@
+@model Car_Project.ViewModels.List.ListDetailViewModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Car_Project.Models.AppUser> SignInManager
+@inject UserManager<Car_Project.Models.AppUser> UserManager
+
+@Html.AntiForgeryToken()
+
+<!-- breadcrumb -->
+<section class="mb-22 background-light">
+    <div class="container">
+        <div class="flex items-center justify-between">
+            <ul class="breadcrumb">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li>
+                    <img src="~/assets/icons/right.svg" alt="chevron-right">
+                </li>
+                <li>
+                    <a asp-controller="List" asp-action="Index">Listings</a>
+                </li>
+                <li>
+                    <img src="~/assets/icons/right.svg" alt="chevron-right">
+                </li>
+                <li>
+                    <span>@Model.Title</span>
+                </li>
+            </ul>
+
+            <div class="swiper-listing-details-navigation">
+                <p class="swiper-listing-details-prev cursor-pointer">
+                    <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.85414 10.1465C5.9006 10.193 5.93745 10.2481 5.96259 10.3088C5.98773 10.3695 6.00067 10.4346 6.00067 10.5003C6.00067 10.566 5.98773 10.631 5.96259 10.6917C5.93745 10.7524 5.9006 10.8076 5.85414 10.854C5.80769 10.9005 5.75254 10.9373 5.69184 10.9625C5.63115 10.9876 5.56609 11.0006 5.50039 11.0006C5.4347 11.0006 5.36964 10.9876 5.30895 10.9625C5.24825 10.9373 5.1931 10.9005 5.14664 10.854L0.146643 5.85403C0.100155 5.80759 0.0632757 5.75245 0.0381136 5.69175C0.0129514 5.63105 0 5.56599 0 5.50028C0 5.43457 0.0129514 5.36951 0.0381136 5.30881C0.0632757 5.24811 0.100155 5.19296 0.146643 5.14653L5.14664 0.146528C5.24046 0.0527077 5.36771 -2.61548e-09 5.50039 0C5.63308 2.61548e-09 5.76032 0.0527077 5.85414 0.146528C5.94796 0.240348 6.00067 0.367596 6.00067 0.500278C6.00067 0.63296 5.94796 0.760208 5.85414 0.854028L1.20727 5.50028L5.85414 10.1465Z" fill="#1C1C1C" />
+                    </svg>
+                    Prev
+                </p>
+                <p class="swiper-listing-details-next cursor-pointer">
+                    Next
+
+                    <svg width="6" height="11" viewBox="0 0 6 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.85403 5.85403L0.854028 10.854C0.807573 10.9005 0.752423 10.9373 0.691726 10.9625C0.63103 10.9876 0.565975 11.0006 0.500278 11.0006C0.434581 11.0006 0.369526 10.9876 0.30883 10.9625C0.248133 10.9373 0.192983 10.9005 0.146528 10.854C0.100073 10.8076 0.0632225 10.7524 0.0380812 10.6917C0.0129398 10.631 0 10.566 0 10.5003C0 10.4346 0.0129398 10.3695 0.0380812 10.3088C0.0632225 10.2481 0.100073 10.193 0.146528 10.1465L4.7934 5.50028L0.146528 0.854028C0.0527074 0.760208 -9.88558e-10 0.63296 0 0.500278C9.88559e-10 0.367596 0.0527074 0.240348 0.146528 0.146528C0.240348 0.0527077 0.367596 9.88558e-10 0.500278 0C0.63296 -9.88558e-10 0.760208 0.0527077 0.854028 0.146528L5.85403 5.14653C5.90052 5.19297 5.9374 5.24811 5.96256 5.30881C5.98772 5.36951 6.00067 5.43457 6.00067 5.50028C6.00067 5.56599 5.98772 5.63105 5.96256 5.69175C5.9374 5.75245 5.90052 5.80759 5.85403 5.85403Z" fill="#1C1C1C" />
+                    </svg>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</section>
+<!-- breadcrumb -->
+
+<section class="pb-100">
+    <div class="tf-spacing-style4"></div>
+    <div class="container">
+        <div class="listing-details">
+            <div class="listing-details--content">
+                <div class="title-section mb-40">
+                    <h2 class="capitalize">@Model.Title</h2>
+                    <div class="flex items-center justify-end gap-12">
+                        <a href="#" class="btn btn-medium btn-line padding-button-medium gap-5 font-weight-600 compare-details" data-car-id="@Model.Id">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_13399_19575)">
+                                    <path d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M6.875 10H13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M10 6.875V13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </g>
+                            </svg>
+                            Compare
+                        </a>
+                        <a href="#" class="btn-icon-circle hover-stroke-white heart" data-car-id="@Model.Id">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.4678 5.375C21.0008 5.37677 22.4707 5.98632 23.5547 7.07031C24.6387 8.15431 25.2482 9.62423 25.25 11.1572C25.2495 14.517 22.7235 17.7209 19.8545 20.2334C17.1857 22.5706 14.4559 24.1025 14 24.3506C13.5441 24.1025 10.8143 22.5706 8.14551 20.2334C5.27653 17.7209 2.75049 14.517 2.75 11.1572C2.75177 9.62423 3.36132 8.15431 4.44531 7.07031C5.52908 5.98655 6.99861 5.37703 8.53125 5.375C10.4976 5.375 12.1694 6.21605 13.2002 7.58887L14 8.65332L14.7998 7.58887C15.8304 6.21627 17.5018 5.37528 19.4678 5.375Z" stroke="#1C1C1C" stroke-width="2" />
+                            </svg>
+                        </a>
+                        <a href="#" class="btn-icon-circle hover-fill-white">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.2537 17.5C18.67 17.4998 18.0922 17.6168 17.5545 17.8439C17.0168 18.0711 16.5302 18.4038 16.1234 18.8224L11.0812 15.5816C11.4778 14.5645 11.4778 13.4355 11.0812 12.4185L16.1234 9.17768C16.8807 9.9535 17.8992 10.4205 18.9813 10.488C20.0634 10.5556 21.132 10.219 21.98 9.54337C22.828 8.8678 23.395 7.90141 23.5709 6.83157C23.7469 5.76174 23.5194 4.66468 22.9324 3.75309C22.3455 2.84149 21.4409 2.18031 20.3942 1.89773C19.3475 1.61516 18.2331 1.73131 17.2671 2.22368C16.3012 2.71605 15.5525 3.54955 15.1661 4.56259C14.7798 5.57563 14.7834 6.69604 15.1762 7.70659L10.134 10.9474C9.52682 10.324 8.74754 9.89589 7.89578 9.71771C7.04403 9.53954 6.15849 9.61942 5.35236 9.94713C4.54624 10.2749 3.85616 10.8355 3.37033 11.5575C2.8845 12.2794 2.625 13.1298 2.625 14C2.625 14.8702 2.8845 15.7206 3.37033 16.4426C3.85616 17.1645 4.54624 17.7252 5.35236 18.0529C6.15849 18.3806 7.04403 18.4605 7.89578 18.2823C8.74754 18.1042 9.52682 17.676 10.134 17.0527L15.1762 20.2935C14.8384 21.1647 14.7884 22.1211 15.0335 23.0228C15.2787 23.9245 15.8061 24.724 16.5384 25.3042C17.2708 25.8845 18.1698 26.215 19.1036 26.2474C20.0374 26.2798 20.9571 26.0124 21.728 25.4843C22.4988 24.9562 23.0803 24.1952 23.3874 23.3127C23.6944 22.4301 23.7108 21.4725 23.4342 20.58C23.1577 19.6875 22.6026 18.907 21.8503 18.3527C21.098 17.7985 20.1881 17.4997 19.2537 17.5Z" fill="#1C1C1C" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Image Slider -->
+                <div class="swiper swiper-listing-details-main">
+                    <div class="swiper-wrapper">
+                        @foreach (var imageUrl in Model.ImageUrls)
+                        {
+                            <div class="swiper-slide">
+                                <div class="listing-details-item main-item relative">
+                                    <img class="img-main" src="@imageUrl" alt="@Model.Title">
+                                    <div class="listing-details-item--content">
+                                        <a class="listing-details-item--button" href="#">
+                                            <img src="~/assets/icons/playcircle.svg" alt="play">
+                                            Play Video
+                                        </a>
+                                        <a class="listing-details-item--button" href="#">
+                                            <img src="~/assets/icons/view-all-photo.svg" alt="view">
+                                            View All Photo
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (!Model.ImageUrls.Any())
+                        {
+                            <div class="swiper-slide">
+                                <div class="listing-details-item main-item relative">
+                                    <img class="img-main" src="~/assets/images/inner-page/slide-listing-details-5.jpg" alt="@Model.Title">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <p class="swiper-button navigation-prev swiper-listing-details-main-prev">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.9487 2.71258C14.2097 2.97026 14.2335 3.37348 14.0199 3.65762L13.9487 3.73903L7.60622 10L13.9487 16.261C14.2097 16.5186 14.2335 16.9219 14.0199 17.206L13.9487 17.2874C13.6877 17.5451 13.2792 17.5685 12.9913 17.3577L12.9088 17.2874L6.04609 10.5132C5.78505 10.2555 5.76132 9.85232 5.9749 9.56818L6.04609 9.48678L12.9088 2.71258C13.196 2.42914 13.6615 2.42914 13.9487 2.71258Z" fill="white" />
+                        </svg>
+                    </p>
+                    <p class="swiper-button navigation-next swiper-listing-details-main-next">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.0513 17.2874C5.79025 17.0297 5.76652 16.6265 5.98011 16.3424L6.0513 16.261L12.3938 10L6.0513 3.73903C5.79025 3.48135 5.76652 3.07813 5.98011 2.79399L6.0513 2.71258C6.31235 2.45491 6.72084 2.43148 7.00869 2.64231L7.09116 2.71258L13.9539 9.48678C14.215 9.74446 14.2387 10.1477 14.0251 10.4318L13.9539 10.5132L7.09116 17.2874C6.80401 17.5709 6.33845 17.5709 6.0513 17.2874Z" fill="white" />
+                        </svg>
+                    </p>
+                </div>
+
+                <!-- Thumbnail Swiper Slider -->
+                <div class="swiper swiper-listing-details-thumbs pb-60 overflow-hidden">
+                    <div class="swiper-wrapper">
+                        @foreach (var imageUrl in Model.ImageUrls)
+                        {
+                            <div class="swiper-slide">
+                                <div class="listing-details-thumb">
+                                    <img src="@imageUrl" alt="thumbnail">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Description -->
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="h4 mb-16">Description</p>
+                    <p class="text-secondary mb-40">@Model.Description</p>
+                    <div class="divider w-full mb-40"></div>
+                }
+
+                <!-- Features -->
+                @if (Model.Features.Any())
+                {
+                    <p class="h4 mb-16 capitalize">Get To Know this car</p>
+                    <div class="mb-40">
+                        <ul class="grid grid-cols-3 xl-grid-cols-2 md-grid-cols-1 gap-8 gap-x-30">
+                            @foreach (var feature in Model.Features)
+                            {
+                                <li class="flex items-center gap-8">
+                                    <img src="~/assets/icons/check.svg" alt="check">
+                                    @feature
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="divider w-full mb-40"></div>
+                }
+
+                <!-- Financing Calculator -->
+                <p class="h4 mb-16">Financing Calculator</p>
+
+                <div class="fc-wrapper mb-40">
+                    <div class="fc-fields">
+                        <div class="fc-field">
+                            <label class="fc-label">Car Price</label>
+                            <input class="fc-input" id="FinancingCalculatorCarPrice" type="number" step="1" min="0" value="@((int)Model.Price)" placeholder="$0">
+                        </div>
+                        <div class="fc-field">
+                            <label class="fc-label">Interest Rate</label>
+                            <input class="fc-input" id="FinancingCalculatorInterestRate" type="number" step="0.01" min="0" max="100" value="1.20" placeholder="0%">
+                        </div>
+                        <div class="fc-field">
+                            <label class="fc-label">Loan Term (months)</label>
+                            <select class="fc-input" id="FinancingCalculatorLoanTerm">
+                                <option value="12">12 months</option>
+                                <option value="24">24 months</option>
+                                <option value="36">36 months</option>
+                                <option value="48">48 months</option>
+                                <option value="60" selected>60 months</option>
+                                <option value="72">72 months</option>
+                                <option value="84">84 months</option>
+                            </select>
+                        </div>
+                        <div class="fc-field">
+                            <label class="fc-label">Down Payment</label>
+                            <input class="fc-input" id="FinancingCalculatorDownPayment" type="number" step="1" min="0" value="0" placeholder="$0">
+                        </div>
+                    </div>
+
+                    <div class="fc-actions">
+                        <button type="button" id="btnCalculateFinancing" class="btn-primary">
+                            Calculate
+                        </button>
+                        <a id="btnGoToCalculator"
+                           href="/Calculator?carPrice=@((int)Model.Price)"
+                           class="btn-line">
+                            Full Calculator
+                        </a>
+                    </div>
+
+                    <!-- Results (shown after Calculate) -->
+                    <div id="financingResults" class="fc-results">
+                        <div class="fc-result-card">
+                            <p class="fc-result-label">Monthly Payment:</p>
+                            <p class="fc-result-value fc-highlight" id="calcMonthlyPayment">—</p>
+                        </div>
+                        <div class="fc-result-card">
+                            <p class="fc-result-label">Total Interest Payment:</p>
+                            <p class="fc-result-value" id="calcTotalInterest">—</p>
+                        </div>
+                        <div class="fc-result-card">
+                            <p class="fc-result-label">Est. Total Loan:</p>
+                            <p class="fc-result-value" id="calcTotalLoan">—</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider w-full mb-40"></div>
+
+                <!-- Location -->
+                <div class="flex items-center gap-16 justify-between mb-16 md-flex-col md-items-start">
+                    <div>
+                        <p class="h4 mb-12">Location</p>
+                        <p class="flex items-center gap-8"><img class="w-16 h-16" src="~/assets/icons/MapPin.svg" alt="location"> 6205 Peachtree Dunwoody Rd, Atlanta, GA 30328</p>
+                    </div>
+                    <a href="#" class="text-sm text-underline text-highlight">Get Directions</a>
+                </div>
+
+                <div class="widget-gg-map flex radius-16 overflow-hidden mb-40">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d97101.88872869895!2d-74.22688511715344!3d40.487336736141906!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1svi!2s!4v1689125037376!5m2!1svi!2s" height="523" style="border:0;width: 100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+
+                <div class="divider w-full mb-40"></div>
+
+                <!-- Customer Reviews -->
+                <div class="flex items-center justify-between gap-16 mb-16">
+                    <p class="h4">Customer Reviews</p>
+                </div>
+
+                <div class="rating-box mb-40">
+                    <div class="rating-box__content">
+                        <div class="rating-box__overview">
+                            <div class="rating-box__average">
+                                <span class="rating-box__score">@Model.AverageRating</span>
+                                <div class="rating-box__stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <img src="~/assets/icons/star-2.svg" alt="star">
+                                    }
+                                </div>
+                                <p class="rating-box__count">(@Model.TotalReviews Ratings)</p>
+                            </div>
+                        </div>
+                        <div class="rating-box__distribution">
+                            @for (int star = 5; star >= 1; star--)
+                            {
+                                <div class="rating-box__bar-item">
+                                    <p class="rating-box__bar-label"><span class="text">@star</span> <img src="~/assets/icons/star-2.svg" alt="star"></p>
+                                    <div class="rating-box__bar-wrapper"><div class="rating-box__bar" style="width: @(Model.GetStarPercent(star))%;"></div></div>
+                                    <span class="rating-box__bar-percent">@(Model.GetStarPercent(star))%</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="rating-box__button">
+                            <a href="#reviewForm" class="btn btn-primary btn-large font-weight-600 capitalize">Write a review</a>
+                        </div>
+                    </div>
+                </div>
+
+                @if (TempData["ReviewSuccess"] != null)
+                {
+                    <div class="alert-box success mb-20" style="padding:14px 18px;border-radius:10px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;font-size:14px;font-weight:500;">
+                        ✅ @TempData["ReviewSuccess"]
+                    </div>
+                }
+                @if (TempData["ReviewError"] != null)
+                {
+                    <div class="alert-box error mb-20" style="padding:14px 18px;border-radius:10px;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;font-size:14px;font-weight:500;">
+                        ⚠️ @TempData["ReviewError"]
+                    </div>
+                }
+
+                @if (Model.CarReviews.Any())
+                {
+                    <div class="comments mb-40">
+                        @foreach (var review in Model.CarReviews)
+                        {
+                            <div class="comment-box">
+                                <div class="comment-box__header mb-20">
+                                    <div class="comment-box__avatar @(string.IsNullOrEmpty(review.AuthorAvatarUrl) ? "guest" : "")">
+                                        @if (!string.IsNullOrEmpty(review.AuthorAvatarUrl))
+                                        {<img src="@review.AuthorAvatarUrl" alt="avatar">}
+                                        else
+                                        {@(string.Concat(review.AuthorName.Split(' ').Take(2).Select(n => n[0].ToString().ToUpper())))}
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center text-secondary mb-8 gap-4">
+                                            <p class="h5">@review.AuthorName</p>
+                                            <span class="text-secondary text-sm">-</span>
+                                            <span class="text-secondary text-sm">@review.CreatedDate.ToString("MMMM dd, yyyy")</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <img src="~/assets/icons/star-2.svg" alt="star" class="star-icon" style="opacity: @(i <= review.Rating ? "1" : "0.3")">
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-secondary">@review.Content</p>
+
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <button type="button" class="reply-toggle-btn" onclick="toggleReplyForm('review-reply-@review.Id')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
+                                        Cavab ver
+                                    </button>
+                                    <div id="review-reply-@review.Id" class="reply-form-wrapper" style="display:none;">
+                                        @using (Html.BeginForm("ReplyToReview", "List", FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="carId" value="@Model.Id" />
+                                            <input type="hidden" name="parentReviewId" value="@review.Id" />
+                                            <textarea name="content" rows="2" class="message" placeholder="Cavabınızı yazın..." required></textarea>
+                                            <button type="submit" class="btn btn-primary btn-small font-weight-600">Göndər</button>
+                                        }
+                                    </div>
+                                }
+
+                                @if (review.Replies.Any())
+                                {
+                                    <div class="reply-list">
+                                        @foreach (var reply in review.Replies)
+                                        {
+                                            <div class="comment-box reply-box">
+                                                <div class="comment-box__header mb-12">
+                                                    <div class="comment-box__avatar @(string.IsNullOrEmpty(reply.AuthorAvatarUrl) ? "guest" : "")" style="width:32px;height:32px;font-size:12px;">
+                                                        @if (!string.IsNullOrEmpty(reply.AuthorAvatarUrl))
+                                                        {<img src="@reply.AuthorAvatarUrl" alt="avatar">}
+                                                        else
+                                                        {@(string.Concat(reply.AuthorName.Split(' ').Take(2).Select(n => n[0].ToString().ToUpper())))}
+                                                    </div>
+                                                    <div>
+                                                        <div class="flex items-center text-secondary gap-4">
+                                                            <p class="h7 font-weight-600">@reply.AuthorName</p>
+                                                            <span class="text-secondary text-xs">-</span>
+                                                            <span class="text-secondary text-xs">@reply.CreatedDate.ToString("MMMM dd, yyyy")</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p class="text-secondary text-sm">@reply.Content</p>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+
+                <div id="reviewForm">
+                    <p class="h4 capitalize mb-8">Add a Review</p>
+
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <p class="mb-20">Your email address will not be published</p>
+                        @using (Html.BeginForm("AddReview", "List", FormMethod.Post, new { @class = "add-review-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="carId" value="@Model.Id" />
+
+                            <div class="col-span-2 padding-0 mb-12">
+                                <p class="mb-8">Review</p>
+                                <textarea placeholder="Your Review" rows="3" name="content" class="message" required></textarea>
+                            </div>
+
+                            <div class="col-span-2 padding-0">
+                                <p class="mb-12">Rating</p>
+                                <div class="rating-input mb-32"
+                                     data-active-icon="/assets/icons/star-4.svg"
+                                     data-inactive-icon="/assets/icons/star-3.svg">
+                                    <input type="hidden" name="rating" id="rating-value" value="5">
+                                    <div class="rating-input__stars" id="rating-stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <span class="rating-input__star @(i <= 5 ? "active" : "")" data-rating="@i">
+                                                <img src="@(i <= 5 ? "/assets/icons/star-4.svg" : "/assets/icons/star-3.svg")"
+                                                     alt="star" class="star-icon">
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-large font-weight-600 capitalize">
+                                Submit Review
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <p class="mb-24 text-secondary">Rəy yazmaq üçün hesabınıza daxil olun.</p>
+                        <a asp-controller="Account" asp-action="Login"
+                           asp-route-returnUrl="@Context.Request.Path"
+                           class="btn btn-primary btn-large font-weight-600 capitalize">
+                            Login to Add a Review
+                        </a>
+                    }
+                </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="listing-details--sidebar">
+                <div class="listing-details--sidebar-box mb-40">
+                    <div class="flat-tabs">
+                        <div class="overflow-x-auto mb-15">
+                            <ul class="menu-tab menu-tab-style5 grid-cols-2">
+                                <li>Cash</li>
+                                <li class="active">Finance</li>
+                            </ul>
+                        </div>
+                        <div class="content-tab visible">
+                            <div class="content-inner">
+                                <p class="h5 mb-4">Price:</p>
+                                <p class="h4 mb-4">$@Model.Price.ToString("N2")</p>
+                                <p class="text-secondary mb-16">List price w/o taxes, fees, and accessories</p>
+                                <p class="flex items-center gap-8">
+                                    <img src="~/assets/icons/Info.svg" alt="info">
+                                    <a asp-controller="Calculator" asp-action="Index"
+                                       asp-route-carPrice="@((int)Model.Price)"
+                                       class="text-underline text-highlight">Vehicle in the VAT system</a>
+                                </p>
+                            </div>
+                            <div class="content-inner active">
+                                <p class="h5 mb-4">Price:</p>
+                                @if (Model.MonthlyPayment.HasValue)
+                                {
+                                    <p class="h4 mb-4">$@Model.MonthlyPayment.Value.ToString("N0")/mo</p>
+                                }
+                                else
+                                {
+                                    <p class="h4 mb-4">$@Model.Price.ToString("N2")</p>
+                                }
+                                <p class="text-secondary mb-4">Finance payment w/o taxes, fees, and accessories</p>
+                                <p class="text-secondary mb-16">Due at signing · 72 mo · 7.89% APR</p>
+                                <div class="flex items-center gap-8">
+                                    <img src="~/assets/icons/Info.svg" alt="info">
+                                    <a asp-controller="Calculator" asp-action="Index"
+                                       asp-route-carPrice="@((int)Model.Price)"
+                                       class="text-underline text-highlight">Vehicle in the VAT system</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="listing-details--sidebar-box mb-40">
+                    <p class="h5 mb-4 capitalize">Car Overview</p>
+                    <ul class="car-overview-list-style2">
+                        <li class="grid-cols-2 grid">
+                            <p class="flex items-center gap-8">
+                                <img class="w-28 h-28" src="~/assets/icons/icon-gauge.svg" alt="mileage">
+                                <span class="h7 text-secondary">Mileage:</span>
+                            </p>
+                            <span class="h7 font-weight-500 pl-28">@Model.Mileage.ToString("N0") km</span>
+                        </li>
+                        <li class="grid-cols-2 grid">
+                            <p class="flex items-center gap-8">
+                                <img class="w-28 h-28" src="~/assets/icons/calendar.svg" alt="year">
+                                <span class="h7 text-secondary">Years:</span>
+                            </p>
+                            <span class="h7 font-weight-500 pl-28">@Model.Year</span>
+                        </li>
+                        <li class="grid-cols-2 grid">
+                            <p class="flex items-center gap-8">
+                                <img class="w-28 h-28" src="~/assets/icons/gaspump.svg" alt="fuel">
+                                <span class="h7 text-secondary">Fuel:</span>
+                            </p>
+                            <span class="h7 font-weight-500 pl-28">@Model.FuelType</span>
+                        </li>
+                        @if (!string.IsNullOrEmpty(Model.Color))
+                        {
+                            <li class="grid-cols-2 grid">
+                                <p class="flex items-center gap-8">
+                                    <img class="w-28 h-28" src="~/assets/icons/palette.svg" alt="color">
+                                    <span class="h7 text-secondary">Color:</span>
+                                </p>
+                                <span class="h7 font-weight-500 pl-28">@Model.Color</span>
+                            </li>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.InteriorColor))
+                        {
+                            <li class="grid-cols-2 grid">
+                                <p class="flex items-center gap-8">
+                                    <img class="w-28 h-28" src="~/assets/icons/Seatbelt.svg" alt="interior">
+                                    <span class="h7 text-secondary">Interior:</span>
+                                </p>
+                                <span class="h7 font-weight-500 pl-28">@Model.InteriorColor</span>
+                            </li>
+                        }
+                        @if (Model.Cylinders.HasValue)
+                        {
+                            <li class="grid-cols-2 grid">
+                                <p class="flex items-center gap-8">
+                                    <img class="w-28 h-28" src="~/assets/icons/Frame.svg" alt="engine">
+                                    <span class="h7 text-secondary">Engine:</span>
+                                </p>
+                                <span class="h7 font-weight-500 pl-28">@Model.Cylinders Cylinders</span>
+                            </li>
+                        }
+                        <li class="grid-cols-2 grid">
+                            <p class="flex items-center gap-8">
+                                <img class="w-28 h-28" src="~/assets/icons/transmission-2.svg" alt="transmission">
+                                <span class="h7 text-secondary">Transmission:</span>
+                            </p>
+                            <span class="h7 font-weight-500 pl-28">@Model.Transmission</span>
+                        </li>
+                        @if (!string.IsNullOrEmpty(Model.BodyStyle))
+                        {
+                            <li class="grid-cols-2 grid">
+                                <p class="flex items-center gap-8">
+                                    <img class="w-28 h-28" src="~/assets/icons/Barcode.svg" alt="body">
+                                    <span class="h7 text-secondary">Body Style:</span>
+                                </p>
+                                <span class="h7 font-weight-500 pl-28">@Model.BodyStyle</span>
+                            </li>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.DriveType))
+                        {
+                            <li class="grid-cols-2 grid">
+                                <p class="flex items-center gap-8">
+                                    <img class="w-28 h-28" src="~/assets/icons/QrCode.svg" alt="drive">
+                                    <span class="h7 text-secondary">Drive Type:</span>
+                                </p>
+                                <span class="h7 font-weight-500 pl-28">@Model.DriveType</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="listing-details--sidebar-box mb-40">
+                    <div class="listing-details--contact">
+                        <div class="listing-details--contact-dealer mb-28">
+                            @if (!string.IsNullOrEmpty(Model.OwnerAvatarUrl))
+                            {
+                                <img src="@Model.OwnerAvatarUrl" alt="@Model.OwnerName" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">
+                            }
+                            else
+                            {
+                                <div style="width:64px;height:64px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#6b7280;flex-shrink:0;">
+                                    @(string.IsNullOrEmpty(Model.OwnerName) ? "?" : Model.OwnerName.Split(' ').Take(2).Select(n => n[0].ToString().ToUpper()).Aggregate("", (a, b) => a + b))
+                                </div>
+                            }
+
+                            <div class="content">
+                                <p class="h4 mb-8 font-weight-600">@(Model.OwnerName ?? "Private Seller")</p>
+                                <div class="verify">
+                                    <img src="~/assets/icons/SealCheck.svg" alt="verified">
+                                    <p class="text-highlight text-sm">Verified Dealer</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.OwnerPhone))
+                        {
+                            <ul class="contact-info mb-28">
+                                <li class="items-center">
+                                    <p class="icon"><img src="~/assets/icons/PhoneCall.svg" alt="phone"></p>
+                                    <div class="flex flex-col">
+                                        <a href="tel:@Model.OwnerPhone">@Model.OwnerPhone</a>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <a href="tel:@Model.OwnerPhone" class="btn btn-medium btn-primary-3 font-weight-600 mb-12 gap-5">
+                                <img src="~/assets/icons/PhoneCall-2.svg" alt="phone">
+                                Call To Dealer
+                            </a>
+
+                            <a href="https://wa.me/@(Model.OwnerPhone.Replace("-","").Replace(" ","").Replace("+",""))"
+                               class="btn btn-medium btn-primary-4 font-weight-600 gap-5" target="_blank">
+                                <img src="~/assets/icons/ChatCircleDots.svg" alt="whatsapp">
+                                Chat via WhatsApp
+                            </a>
+                        }
+                        else
+                        {
+                            <p class="text-secondary text-sm">Contact info not available.</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="listing-details--sidebar-box">
+                    <p class="h5 mb-16 capitalize">Send Inquiry about Vehicle</p>
+                    <form action="#" class="send-inquiry">
+                        <div class="grid grid-cols-1 gap-18 mb-8">
+                            <div>
+                                <p class="mb-8">Name</p>
+                                <input class="active input-large" id="SendInquiryname" name="SendInquiryname" type="text" placeholder="Your Name" required="" />
+                            </div>
+                            <div>
+                                <p class="mb-8">Email</p>
+                                <input class="input-large" name="SendInquiryemail" id="SendInquiryemail" type="text" placeholder="Your Email" required="" />
+                            </div>
+                            <div>
+                                <p class="mb-8">Phone</p>
+                                <input placeholder="Phone (optional)" class="input-large" name="SendInquiryphone" id="SendInquiryphone" type="number" value="" required="" />
+                            </div>
+                            <div>
+                                <p class="mb-8">Subject</p>
+                                <select>
+                                    <option>This Vehicle's Availability</option>
+                                    <option>Price Inquiry</option>
+                                    <option>Test Drive Request</option>
+                                </select>
+                            </div>
+                            <div class="padding-0">
+                                <p class="mb-6">Message</p>
+                                <textarea placeholder="Comment" rows="3" tabindex="5" name="message" class="message" id="message" required></textarea>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-large font-weight-600 w-full mb-18">Send Inquiry</button>
+                        <label class="filter-checkbox style-2 mb-6">
+                            <input type="checkbox" name="features" value="price-alerts">
+                            <span class="text-sm">Yes, I would like to receive price alerts on this vehicle and helpful shopping information.</span>
+                        </label>
+                        <p class="text-xs text-secondary">By using this service, you accept our <a href="#" class="text-xs text-underline text-highlight">Visitor Agreement.</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- You might also like -->
+@if (Model.RelatedCars.Any())
+{
+    <section class="py-100 background-light">
+        <div class="container">
+            <p class="h3 mb-40 capitalize">You might also like</p>
+            <div class="swiper-container swiper-card">
+                <div class="swiper-wrapper">
+                    @foreach (var car in Model.RelatedCars)
+                    {
+                        <div class="swiper-slide">
+                            <div class="card-box card-box-style-1">
+                                <div class="top">
+                                    @if (!string.IsNullOrEmpty(car.Badge))
+                                    {
+                                        <p class="@car.BadgeColor text-white highlight">@car.Badge</p>
+                                    }
+                                    else
+                                    {
+                                        <p></p>
+                                    }
+                                    <p class="heart" data-car-id="@car.Id">
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <g clip-path="url(#clip0_13399_19510)">
+                                                <path d="M8 14C8 14 1.5 10.5 1.5 6.375C1.5 5.47989 1.85558 4.62145 2.48851 3.98851C3.12145 3.35558 3.97989 3 4.875 3C6.28688 3 7.49625 3.76937 8 5C8.50375 3.76937 9.71312 3 11.125 3C12.0201 3 12.8785 3.35558 13.5115 3.98851C14.1444 4.62145 14.5 5.47989 14.5 6.375C14.5 10.5 8 14 8 14Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                            </g>
+                                        </svg>
+                                    </p>
+                                </div>
+                                <div class="image">
+                                    <a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id">
+                                        <img class="card--img" src="@car.ThumbnailUrl" alt="@car.Title">
+                                    </a>
+                                </div>
+                                <div class="content border-light border-top-none">
+                                    <div class="bottom">
+                                        <p class="category uppercase text-white">
+                                            <a asp-controller="List" asp-action="Index" asp-route-brand="@car.BrandName" class="text-white uppercase text-xs">@car.BrandName</a>
+                                        </p>
+
+                                        <div class="flex items-center gap-8">
+                                            <p class="category uppercase text-white">
+                                                <img src="~/assets/icons/picture.svg" alt="picture">
+                                                @car.ImageCount
+                                            </p>
+                                            <p class="category uppercase text-white">
+                                                <img src="~/assets/icons/play.svg" alt="play">
+                                                @car.VideoCount
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p class="h6 card-box__title mb-8">
+                                        <a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id">@car.Title</a>
+                                    </p>
+                                    <ul class="tag mb-10">
+                                        <li>
+                                            <img src="~/assets/icons/icon-gauge.svg" alt="mileage">
+                                            <span>@car.Mileage.ToString("N0") miles</span>
+                                        </li>
+                                        <li>
+                                            <img src="~/assets/icons/calendar.svg" alt="year">
+                                            <span>@car.Year</span>
+                                        </li>
+                                        <li>
+                                            <img src="~/assets/icons/gaspump.svg" alt="fuel">
+                                            <span>@car.FuelType</span>
+                                        </li>
+                                        <li>
+                                            <img src="~/assets/icons/manual.svg" alt="transmission">
+                                            <span>@car.Transmission</span>
+                                        </li>
+                                    </ul>
+                                    @if (car.MonthlyPayment.HasValue)
+                                    {
+                                        <p class="h6 card-box__price mb-15 flex justify-between gap-8 items-center">
+                                            $@car.Price.ToString("N2")
+                                            <span class="text-sm">
+                                                $@car.MonthlyPayment.Value.ToString("N0")/mo
+                                                <a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="text-underline ml-2 text-muted text-xs">See Finance</a>
+                                            </span>
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="card-box__price mb-15">$@car.Price.ToString("N2")</p>
+                                    }
+                                    <div class="divider mb-15"></div>
+                                    <div class="flex justify-between">
+                                        <p class="compare-details btn btn-small" data-car-id="@car.Id">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <g clip-path="url(#clip0_13399_19575)">
+                                                    <path d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <path d="M6.875 10H13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <path d="M10 6.875V13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                </g>
+                                            </svg>
+                                            Compare
+                                        </p>
+
+                                        <a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="view-details">
+                                            View details
+                                            <img class="ml-4" src="~/assets/icons/CaretCircleRight.svg" alt="CaretCircleRight.svg">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="hidden md-block">
+                    <div class="swiper-pagination pagination-dark pagination-style pagination-swiper-card mt-38"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+<script>
+// ====== Financing Calculator ======
+document.addEventListener('DOMContentLoaded', function () {
+    var btnCalc = document.getElementById('btnCalculateFinancing');
+    if (!btnCalc) return;
+
+    btnCalc.addEventListener('click', function () {
+        var carPrice     = parseFloat(document.getElementById('FinancingCalculatorCarPrice').value)    || 0;
+        var interestRate = parseFloat(document.getElementById('FinancingCalculatorInterestRate').value) || 0;
+        var loanTerm     = parseInt(document.getElementById('FinancingCalculatorLoanTerm').value)       || 60;
+        var downPayment  = parseFloat(document.getElementById('FinancingCalculatorDownPayment').value)  || 0;
+
+        var principal = carPrice - downPayment;
+        if (principal <= 0) { alert('Car price must be greater than down payment.'); return; }
+
+        var monthlyRate = (interestRate / 100) / 12;
+        var monthly;
+        if (monthlyRate === 0) {
+            monthly = principal / loanTerm;
+        } else {
+            monthly = principal * (monthlyRate * Math.pow(1 + monthlyRate, loanTerm))
+                                / (Math.pow(1 + monthlyRate, loanTerm) - 1);
+        }
+
+        var totalLoan     = monthly * loanTerm;
+        var totalInterest = totalLoan - principal;
+
+        function fmt(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+        document.getElementById('calcMonthlyPayment').textContent = fmt(monthly) + '/mo';
+        document.getElementById('calcTotalInterest').textContent  = fmt(totalInterest);
+        document.getElementById('calcTotalLoan').textContent      = fmt(totalLoan);
+
+        document.getElementById('financingResults').style.display = 'grid';
+
+        // Update the full-calculator link with current values
+        var goBtn = document.getElementById('btnGoToCalculator');
+        goBtn.href = '/Calculator?carPrice=' + encodeURIComponent(carPrice)
+            + '&downPayment=' + encodeURIComponent(downPayment)
+            + '&loanTerm='    + encodeURIComponent(loanTerm)
+            + '&interestRate='+ encodeURIComponent(interestRate);
+    });
+});
+
+// ====== Star Rating Interactivity ======
+document.addEventListener('DOMContentLoaded', function () {
+    const stars     = document.querySelectorAll('.rating-input__star');
+    const ratingVal = document.getElementById('rating-value');
+    if (!stars.length || !ratingVal) return;
+
+    const activeIcon   = '/assets/icons/star-4.svg';
+    const inactiveIcon = '/assets/icons/star-3.svg';
+
+    stars.forEach(function (star) {
+        star.addEventListener('click', function () {
+            const selected = parseInt(this.dataset.rating);
+            ratingVal.value = selected;
+            stars.forEach(function (s) {
+                const r   = parseInt(s.dataset.rating);
+                const img = s.querySelector('img');
+                if (r <= selected) {
+                    s.classList.add('active');
+                    img.src = activeIcon;
+                } else {
+                    s.classList.remove('active');
+                    img.src = inactiveIcon;
+                }
+            });
+        });
+
+        star.addEventListener('mouseenter', function () {
+            const hovered = parseInt(this.dataset.rating);
+            stars.forEach(function (s) {
+                const r   = parseInt(s.dataset.rating);
+                const img = s.querySelector('img');
+                img.src   = r <= hovered ? activeIcon : inactiveIcon;
+            });
+        });
+
+        star.addEventListener('mouseleave', function () {
+            const current = parseInt(ratingVal.value);
+            stars.forEach(function (s) {
+                const r   = parseInt(s.dataset.rating);
+                const img = s.querySelector('img');
+                img.src   = r <= current ? activeIcon : inactiveIcon;
+            });
+        });
+    });
+});
+
+// ====== Wishlist Heart (AJAX) ======
+$(document).on('click', '.heart', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $btn = $(this);
+    var carId = $btn.data('car-id');
+    if (!carId) return;
+
+    $.ajax({
+        type: 'POST',
+        url: '/Wishlist/Toggle/' + carId,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                $('.heart[data-car-id="' + carId + '"]').toggleClass('active', res.isInWishlist);
+                updateNavBadge('#wishlistNavCount', res.count);
+                showToast(res.isInWishlist ? 'Added to wishlist!' : 'Removed from wishlist.', 'success');
+            }
+        },
+        error: function() { showToast('Error updating wishlist.', 'error'); }
+    });
+});
+
+// ====== Compare Button (AJAX) ======
+$(document).on('click', '.compare-details', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $btn = $(this);
+    var carId = $btn.data('car-id');
+    if (!carId) return;
+
+    if ($btn.hasClass('active')) {
+        $.ajax({
+            type: 'POST',
+            url: '/Compare/Remove/' + carId,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+            },
+            success: function(res) {
+                if (res.success) {
+                    $btn.removeClass('active');
+                    updateNavBadge('#compareNavCount', res.count);
+                    showToast('Removed from compare.', 'success');
+                }
+            },
+            error: function() { showToast('Error removing from compare.', 'error'); }
+        });
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: '/Compare/Add/' + carId,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                $btn.addClass('active');
+                updateNavBadge('#compareNavCount', res.count);
+                showToast('Added to compare!', 'success');
+            } else {
+                showToast(res.message || 'Could not add to compare.', 'error');
+            }
+        },
+        error: function() { showToast('Error adding to compare.', 'error'); }
+    });
+});
+
+// ====== Helpers ======
+function updateNavBadge(selector, count) {
+    var $badge = $(selector);
+    if (count > 0) {
+        $badge.text(count).show();
+    } else {
+        $badge.text('0').hide();
+    }
+}
+
+function showToast(msg, type) {
+    var existing = $('#action-toast');
+    if (existing.length) existing.remove();
+    var cls = type === 'success' ? 'auth-toast--success' : 'auth-toast--error';
+    var $toast = $('<div id="action-toast" class="auth-toast ' + cls + '"><span>' + msg + '</span><button onclick="$(\'#action-toast\').remove()">✕</button></div>');
+    $('body').append($toast);
+    setTimeout(function() { $toast.fadeOut(300, function() { $(this).remove(); }); }, 3000);
+}
+
+function toggleReplyForm(replyFormId) {
+    var $form = $('#' + replyFormId);
+    $form.toggle();
+}
+</script>
+}

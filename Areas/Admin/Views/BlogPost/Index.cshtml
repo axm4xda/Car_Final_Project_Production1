@@ -1,0 +1,53 @@
+@model IEnumerable<BlogPost>
+@{
+    ViewData["Title"] = "Blog Yazılar";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Blog Yazılar (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Yazı</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr><th>Şəkil</th><th>Başlıq</th><th>Kateqoriya</th><th>Müəllif</th><th>Status</th><th>Tarix</th><th>Əməliyyat</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(p.ThumbnailUrl))
+                                { <img src="@p.ThumbnailUrl" class="thumb" alt=""> }
+                                else
+                                { <span class="a-badge gray">Yoxdur</span> }
+                            </td>
+                            <td><strong>@p.Title</strong></td>
+                            <td>@p.Category?.Name</td>
+                            <td>@p.AuthorName</td>
+                            <td>
+                                <span class="a-badge @(p.Status == BlogStatus.Published ? "green" : p.Status == BlogStatus.Archived ? "gray" : "yellow")">
+                                    @(p.Status == BlogStatus.Published ? "Yayımlandı" : p.Status == BlogStatus.Archived ? "Arxiv" : "Qaralama")
+                                </span>
+                            </td>
+                            <td>@p.CreatedDate.ToString("dd.MM.yyyy")</td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@p.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@p.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ blog yazısı yoxdur.</p></div>
+    }
+</div>

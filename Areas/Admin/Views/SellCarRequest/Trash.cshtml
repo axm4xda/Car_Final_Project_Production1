@@ -1,0 +1,171 @@
+@model Car_Project.Areas.Admin.ViewModels.TrashViewModel
+@using Car_Project.Models
+@{
+    ViewData["Title"] = "Zibil Qutusu";
+    var reqList = Model.TrashedRequests.ToList();
+    var carList = Model.TrashedCars.ToList();
+    var totalCount = reqList.Count + carList.Count;
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>
+            <div class="a-card-title">🗑 Zibil Qutusu (@totalCount)</div>
+            <p style="font-size:12px;color:#9ca3af;margin-top:4px;">Zibil qutusundakı elementlər 10 gün sonra avtomatik silinir.</p>
+        </div>
+        <div class="act-btns">
+            <a asp-action="Index" class="btn-a ghost">← Geri</a>
+            @if (totalCount > 0)
+            {
+                <form asp-action="EmptyTrash" method="post" class="del-form" onsubmit="return confirm('Zibil qutusunu tamamilə boşaltmaq istəyirsiniz? Bu əməliyyat geri qaytarıla bilməz!')">
+                    @Html.AntiForgeryToken()
+                    <button class="btn-a danger">🗑 Hamısını Sil</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @* =========== MAŞINLAR =========== *@
+    @if (carList.Any())
+    {
+        <div style="padding:16px 20px 4px;">
+            <h3 style="font-size:15px;font-weight:700;color:#374151;margin-bottom:12px;">🚗 Silinmiş Maşınlar (@carList.Count)</h3>
+        </div>
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr>
+                        <th>Şəkil</th>
+                        <th>Ad</th>
+                        <th>Marka</th>
+                        <th>Qiymət</th>
+                        <th>İl</th>
+                        <th>Silinmə Tarixi</th>
+                        <th>Avtomatik Silinir</th>
+                        <th>Əməliyyat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var car in carList)
+                    {
+                        var deletedDate = car.DeletedDate ?? DateTime.UtcNow;
+                        var autoDeleteDate = deletedDate.AddDays(10);
+                        var daysLeft = (autoDeleteDate - DateTime.UtcNow).Days;
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(car.ThumbnailUrl))
+                                {
+                                    <img src="@car.ThumbnailUrl" class="thumb" alt="">
+                                }
+                                else
+                                {
+                                    <span class="a-badge gray">Yoxdur</span>
+                                }
+                            </td>
+                            <td><strong>@car.Title</strong></td>
+                            <td>@car.Brand?.Name</td>
+                            <td>$@car.Price.ToString("N0")</td>
+                            <td>@car.Year</td>
+                            <td>@deletedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @if (daysLeft > 0)
+                                {
+                                    <span class="a-badge" style="background:#fefce8;color:#ca8a04;">@daysLeft gün qaldı</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge red">Tezliklə</span>
+                                }
+                            </td>
+                            <td class="act-btns">
+                                <form asp-area="Admin" asp-controller="Car" asp-action="RestoreCar" asp-route-id="@car.Id" method="post" class="del-form">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a success btn-sm" title="Bərpa et">♻️ Bərpa</button>
+                                </form>
+                                <form asp-area="Admin" asp-controller="Car" asp-action="PermanentDeleteCar" asp-route-id="@car.Id" method="post" class="del-form" onsubmit="return confirm('Maşını həmişəlik silmək istəyirsiniz? Bu geri qaytarıla bilməz!')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm" title="Həmişəlik sil">🗑 Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @* =========== SATIŞ MÜRACİƏTLƏRİ =========== *@
+    @if (reqList.Any())
+    {
+        <div style="padding:16px 20px 4px;margin-top:@(carList.Any() ? "16px" : "0")">
+            <h3 style="font-size:15px;font-weight:700;color:#374151;margin-bottom:12px;">📋 Silinmiş Satış Müraciətləri (@reqList.Count)</h3>
+        </div>
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr>
+                        <th>Ad</th>
+                        <th>Email</th>
+                        <th>Maşın</th>
+                        <th>Qiymət</th>
+                        <th>Əvvəlki Status</th>
+                        <th>Silinmə Tarixi</th>
+                        <th>Avtomatik Silinir</th>
+                        <th>Əməliyyat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var req in reqList)
+                    {
+                        var trashedDate = req.TrashedDate ?? DateTime.UtcNow;
+                        var deleteDate = trashedDate.AddDays(10);
+                        var daysLeft = (deleteDate - DateTime.UtcNow).Days;
+                        <tr>
+                            <td><strong>@req.OwnerName</strong></td>
+                            <td>@req.Email</td>
+                            <td>@req.CarTitle (@req.Year)</td>
+                            <td>$@req.AskingPrice.ToString("N0")</td>
+                            <td>
+                                @if (req.IsReviewed)
+                                {
+                                    <span class="a-badge gray">Nəzərdən keçirilmiş</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge yellow">Gözləyirdi</span>
+                                }
+                            </td>
+                            <td>@trashedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @if (daysLeft > 0)
+                                {
+                                    <span class="a-badge" style="background:#fefce8;color:#ca8a04;">@daysLeft gün qaldı</span>
+                                }
+                                else
+                                {
+                                    <span class="a-badge red">Tezliklə</span>
+                                }
+                            </td>
+                            <td class="act-btns">
+                                <form asp-action="Restore" asp-route-id="@req.Id" method="post" class="del-form">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a success btn-sm" title="Bərpa et">♻️ Bərpa</button>
+                                </form>
+                                <form asp-action="PermanentDelete" asp-route-id="@req.Id" method="post" class="del-form" onsubmit="return confirm('Həmişəlik silmək istəyirsiniz? Bu geri qaytarıla bilməz!')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm" title="Həmişəlik sil">🗑 Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (totalCount == 0)
+    {
+        <div class="empty-st">
+            <p>🎉 Zibil qutusu boşdur.</p>
+        </div>
+    }
+</div>

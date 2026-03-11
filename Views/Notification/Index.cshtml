@@ -1,0 +1,214 @@
+@model IList<Car_Project.Models.Notification>
+@{
+    ViewData["Title"] = "Bildirişlər";
+}
+
+<section class="flat-spacing" style="padding: 40px 0 80px;">
+    <div class="container" style="max-width: 900px;">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+            <h2 style="font-size:24px;font-weight:700;">🔔 Bildirişlərim</h2>
+            @if (Model.Any(n => !n.IsRead))
+            {
+                <form asp-controller="Notification" asp-action="MarkAllAsRead" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="notif-mark-all-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Hamısını oxunmuş et
+                    </button>
+                </form>
+            }
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="notif-empty">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <p style="margin-top:16px;font-size:16px;color:#9ca3af;font-weight:500;">Hələ heç bir bildirişiniz yoxdur</p>
+            </div>
+        }
+        else
+        {
+            <div class="notif-list">
+                @foreach (var n in Model)
+                {
+                    <div class="notif-item @(n.IsRead ? "" : "unread")">
+                        <div class="notif-icon @GetIconClass(n.Type)">
+                            @GetIconSvg(n.Type)
+                        </div>
+                        <div class="notif-body">
+                            <div class="notif-title">
+                                @n.Title
+                                @if (!n.IsRead)
+                                {
+                                    <span class="notif-new-badge">Yeni</span>
+                                }
+                            </div>
+                            <p class="notif-message">@n.Message</p>
+                            <span class="notif-time">@GetTimeAgo(n.CreatedDate)</span>
+                        </div>
+                        <div class="notif-actions">
+                            @if (!string.IsNullOrEmpty(n.Link))
+                            {
+                                <form asp-controller="Notification" asp-action="MarkAsRead" asp-route-id="@n.Id" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="notif-action-btn notif-go" title="Keçid et">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            <polyline points="12 5 19 12 12 19"></polyline>
+                                        </svg>
+                                    </button>
+                                </form>
+                            }
+                            else if (!n.IsRead)
+                            {
+                                <form asp-controller="Notification" asp-action="MarkAsRead" asp-route-id="@n.Id" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="notif-action-btn" title="Oxunmuş et">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </button>
+                                </form>
+                            }
+                            <form asp-controller="Notification" asp-action="Delete" asp-route-id="@n.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="notif-action-btn notif-del" title="Sil" onclick="return confirm('Bildirişi silmək istədiyinizə əminsiniz?')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+    .notif-list { display: flex; flex-direction: column; gap: 12px; }
+    .notif-item {
+        display: flex; align-items: flex-start; gap: 16px;
+        background: #fff; border: 1px solid #e5e7eb; border-radius: 14px;
+        padding: 18px 20px; transition: all .2s;
+    }
+    .notif-item.unread { background: #fffbf5; border-color: #fed7aa; }
+    .notif-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+
+    .notif-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .notif-icon svg { width: 22px; height: 22px; }
+    .notif-icon.ico-info    { background: #eff6ff; color: #2563eb; }
+    .notif-icon.ico-success { background: #ecfdf5; color: #059669; }
+    .notif-icon.ico-warning { background: #fefce8; color: #ca8a04; }
+    .notif-icon.ico-danger  { background: #fef2f2; color: #dc2626; }
+    .notif-icon.ico-purple  { background: #f5f3ff; color: #7c3aed; }
+
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-title { font-size: 14px; font-weight: 600; color: #1c1c1c; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .notif-message { font-size: 13px; color: #6b7280; line-height: 1.5; margin-bottom: 4px; }
+    .notif-time { font-size: 11px; color: #9ca3af; }
+    .notif-new-badge {
+        font-size: 10px; font-weight: 700; background: #FF5722; color: #fff;
+        padding: 2px 8px; border-radius: 20px;
+    }
+
+    .notif-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .notif-action-btn {
+        width: 34px; height: 34px; border-radius: 8px; border: 1px solid #e5e7eb;
+        background: #f9fafb; cursor: pointer; display: flex; align-items: center;
+        justify-content: center; transition: all .2s; color: #6b7280;
+    }
+    .notif-action-btn:hover { background: #e5e7eb; color: #1c1c1c; }
+    .notif-action-btn.notif-go { border-color: #FF5722; color: #FF5722; background: #fff5f2; }
+    .notif-action-btn.notif-go:hover { background: #FF5722; color: #fff; }
+    .notif-action-btn.notif-del:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+
+    .notif-mark-all-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+        background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
+        cursor: pointer; transition: all .2s;
+    }
+    .notif-mark-all-btn:hover { background: #d1fae5; }
+
+    .notif-empty { text-align: center; padding: 80px 20px; }
+
+    @@media (max-width: 640px) {
+        .notif-item { flex-direction: column; gap: 12px; }
+        .notif-actions { align-self: flex-end; }
+    }
+</style>
+
+@functions {
+    string GetTimeAgo(DateTime createdDate)
+    {
+        var diff = DateTime.UtcNow - createdDate;
+        if (diff.TotalMinutes < 1) return "İndicə";
+        if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes} dəq əvvəl";
+        if (diff.TotalHours < 24) return $"{(int)diff.TotalHours} saat əvvəl";
+        if (diff.TotalDays < 30) return $"{(int)diff.TotalDays} gün əvvəl";
+        return createdDate.ToString("dd.MM.yyyy");
+    }
+
+    string GetIconClass(Car_Project.Models.NotificationType type)
+    {
+        return type switch
+        {
+            Car_Project.Models.NotificationType.Success or
+            Car_Project.Models.NotificationType.CarApproved or
+            Car_Project.Models.NotificationType.SellRequestApproved => "ico-success",
+
+            Car_Project.Models.NotificationType.Warning => "ico-warning",
+
+            Car_Project.Models.NotificationType.CarRejected or
+            Car_Project.Models.NotificationType.SellRequestRejected => "ico-danger",
+
+            Car_Project.Models.NotificationType.NewContactMessage or
+            Car_Project.Models.NotificationType.AdminReply => "ico-purple",
+
+            _ => "ico-info"
+        };
+    }
+
+    Microsoft.AspNetCore.Html.IHtmlContent GetIconSvg(Car_Project.Models.NotificationType type)
+    {
+        var svg = type switch
+        {
+            Car_Project.Models.NotificationType.CarApproved or
+            Car_Project.Models.NotificationType.SellRequestApproved or
+            Car_Project.Models.NotificationType.Success =>
+                "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'></polyline></svg>",
+
+            Car_Project.Models.NotificationType.CarRejected or
+            Car_Project.Models.NotificationType.SellRequestRejected =>
+                "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='18' y1='6' x2='6' y2='18'></line><line x1='6' y1='6' x2='18' y2='18'></line></svg>",
+
+            Car_Project.Models.NotificationType.Warning =>
+                "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'></path><line x1='12' y1='9' x2='12' y2='13'></line><line x1='12' y1='17' x2='12.01' y2='17'></line></svg>",
+
+            Car_Project.Models.NotificationType.NewContactMessage or
+            Car_Project.Models.NotificationType.AdminReply =>
+                "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'></path></svg>",
+
+            Car_Project.Models.NotificationType.NewCarListing or
+            Car_Project.Models.NotificationType.NewSellRequest =>
+                "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='12' y1='8' x2='12' y2='16'></line><line x1='8' y1='12' x2='16' y2='12'></line></svg>",
+
+            _ =>
+                "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><line x1='12' y1='16' x2='12' y2='12'></line><line x1='12' y1='8' x2='12.01' y2='8'></line></svg>"
+        };
+
+        return new Microsoft.AspNetCore.Html.HtmlString(svg);
+    }
+}

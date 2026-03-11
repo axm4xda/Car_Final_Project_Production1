@@ -1,0 +1,62 @@
+@model IEnumerable<ServiceCenter>
+@{
+    ViewData["Title"] = "Servis Mərkəzləri";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Servis Mərkəzləri (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Servis Mərkəzi</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead>
+                    <tr>
+                        <th>Şəkil</th>
+                        <th>Ad</th>
+                        <th>Ünvan</th>
+                        <th>Telefon</th>
+                        <th>Email</th>
+                        <th>İş Saatları</th>
+                        <th>Əməliyyat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var center in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(center.ImageUrl))
+                                {
+                                    <img src="@center.ImageUrl" class="thumb" alt="">
+                                }
+                                else
+                                {
+                                    <span class="a-badge gray">Yoxdur</span>
+                                }
+                            </td>
+                            <td><strong>@center.Name</strong></td>
+                            <td>@center.Address</td>
+                            <td>@(center.Phone ?? "—")</td>
+                            <td>@(center.Email ?? "—")</td>
+                            <td>@(center.WorkingHours ?? "—")</td>
+                            <td class="act-btns">
+                                <a asp-action="Details" asp-route-id="@center.Id" class="btn-a info btn-sm">👁</a>
+                                <a asp-action="Edit" asp-route-id="@center.Id" class="btn-a warning btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@center.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-st"><p>Hələ servis mərkəzi yoxdur.</p></div>
+    }
+</div>

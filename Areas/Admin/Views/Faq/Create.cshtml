@@ -1,0 +1,21 @@
+@model FAQ
+@{
+    ViewData["Title"] = "Yeni FAQ";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Yeni FAQ Əlavə Et</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label>Sual</label><input asp-for="Question" class="fc" required></div>
+        <div class="fg"><label>Cavab</label><textarea asp-for="Answer" class="fc" rows="4" required></textarea></div>
+        <div class="f-row">
+            <div class="fg"><label>Qrup Adı (isteğe bağlı)</label><input asp-for="GroupName" class="fc" placeholder="Məsələn: Ödəniş, Çatdırılma"></div>
+            <div class="fg"><label>Sıra</label><input asp-for="Order" class="fc" type="number" value="0"></div>
+        </div>
+        <div class="fg"><label class="f-chk"><input asp-for="IsActive" type="checkbox"> Aktiv</label></div>
+        <button class="btn-a primary" type="submit">Əlavə Et</button>
+    </form>
+</div>

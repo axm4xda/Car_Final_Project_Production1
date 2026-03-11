@@ -1,0 +1,214 @@
+﻿@model Car_Project.ViewModels.Shop.CartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var related = ViewBag.RelatedProducts as List<Car_Project.ViewModels.Shop.ProductCardViewModel>
+                  ?? new List<Car_Project.ViewModels.Shop.ProductCardViewModel>();
+    decimal subTotal  = Model.SubTotal;
+    decimal discount  = 0;
+    decimal shipping  = 0;
+    decimal total     = subTotal - discount + shipping;
+}
+
+<!-- breadcrumb -->
+<section class="background-light mb-32">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Shopping Cart</span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- Shopping Cart -->
+<section class="bg-white pb-84 shopping-cart-page">
+    <div class="container">
+        <h2>Shopping Cart</h2>
+        <div class="tf-spacing-style3"></div>
+
+        <div class="innerpage-container">
+            <div class="innerpage__content md-mb-30">
+
+                @if (!Model.Items.Any())
+                {
+                    <div class="mb-40">
+                        <p class="text-secondary mb-20">Səbətiniz boşdur.</p>
+                        <a asp-controller="Product" asp-action="Index"
+                           class="btn btn-primary btn-large">Alış-verişə davam et</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="cart-wrapper">
+                        <!-- Cart Header -->
+                        <div class="cart-header">
+                            <div class="font-weight-600">Products</div>
+                            <div class="font-weight-600">Price</div>
+                            <div class="font-weight-600">Quantity</div>
+                            <div class="font-weight-600">Total Price</div>
+                            <div class="font-weight-600"></div>
+                        </div>
+
+                        <!-- Cart Items -->
+                        <div class="cart-items">
+                            @foreach (var item in Model.Items)
+                            {
+                                <div class="cart-item">
+                                    <div class="cart-item__product">
+                                        <div class="cart-item__image">
+                                            <img src="@(item.ThumbnailUrl ?? "~/assets/images/shop/product-1.jpg")"
+                                                 alt="@item.ProductName">
+                                        </div>
+                                        <div class="cart-item__name">
+                                            <span class="font-weight-600">@item.ProductName</span>
+                                        </div>
+                                    </div>
+                                    <div class="cart-item__price">
+                                        <span class="price">$@item.UnitPrice.ToString("F2")</span>
+                                    </div>
+                                    <div class="cart-item__quantity">
+                                        <form asp-controller="Payment" asp-action="UpdateQuantity" method="post"
+                                              class="quantity-selector">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@item.ProductId">
+                                            <button type="submit" name="quantity" value="@(item.Quantity - 1)"
+                                                    class="quantity-selector__btn quantity-selector__btn--minus flex">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M5 12H19" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </button>
+                                            <input class="quantity-selector__value" name="quantity"
+                                                   value="@item.Quantity" type="number" min="1">
+                                            <button type="submit" name="quantity" value="@(item.Quantity + 1)"
+                                                    class="quantity-selector__btn quantity-selector__btn--plus flex">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 5V19" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <path d="M5 12H19" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="cart-item__total">
+                                        <span class="total-price">@item.Quantity X $@item.TotalPrice.ToString("F2")</span>
+                                    </div>
+                                    <div class="cart-item__action">
+                                        <form asp-controller="Payment" asp-action="Remove" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@item.ProductId">
+                                            <button type="submit" class="cart-item__remove" aria-label="Remove item">
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M9.64052 9.1099C9.67536 9.14474 9.703 9.1861 9.72186 9.23162C9.74071 9.27714 9.75042 9.32594 9.75042 9.37521C9.75042 9.42448 9.74071 9.47327 9.72186 9.5188C9.703 9.56432 9.67536 9.60568 9.64052 9.64052C9.60568 9.67536 9.56432 9.703 9.5188 9.72186C9.47327 9.74071 9.42448 9.75042 9.37521 9.75042C9.32594 9.75042 9.27714 9.74071 9.23162 9.72186C9.1861 9.703 9.14474 9.67536 9.1099 9.64052L6.00021 6.53036L2.89052 9.64052C2.82016 9.71089 2.72472 9.75042 2.62521 9.75042C2.5257 9.75042 2.43026 9.71089 2.3599 9.64052C2.28953 9.57016 2.25 9.47472 2.25 9.37521C2.25 9.2757 2.28953 9.18026 2.3599 9.1099L5.47005 6.00021L2.3599 2.89052C2.28953 2.82016 2.25 2.72472 2.25 2.62521C2.25 2.5257 2.28953 2.43026 2.3599 2.3599C2.43026 2.28953 2.5257 2.25 2.62521 2.25C2.72472 2.25 2.82016 2.28953 2.89052 2.3599L6.00021 5.47005L9.1099 2.3599C9.18026 2.28953 9.2757 2.25 9.37521 2.25C9.47472 2.25 9.57016 2.28953 9.64052 2.3599C9.71089 2.43026 9.75042 2.5257 9.75042 2.62521C9.75042 2.72472 9.71089 2.82016 9.64052 2.89052L6.53036 6.00021L9.64052 9.1099Z" fill="#1C1C1C" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Cart Footer -->
+                    <div class="cart-total flex justify-between gap-12">
+                        <div class="cart-total__voucher">
+                            <input type="text" class="input-large" placeholder="Add voucher discount" id="couponInput">
+                            <button type="button" class="btn btn-small-2 btn-primary">Apply Coupon</button>
+                        </div>
+                        <div class="cart-total__actions">
+                            <a asp-controller="Product" asp-action="Index"
+                               class="btn btn-primary btn-large-3">Continue Shopping</a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="innerpage__sidebar">
+                <div class="listing-details--sidebar-box">
+                    <p class="h4 mb-20 capitalize">Order Summary</p>
+
+                    <div>
+                        <p class="flex justify-between gap-8 mb-18">
+                            <span class="font-weight-600">Subtotal</span>
+                            <span class="font-weight-600">$@subTotal.ToString("F2")</span>
+                        </p>
+
+                        <div class="divider mb-20"></div>
+
+                        <p class="flex justify-between gap-8 mb-20">
+                            <span class="font-weight-600">Discounts</span>
+                            <span class="font-weight-600">-$@discount.ToString("F2")</span>
+                        </p>
+
+                        <div class="divider mb-20"></div>
+
+                        <div class="flex justify-between gap-8 mb-20">
+                            <span class="font-weight-600">Shipping</span>
+                            <span class="font-weight-600">@(shipping == 0 ? "Free" : "$" + shipping.ToString("F2"))</span>
+                        </div>
+
+                        <div class="divider mb-20"></div>
+
+                        <div class="flex justify-between gap-8 mb-20">
+                            <p class="h4 font-weight-600">Total</p>
+                            <p class="h4 font-weight-600">$@total.ToString("F2")</p>
+                        </div>
+
+                        <a asp-controller="Checkout" asp-action="Index"
+                           class="btn btn-primary btn-large font-weight-600 w-full mb-12">
+                            Process To Checkout
+                        </a>
+                        <a asp-controller="Product" asp-action="Index"
+                           class="text-underline text-center block">Or continue shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        @if (related.Any())
+        {
+            <div class="tf-spacing"></div>
+            <h2 class="mb-40">Related Products</h2>
+            <div class="swiper-card swiper-products">
+                <div class="swiper-wrapper">
+                    @foreach (var p in related)
+                    {
+                        <div class="swiper-slide">
+                            <div class="product">
+                                <div class="product-top">
+                                    @if (!string.IsNullOrEmpty(p.Badge))
+                                    {
+                                        <div class="promotion uppercase text-white"
+                                             style="background-color:@(p.BadgeColor ?? "#ef4444")">
+                                            @p.Badge
+                                        </div>
+                                    }
+                                    <a class="img" href="#">
+                                        <img class="img"
+                                             src="@(p.ThumbnailUrl ?? "~/assets/images/shop/product-1.jpg")"
+                                             alt="@p.Name">
+                                    </a>
+                                    <form asp-controller="Product" asp-action="AddToCart" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@p.Id">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="product-add-to-cart">Add to Cart</button>
+                                    </form>
+                                </div>
+                                <a href="#" class="block mb-4 h7 font-weight-500">@p.Name</a>
+                                <p class="h5 price">
+                                    $@p.Price.ToString("F2")
+                                    @if (p.OldPrice.HasValue)
+                                    {
+                                        <span class="price-old">$@p.OldPrice.Value.ToString("F2")</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="swiper-pagination pagination-dark pagination-style pagination-swiper-products mt-38"></div>
+            </div>
+        }
+    </div>
+</section>

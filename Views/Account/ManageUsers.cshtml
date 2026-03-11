@@ -1,0 +1,101 @@
+@model IList<Car_Project.ViewModels.Account.UserWithRoleViewModel>
+
+<!-- breadcrumb -->
+<section class="background-light">
+	<div class="container">
+		<ul class="breadcrumb">
+			<li><a asp-controller="Home" asp-action="Index">Home</a></li>
+			<li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+			<li><span>İstifadəçi İdarəetmə</span></li>
+		</ul>
+	</div>
+</section>
+
+<section class="pb-100">
+	<div class="tf-spacing-style3"></div>
+	<div class="container">
+		<h2 class="mb-20">İstifadəçi İdarəetmə</h2>
+		<p class="text-secondary mb-40">Bütün istifadəçiləri idarə edin, rol təyin edin və ya silin.</p>
+
+		<div style="overflow-x:auto;">
+			<table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+				<thead>
+					<tr style="background:#f9fafb;text-align:left;">
+						<th style="padding:14px 16px;font-size:13px;font-weight:600;color:#6b7280;border-bottom:1px solid #e5e7eb;">Ad Soyad</th>
+						<th style="padding:14px 16px;font-size:13px;font-weight:600;color:#6b7280;border-bottom:1px solid #e5e7eb;">Email</th>
+						<th style="padding:14px 16px;font-size:13px;font-weight:600;color:#6b7280;border-bottom:1px solid #e5e7eb;">Rol</th>
+						<th style="padding:14px 16px;font-size:13px;font-weight:600;color:#6b7280;border-bottom:1px solid #e5e7eb;">Qeydiyyat Tarixi</th>
+						<th style="padding:14px 16px;font-size:13px;font-weight:600;color:#6b7280;border-bottom:1px solid #e5e7eb;text-align:center;">Əməliyyat</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var user in Model)
+					{
+						<tr style="border-bottom:1px solid #f3f4f6;">
+							<td style="padding:12px 16px;font-size:14px;font-weight:500;">@user.FullName</td>
+							<td style="padding:12px 16px;font-size:14px;color:#6b7280;">@user.Email</td>
+							<td style="padding:12px 16px;">
+								@if (user.Role == "SuperAdmin")
+								{
+									<span style="display:inline-block;padding:4px 12px;background:#7c3aed;color:white;border-radius:20px;font-size:12px;font-weight:600;">
+										SuperAdmin
+									</span>
+								}
+								else if (user.Role == "Admin")
+								{
+									<span style="display:inline-block;padding:4px 12px;background:#2563eb;color:white;border-radius:20px;font-size:12px;font-weight:600;">
+										Admin
+									</span>
+								}
+								else if (user.Role == "Agent")
+								{
+									<span style="display:inline-block;padding:4px 12px;background:#f59e0b;color:white;border-radius:20px;font-size:12px;font-weight:600;">
+										Agent
+									</span>
+								}
+								else
+								{
+									<span style="display:inline-block;padding:4px 12px;background:#e5e7eb;color:#374151;border-radius:20px;font-size:12px;font-weight:600;">
+										User
+									</span>
+								}
+							</td>
+							<td style="padding:12px 16px;font-size:13px;color:#9ca3af;">@user.CreatedDate.ToString("dd MMM yyyy")</td>
+							<td style="padding:12px 16px;text-align:center;">
+								@if (user.Role != "SuperAdmin")
+								{
+									<div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;">
+										<form asp-controller="Account" asp-action="ChangeUserRole" method="post" style="display:flex;gap:6px;align-items:center;">
+											@Html.AntiForgeryToken()
+											<input type="hidden" name="userId" value="@user.Id" />
+											<select name="newRole" style="height:34px;padding:0 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;background:white;line-height:34px;">
+												<option value="User" selected="@(user.Role == "User" ? "selected" : null)">User</option>
+												<option value="Agent" selected="@(user.Role == "Agent" ? "selected" : null)">Agent</option>
+												<option value="Admin" selected="@(user.Role == "Admin" ? "selected" : null)">Admin</option>
+											</select>
+											<button type="submit" style="height:34px;padding:0 14px;background:#2563eb;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">
+												Təyin et
+											</button>
+										</form>
+										<form asp-controller="Account" asp-action="RemoveUser" method="post"
+											  onsubmit="return confirm('Bu istifadəçini silmək istədiyinizdən əminsiniz?');">
+											@Html.AntiForgeryToken()
+											<input type="hidden" name="userId" value="@user.Id" />
+											<button type="submit" style="height:34px;padding:0 14px;background:#dc2626;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">
+												Sil
+											</button>
+										</form>
+									</div>
+								}
+								else
+								{
+									<span style="font-size:12px;color:#9ca3af;">—</span>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>

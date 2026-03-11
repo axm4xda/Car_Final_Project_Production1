@@ -1,0 +1,349 @@
+@model Car_Project.ViewModels.SalesAgent.SalesAgentDetailsViewModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Car_Project.Models.AppUser> SignInManager
+@inject UserManager<Car_Project.Models.AppUser>   UserManager
+
+<!-- breadcrumb -->
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><a asp-controller="Home" asp-action="Index">Pages</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><a asp-controller="SalesAgent" asp-action="Index">Sale Agents</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>@Model.FullName</span></li>
+        </ul>
+    </div>
+</section>
+<!-- breadcrumb -->
+
+<section class="pb-100">
+    <div class="tf-spacing-style3"></div>
+
+    <div class="container innerpage-container">
+        <div class="innerpage__content md-mb-30">
+
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img class="w-full mb-35 radius-16" src="@Model.ImageUrl" alt="@Model.FullName">
+            }
+
+            <h2 class="mb-12">@Model.FullName</h2>
+
+            @if (Model.IsVerified)
+            {
+                <div class="flex">
+                    <div class="verify mb-16">
+                        <img src="~/assets/icons/SealCheck.svg" alt="verified">
+                        <p class="text-highlight text-sm">Verified Dealer</p>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Bio))
+            {
+                <p class="text-secondary mb-40">@Model.Bio</p>
+            }
+
+            <div class="divider mb-40 w-full"></div>
+
+            <!-- Customer Reviews -->
+            <div class="flex items-center justify-between gap-16 mb-16">
+                <p class="h4">Customer Reviews</p>
+                <a href="#reviewForm" class="btn btn-primary btn-small-2 font-weight-600 capitalize">Write a review</a>
+            </div>
+
+            <div class="rating-box max-w-1170 mb-40">
+                <div class="rating-box__content">
+                    <div class="rating-box__overview">
+                        <div class="rating-box__average">
+                            <span class="rating-box__score">@Model.AverageRating</span>
+                            <div class="rating-box__stars">
+                                @for (int i = 1; i <= 5; i++)
+                                {<img src="~/assets/icons/star-2.svg" alt="star">}
+                            </div>
+                            <p class="rating-box__count">(@Model.TotalReviews Ratings)</p>
+                        </div>
+                    </div>
+                    <div class="rating-box__distribution">
+                        @for (int star = 5; star >= 1; star--)
+                        {
+                            <div class="rating-box__bar-item">
+                                <p class="rating-box__bar-label">
+                                    <span class="text">@star</span>
+                                    <img src="~/assets/icons/star-2.svg" alt="star">
+                                </p>
+                                <div class="rating-box__bar-wrapper">
+                                    <div class="rating-box__bar" style="width: @(Model.GetStarPercent(star))%;"></div>
+                                </div>
+                                <span class="rating-box__bar-percent">@(Model.GetStarPercent(star))%</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="rating-box__button">
+                        <a href="#reviewForm" class="h-50 btn btn-primary btn-large font-weight-600 capitalize">Write a review</a>
+                    </div>
+                </div>
+            </div>
+
+            @if (TempData["ReviewSuccess"] != null)
+            {
+                <div class="alert-box success mb-20" style="padding:14px 18px;border-radius:10px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;font-size:14px;font-weight:500;">
+                    ✅ @TempData["ReviewSuccess"]
+                </div>
+            }
+            @if (TempData["ReviewError"] != null)
+            {
+                <div class="alert-box error mb-20" style="padding:14px 18px;border-radius:10px;background:#fef2f2;color:#991b1b;border:1px solid #fecaca;font-size:14px;font-weight:500;">
+                    ⚠️ @TempData["ReviewError"]
+                </div>
+            }
+
+            @if (Model.Reviews.Any())
+            {
+                <div class="comments mb-40">
+                    @foreach (var review in Model.Reviews)
+                    {
+                        <div class="comment-box">
+                            <div class="comment-box__header mb-20">
+                                <div class="comment-box__avatar @(string.IsNullOrEmpty(review.AuthorAvatarUrl) ? "guest" : "")">
+                                    @if (!string.IsNullOrEmpty(review.AuthorAvatarUrl))
+                                    {<img src="@review.AuthorAvatarUrl" alt="avatar">}
+                                    else
+                                    {@(string.Concat(review.AuthorName.Split(' ').Take(2).Select(n => n[0].ToString().ToUpper())))}
+                                </div>
+                                <div>
+                                    <div class="flex items-center text-secondary mb-8 gap-4">
+                                        <p class="h5">@review.AuthorName</p>
+                                        <span class="text-secondary text-sm">-</span>
+                                        <span class="text-secondary text-sm">@review.CreatedDate.ToString("MMMM dd, yyyy")</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <img src="@(i <= review.Rating ? "/assets/icons/star-4.svg" : "/assets/icons/star-3.svg")"
+                                                 alt="star" class="star-icon" style="opacity:1;">
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-secondary">@review.Content</p>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-secondary mb-40">Hələ heç bir rəy yoxdur. İlk rəyi siz yazın!</p>
+            }
+
+            <!-- Add Review Form -->
+            <div id="reviewForm">
+                <p class="h4 capitalize mb-8">Add a Review</p>
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    @using (Html.BeginForm("AddReview", "SalesAgent", FormMethod.Post, new { @class = "add-review-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="agentId" value="@Model.Id" />
+
+                        <div class="col-span-2 padding-0 mb-12">
+                            <p class="mb-8">Review</p>
+                            <textarea placeholder="Your Review" rows="3" name="content" class="message" required></textarea>
+                        </div>
+
+                        <div class="col-span-2 padding-0">
+                            <p class="mb-12">Rating</p>
+                            <div class="rating-input mb-32"
+                                 data-active-icon="/assets/icons/star-4.svg"
+                                 data-inactive-icon="/assets/icons/star-3.svg">
+                                <input type="hidden" name="rating" id="rating-value" value="5">
+                                <div class="rating-input__stars" id="rating-stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="rating-input__star @(i <= 5 ? "active" : "")" data-rating="@i">
+                                            <img src="@(i <= 5 ? "/assets/icons/star-4.svg" : "/assets/icons/star-3.svg")"
+                                                 alt="star" class="star-icon">
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large font-weight-600 capitalize">
+                            Submit Review
+                        </button>
+                    }
+                }
+                else
+                {
+                    <p class="mb-24 text-secondary">Rəy yazmaq üçün hesabınıza daxil olun.</p>
+                    <a asp-controller="Account" asp-action="Login"
+                       asp-route-returnUrl="@Context.Request.Path"
+                       class="btn btn-primary btn-large font-weight-600 capitalize">
+                        Login to Add a Review
+                    </a>
+                }
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="innerpage__sidebar">
+            <div class="listing-details--sidebar-box mb-40">
+                <div class="listing-details--contact">
+                    <p class="h4 mb-16">Location</p>
+
+                    @if (!string.IsNullOrEmpty(Model.MapEmbedUrl))
+                    {
+                        <div class="widget-gg-map flex radius-8 overflow-hidden mb-28">
+                            <iframe src="@Model.MapEmbedUrl" height="234" style="border:0;width:100%;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Address))
+                    {
+                        <ul class="contact-info mb-20">
+                            <li>
+                                <p class="icon"><img src="~/assets/icons/MapPin.svg" alt="location"></p>
+                                <div class="flex flex-col gap-4">
+                                    <a href="#">@Model.Address</a>
+                                    <a href="#" class="text-underline text-highlight text-sm">Get Directions</a>
+                                </div>
+                            </li>
+                        </ul>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Phone1) || !string.IsNullOrEmpty(Model.Phone2))
+                    {
+                        <ul class="contact-info mb-28">
+                            <li class="items-center">
+                                <p class="icon"><img src="~/assets/icons/PhoneCall.svg" alt="phone"></p>
+                                <div class="flex flex-col">
+                                    @if (!string.IsNullOrEmpty(Model.Phone1))
+                                    {<a href="tel:@Model.Phone1">@Model.Phone1</a>}
+                                    @if (!string.IsNullOrEmpty(Model.Phone2))
+                                    {<a href="tel:@Model.Phone2">@Model.Phone2</a>}
+                                </div>
+                            </li>
+                        </ul>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Phone1))
+                    {
+                        <a href="tel:@Model.Phone1" class="btn btn-medium btn-primary-3 font-weight-600 mb-12 gap-5">
+                            <img src="~/assets/icons/PhoneCall-2.svg" alt="phone">
+                            Call To Agent
+                        </a>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Phone1))
+                    {
+                        <a href="https://wa.me/@(Model.Phone1.Replace("-","").Replace(" ","").Replace("+",""))"
+                           class="btn btn-medium btn-primary-4 font-weight-600 gap-5" target="_blank">
+                            <img src="~/assets/icons/ChatCircleDots.svg" alt="whatsapp">
+                            Chat via WhatsApp
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <!-- Send Inquiry -->
+            <div class="listing-details--sidebar-box">
+                <p class="h5 mb-16 capitalize">Send Inquiry to Agent</p>
+
+                <form action="#" class="send-inquiry">
+                    <div class="grid grid-cols-1 gap-18 mb-8">
+                        <div>
+                            <p class="mb-8">Name</p>
+                            <input class="input-large" id="SendInquiryname" name="SendInquiryname" type="text" required="" />
+                        </div>
+                        <div>
+                            <p class="mb-8">Email</p>
+                            <input class="input-large" name="SendInquiryemail" id="SendInquiryemail" type="text" required="" />
+                        </div>
+                        <div>
+                            <p class="mb-8">Phone</p>
+                            <input placeholder="Phone (optional)" class="input-large" name="SendInquiryphone" id="SendInquiryphone" type="number" />
+                        </div>
+                        <div>
+                            <p class="mb-8">Subject</p>
+                            <select>
+                                <option>Agent Availability</option>
+                                <option>Car Information</option>
+                                <option>Price Inquiry</option>
+                            </select>
+                        </div>
+                        <div class="padding-0">
+                            <p class="mb-6">Message</p>
+                            <textarea placeholder="Comment" rows="3" name="message2" class="message" id="message2" required></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large font-weight-600 w-full mb-18">Send Inquiry</button>
+                    <label class="filter-checkbox style-2 mb-6">
+                        <input type="checkbox" name="newsletter" value="yes">
+                        <span class="text-sm">Yes, I would like to receive helpful shopping information.</span>
+                    </label>
+                    <p class="text-xs text-secondary">
+                        By using this service, you accept our
+                        <a href="#" class="text-xs text-underline text-highlight">Visitor Agreement.</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // Star rating interactivity
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars     = document.querySelectorAll('.rating-input__star');
+        const ratingVal = document.getElementById('rating-value');
+        if (!stars.length || !ratingVal) return;
+
+        const activeIcon   = '/assets/icons/star-4.svg';
+        const inactiveIcon = '/assets/icons/star-3.svg';
+
+        stars.forEach(function (star) {
+            star.addEventListener('click', function () {
+                const selected = parseInt(this.dataset.rating);
+                ratingVal.value = selected;
+                stars.forEach(function (s) {
+                    const r   = parseInt(s.dataset.rating);
+                    const img = s.querySelector('img');
+                    if (r <= selected) {
+                        s.classList.add('active');
+                        img.src = activeIcon;
+                    } else {
+                        s.classList.remove('active');
+                        img.src = inactiveIcon;
+                    }
+                });
+            });
+
+            star.addEventListener('mouseenter', function () {
+                const hovered = parseInt(this.dataset.rating);
+                stars.forEach(function (s) {
+                    const r   = parseInt(s.dataset.rating);
+                    const img = s.querySelector('img');
+                    img.src   = r <= hovered ? activeIcon : inactiveIcon;
+                });
+            });
+
+            star.addEventListener('mouseleave', function () {
+                const current = parseInt(ratingVal.value);
+                stars.forEach(function (s) {
+                    const r   = parseInt(s.dataset.rating);
+                    const img = s.querySelector('img');
+                    img.src   = r <= current ? activeIcon : inactiveIcon;
+                });
+            });
+        });
+    });
+</script>
+}

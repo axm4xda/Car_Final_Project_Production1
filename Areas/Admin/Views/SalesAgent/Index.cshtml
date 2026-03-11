@@ -1,0 +1,43 @@
+@model IEnumerable<SalesAgent>
+@{
+    ViewData["Title"] = "Satış Agentləri";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Satış Agentləri (@Model.Count())</div>
+        <a asp-action="Create" class="btn-a primary">+ Yeni Agent</a>
+    </div>
+    @if (Model.Any())
+    {
+        <div class="tbl-wrap">
+            <table class="a-table">
+                <thead><tr><th>Şəkil</th><th>Ad</th><th>Vəzifə</th><th>Email</th><th>Telefon</th><th>Rəylər</th><th>Status</th><th>Əməliyyat</th></tr></thead>
+                <tbody>
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td>@if (!string.IsNullOrEmpty(a.ImageUrl)){<img src="@a.ImageUrl" class="thumb" alt="">}else{<span class="a-badge gray">Yoxdur</span>}</td>
+                            <td><strong>@a.FullName</strong></td>
+                            <td>@a.Title</td>
+                            <td>@a.Email</td>
+                            <td>@a.Phone1</td>
+                            <td>@a.Reviews.Count</td>
+                            <td>
+                                <span class="a-badge @(a.IsActive ? "green" : "red")">@(a.IsActive ? "Aktiv" : "Deaktiv")</span>
+                                @if (a.IsVerified){<span class="a-badge blue">Təsdiqlənmiş</span>}
+                            </td>
+                            <td class="act-btns">
+                                <a asp-action="Edit" asp-route-id="@a.Id" class="btn-a info btn-sm">✏️</a>
+                                <form asp-action="Delete" asp-route-id="@a.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istəyirsiniz?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn-a danger btn-sm">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else{<div class="empty-st"><p>Hələ satış agenti yoxdur.</p></div>}
+</div>

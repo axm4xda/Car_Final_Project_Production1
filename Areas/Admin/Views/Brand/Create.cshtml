@@ -1,0 +1,16 @@
+@model Brand
+@{
+    ViewData["Title"] = "Yeni Marka";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Yeni Marka Əlavə Et</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="fg"><label>Ad</label><input asp-for="Name" class="fc" required></div>
+        <div class="fg"><label>Logo</label><input type="file" name="logoFile" class="fc" accept="image/*"></div>
+        <button class="btn-a primary" type="submit">Əlavə Et</button>
+    </form>
+</div>

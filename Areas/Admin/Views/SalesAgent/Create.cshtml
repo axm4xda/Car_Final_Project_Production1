@@ -1,0 +1,42 @@
+@model SalesAgent
+@{
+    ViewData["Title"] = "Yeni Satış Agenti";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Yeni Satış Agenti Əlavə Et</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="f-row">
+            <div class="fg"><label>Ad Soyad</label><input asp-for="FullName" class="fc" required></div>
+            <div class="fg"><label>Vəzifə</label><input asp-for="Title" class="fc" required></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Email</label><input asp-for="Email" class="fc" type="email"></div>
+            <div class="fg"><label>Telefon 1</label><input asp-for="Phone1" class="fc"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Telefon 2</label><input asp-for="Phone2" class="fc"></div>
+            <div class="fg"><label>Ünvan</label><input asp-for="Address" class="fc"></div>
+        </div>
+        <div class="fg"><label>Haqqında</label><textarea asp-for="Bio" class="fc"></textarea></div>
+        <div class="fg"><label>Şəkil</label><input type="file" name="imageFile" class="fc" accept="image/*"></div>
+        <div class="fg"><label>Xəritə Embed URL</label><input asp-for="MapEmbedUrl" class="fc"></div>
+        <div class="f-row">
+            <div class="fg"><label>Facebook URL</label><input asp-for="FacebookUrl" class="fc"></div>
+            <div class="fg"><label>Twitter URL</label><input asp-for="TwitterUrl" class="fc"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Instagram URL</label><input asp-for="InstagramUrl" class="fc"></div>
+            <div class="fg"><label>Telegram URL</label><input asp-for="TelegramUrl" class="fc"></div>
+        </div>
+        <div class="fg"><label>Skype URL</label><input asp-for="SkypeUrl" class="fc"></div>
+        <div class="fg" style="display:flex;gap:24px">
+            <label class="f-chk"><input asp-for="IsVerified" type="checkbox"> Təsdiqlənmiş</label>
+            <label class="f-chk"><input asp-for="IsActive" type="checkbox"> Aktiv</label>
+        </div>
+        <button class="btn-a primary" type="submit">Əlavə Et</button>
+    </form>
+</div>

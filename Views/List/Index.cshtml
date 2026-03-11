@@ -1,0 +1,653 @@
+@model Car_Project.ViewModels.List.ListIndexViewModel
+
+@Html.AntiForgeryToken()
+
+<style>
+    /* ── VIP Card Badge ── */
+    .vip-badge-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        background: linear-gradient(135deg, #FF5722, #ff7043);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+    }
+
+    /* VIP card golden outline */
+    .card-box--vip {
+        border: 2px solid #FF5722 !important;
+        box-shadow: 0 4px 18px rgba(255,87,34,0.15) !important;
+    }
+</style>
+
+<!-- breadcrumb -->
+<section class="background-light mb-32">
+	<div class="container">
+		<ul class="breadcrumb">
+			<li>
+				<a asp-controller="Home" asp-action="Index">Home</a>
+			</li>
+			<li>
+				<img src="~/assets/icons/right.svg" alt="chevron-right">
+			</li>
+			<li>
+				<span>Listing</span>
+			</li>
+		</ul>
+	</div>
+</section>
+<!-- breadcrumb -->
+
+<!-- Car Listings -->
+<section class="pb-100">
+	<div class="container">
+		<h2>Car Listings</h2>
+	</div>
+	<div class="tf-spacing-style3"></div>
+
+	<div class="container mb-40 flat-tabs" data-custom="true">
+		<div class="row">
+			<div class="col-xxl-5 col-6">
+				<div class="flex items-center gap-16">
+					<button class="btn-filter" id="filterSidebarToggle">
+						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M3.125 6.87499H5.70312C5.84081 7.41275 6.15356 7.88939 6.59207 8.22976C7.03057 8.57014 7.56989 8.75489 8.125 8.75489C8.68011 8.75489 9.21943 8.57014 9.65793 8.22976C10.0964 7.88939 10.4092 7.41275 10.5469 6.87499H16.875C17.0408 6.87499 17.1997 6.80914 17.3169 6.69193C17.4342 6.57472 17.5 6.41575 17.5 6.24999C17.5 6.08423 17.4342 5.92526 17.3169 5.80805C17.1997 5.69084 17.0408 5.62499 16.875 5.62499H10.5469C10.4092 5.08723 10.0964 4.61059 9.65793 4.27021C9.21943 3.92984 8.68011 3.74509 8.125 3.74509C7.56989 3.74509 7.03057 3.92984 6.59207 4.27021C6.15356 4.61059 5.84081 5.08723 5.70312 5.62499H3.125C2.95924 5.62499 2.80027 5.69084 2.68306 5.80805C2.56585 5.92526 2.5 6.08423 2.5 6.24999C2.5 6.41575 2.56585 6.57472 2.68306 6.69193C2.80027 6.80914 2.95924 6.87499 3.125 6.87499ZM8.125 4.99999C8.37223 4.99999 8.6139 5.0733 8.81946 5.21065C9.02502 5.348 9.18524 5.54323 9.27985 5.77163C9.37446 6.00004 9.39921 6.25138 9.35098 6.49385C9.30275 6.73633 9.1837 6.95906 9.00888 7.13387C8.83407 7.30869 8.61134 7.42774 8.36886 7.47597C8.12639 7.5242 7.87505 7.49945 7.64665 7.40484C7.41824 7.31023 7.22301 7.15001 7.08566 6.94445C6.94831 6.73889 6.875 6.49722 6.875 6.24999C6.875 5.91847 7.0067 5.60053 7.24112 5.36611C7.47554 5.13169 7.79348 4.99999 8.125 4.99999ZM16.875 13.125H15.5469C15.4092 12.5872 15.0964 12.1106 14.6579 11.7702C14.2194 11.4298 13.6801 11.2451 13.125 11.2451C12.5699 11.2451 12.0306 11.4298 11.5921 11.7702C11.1536 12.1106 10.8408 12.5872 10.7031 13.125H3.125C2.95924 13.125 2.80027 13.1908 2.68306 13.308C2.56585 13.4253 2.5 13.5842 2.5 13.75C2.5 13.9157 2.56585 14.0747 2.68306 14.1919C2.80027 14.3091 2.95924 14.375 3.125 14.375H10.7031C10.8408 14.9127 11.1536 15.3894 11.5921 15.7298C12.0306 16.0701 12.5699 16.2549 13.125 16.2549C13.6801 16.2549 14.2194 16.0701 14.6579 15.7298C15.0964 15.3894 15.4092 14.9127 15.5469 14.375H16.875C17.0408 14.375 17.1997 14.3091 17.3169 14.1919C17.4342 14.0747 17.5 13.9157 17.5 13.75C17.5 13.5842 17.4342 13.4253 17.3169 13.308C17.1997 13.1908 17.0408 13.125 16.875 13.125ZM13.125 15C12.8778 15 12.6361 14.9267 12.4305 14.7893C12.225 14.652 12.0648 14.4568 11.9701 14.2283C11.8755 13.9999 11.8508 13.7486 11.899 13.5061C11.9472 13.2636 12.0663 13.0409 12.2411 12.8661C12.4159 12.6913 12.6387 12.5722 12.8811 12.524C13.1236 12.4758 13.3749 12.5005 13.6034 12.5951C13.8318 12.6897 14.027 12.85 14.1643 13.0555C14.3017 13.2611 14.375 13.5028 14.375 13.75C14.375 14.0815 14.2433 14.3995 14.0089 14.6339C13.7745 14.8683 13.4565 15 13.125 15Z" fill="#1C1C1C" />
+						</svg>
+					</button>
+					<p class="md-hidden">Showing @((Model.CurrentPage - 1) * 9 + 1) – @Math.Min(Model.CurrentPage * 9, Model.TotalCount) of @Model.TotalCount Listings</p>
+				</div>
+			</div>
+			<div class="col-md-2 col-4 xl2-hidden">
+				<div class="flex items-center gap-12 py-12 justify-center listing-tabs menu-tab">
+					<span class="item-menu">
+						<svg width="14" height="20" viewBox="0 0 14 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="3" cy="6" r="2.5" stroke="#9FA1A4" />
+							<circle cx="11" cy="6" r="2.5" stroke="#9FA1A4" />
+							<circle cx="3" cy="14" r="2.5" stroke="#9FA1A4" />
+							<circle cx="11" cy="14" r="2.5" stroke="#9FA1A4" />
+						</svg>
+					</span>
+					<span class="item-menu active">
+						<svg width="30" height="20" viewBox="0 0 30 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<circle cx="3" cy="6" r="2.5" fill="white" stroke="#9FA1A4" />
+							<circle cx="11" cy="6" r="2.5" fill="white" stroke="#9FA1A4" />
+							<circle cx="19" cy="6" r="2.5" fill="white" stroke="#9FA1A4" />
+							<circle cx="27" cy="6" r="2.5" fill="white" stroke="#9FA1A4" />
+							<circle cx="3" cy="14" r="2.5" fill="white" stroke="#9FA1A4" />
+							<circle cx="11" cy="14" r="2.5" fill="white" stroke="#9FA1A4" />
+							<circle cx="19" cy="14" r="2.5" fill="white" stroke="#9FA1A4" />
+							<circle cx="27" cy="14" r="2.5" fill="white" stroke="#9FA1A4" />
+						</svg>
+					</span>
+				</div>
+			</div>
+			<div class="col-xxl-5 col-6">
+				<div class="flex items-center h-full gap-8 justify-end">
+					<p class="md-hidden">Sort Vehicles by</p>
+					<div class="sort-select-wrapper">
+						<select id="sortVehiclesSelect" class="sort-select">
+							@{
+								var urlLowest  = Url.Action("Index", "List", new { brand = Model.Filter.SelectedBrand, condition = Model.Filter.Condition, fuelType = Model.Filter.SelectedFuelType, transmission = Model.Filter.SelectedTransmission, minPrice = Model.Filter.MinPrice, maxPrice = Model.Filter.MaxPrice, sortBy = "lowest-price" });
+								var urlHighest = Url.Action("Index", "List", new { brand = Model.Filter.SelectedBrand, condition = Model.Filter.Condition, fuelType = Model.Filter.SelectedFuelType, transmission = Model.Filter.SelectedTransmission, minPrice = Model.Filter.MinPrice, maxPrice = Model.Filter.MaxPrice, sortBy = "highest-price" });
+								var urlNewest  = Url.Action("Index", "List", new { brand = Model.Filter.SelectedBrand, condition = Model.Filter.Condition, fuelType = Model.Filter.SelectedFuelType, transmission = Model.Filter.SelectedTransmission, minPrice = Model.Filter.MinPrice, maxPrice = Model.Filter.MaxPrice, sortBy = "newest-year" });
+								var urlMileage = Url.Action("Index", "List", new { brand = Model.Filter.SelectedBrand, condition = Model.Filter.Condition, fuelType = Model.Filter.SelectedFuelType, transmission = Model.Filter.SelectedTransmission, minPrice = Model.Filter.MinPrice, maxPrice = Model.Filter.MaxPrice, sortBy = "lowest-mileage" });
+
+								var selLowest  = (Model.Filter.SortBy == "lowest-price"   || Model.Filter.SortBy == null) ? " selected" : "";
+								var selHighest = Model.Filter.SortBy == "highest-price"  ? " selected" : "";
+								var selNewest  = Model.Filter.SortBy == "newest-year"    ? " selected" : "";
+								var selMileage = Model.Filter.SortBy == "lowest-mileage" ? " selected" : "";
+							}
+							@Html.Raw($"<option value=\"{urlLowest}\"{selLowest}>Lowest Price</option>")
+							@Html.Raw($"<option value=\"{urlHighest}\"{selHighest}>Highest Price</option>")
+							@Html.Raw($"<option value=\"{urlNewest}\"{selNewest}>Newest Year</option>")
+							@Html.Raw($"<option value=\"{urlMileage}\"{selMileage}>Lowest Mileage</option>")
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="mb-8 col-md-12"></div>
+
+			<div class="col-md-12 gap-7 mb-32 inline" id="filterResults">
+				<p class="inline gap-4"><span id="filterMatchesCount">@Model.TotalCount </span> matches </p>
+				@if (!string.IsNullOrEmpty(Model.Filter.SelectedBrand) || !string.IsNullOrEmpty(Model.Filter.SelectedFuelType) || !string.IsNullOrEmpty(Model.Filter.SelectedTransmission) || !string.IsNullOrEmpty(Model.Filter.Condition))
+				{
+					<div class="align-middle inline-block divider-vertical-style2 h-16" id="filterDivider"></div>
+					<div id="filterTags" class="inline gap-8">
+						@if (!string.IsNullOrEmpty(Model.Filter.SelectedBrand))
+						{
+							<span class="filter-tag">@Model.Filter.SelectedBrand</span>
+						}
+						@if (!string.IsNullOrEmpty(Model.Filter.SelectedFuelType))
+						{
+							<span class="filter-tag">@Model.Filter.SelectedFuelType</span>
+						}
+						@if (!string.IsNullOrEmpty(Model.Filter.SelectedTransmission))
+						{
+							<span class="filter-tag">@Model.Filter.SelectedTransmission</span>
+						}
+					</div>
+					<a href="@Url.Action("Index", "List")" class="btn-clear-items">
+						Remove All
+						<img src="~/assets/icons/X-White.svg" alt="X">
+					</a>
+				}
+			</div>
+		</div>
+
+		<div class="content-tab">
+			<div class="content-inner active">
+				@{
+					var allBodyStyles = new[]
+					{
+						new { Name = "SUV",         Label = "SUV"         },
+						new { Name = "Sedan",       Label = "Sedan"       },
+						new { Name = "Hatchback",   Label = "Hatchback"   },
+						new { Name = "Crossover",   Label = "Crossover"   },
+						new { Name = "Pickup",      Label = "Pickup"      },
+						new { Name = "Coupe",       Label = "Coupe"       },
+						new { Name = "Convertible", Label = "Convertible" },
+						new { Name = "Wagon",       Label = "Wagon"       },
+						new { Name = "Minivan",     Label = "Minivan"     },
+						new { Name = "Electric",    Label = "Electric"    },
+					};
+					var otherStyles = allBodyStyles
+						.Where(s => !s.Name.Equals(Model.Filter.SelectedBodyStyle ?? "", StringComparison.OrdinalIgnoreCase))
+						.ToArray();
+				}
+
+				@if (Model.Cars.Any())
+				{
+					<div class="grid grid-cols-4 xl-grid-cols-3 lg-grid-cols-2 sm-grid-cols-1 gap-x-30 gap-y-41">
+						@{ int delay = 1; }
+						@foreach (var car in Model.Cars)
+						{
+							<div class="card-box card-box-style-1 wow fadeIn @(car.IsVip ? "card-box--vip" : "")" data-wow-delay="0.@(delay)s">
+								<div class="top">
+									<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+										@if (car.IsVip)
+										{
+											<span class="vip-badge-card">⭐ VIP</span>
+										}
+										@if (!string.IsNullOrEmpty(car.Badge))
+										{
+											<p class="@car.BadgeColor text-white highlight" style="margin:0;">@car.Badge</p>
+										}
+									</div>
+									<p class="heart @(Model.WishlistedCarIds.Contains(car.Id) ? "active" : "")" data-car-id="@car.Id" title="Add to Wishlist">
+										<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<g clip-path="url(#clip0_heart_@car.Id)">
+												<path d="M8 14C8 14 1.5 10.5 1.5 6.375C1.5 5.47989 1.85558 4.62145 2.48851 3.98851C3.12145 3.35558 3.97989 3 4.875 3C6.28688 3 7.49625 3.76937 8 5C8.50375 3.76937 9.71312 3 11.125 3C12.0201 3 12.8785 3.35558 13.5115 3.98851C14.1444 4.62145 14.5 5.47989 14.5 6.375C14.5 10.5 8 14 8 14Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+											</g>
+										</svg>
+									</p>
+								</div>
+								<div class="image">
+									<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id">
+										@if (!string.IsNullOrEmpty(car.ThumbnailUrl))
+										{
+											<img class="card--img" src="@car.ThumbnailUrl" alt="@car.Title">
+										}
+										else
+										{
+											<img class="card--img" src="~/assets/images/card/card-1.jpg" alt="@car.Title">
+										}
+									</a>
+								</div>
+								<div class="content border-light border-top-none">
+									<div class="bottom">
+										<p class="category uppercase text-white">
+											<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="text-white uppercase text-xs">@car.BrandName</a>
+										</p>
+										<div class="flex items-center gap-8">
+											<p class="category uppercase text-white">
+												<img src="~/assets/icons/picture.svg" alt="picture">
+												@car.ImageCount
+											</p>
+										</div>
+									</div>
+									<p class="h6 card-box__title mb-8">
+										<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id">@car.Title</a>
+									</p>
+
+									<ul class="tag mb-10">
+										<li>
+											<img src="~/assets/icons/icon-gauge.svg" alt="mileage">
+											<span>@car.Mileage.ToString("N0") km</span>
+										</li>
+										<li>
+											<img src="~/assets/icons/calendar.svg" alt="year">
+											<span>@car.Year</span>
+										</li>
+										<li>
+											<img src="~/assets/icons/gaspump.svg" alt="fuel">
+											<span>@car.FuelType</span>
+										</li>
+										<li>
+											@if (car.Transmission == "Manual")
+											{
+												<img src="~/assets/icons/manual.svg" alt="transmission">
+											}
+											else
+											{
+												<img src="~/assets/icons/auto.svg" alt="transmission">
+											}
+											<span>@car.Transmission</span>
+										</li>
+									</ul>
+
+									@if (car.MonthlyPayment.HasValue)
+									{
+										<p class="h6 card-box__price mb-15 flex justify-between gap-8 items-center">
+											$@car.Price.ToString("N2")
+											<span class="text-sm">
+												$@car.MonthlyPayment.Value.ToString("N0")/mo
+											</span>
+										</p>
+									}
+									else
+									{
+										<p class="card-box__price mb-15">$@car.Price.ToString("N2")</p>
+									}
+
+									<div class="divider mb-15"></div>
+
+									<div class="flex justify-between">
+										<p class="compare-details btn btn-small @(Model.ComparedCarIds.Contains(car.Id) ? "active" : "")" data-car-id="@car.Id" id="compare-btn-@car.Id">
+											<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<g clip-path="url(#clip0_compare_@car.Id)">
+													<path d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+													<path d="M6.875 10H13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+													<path d="M10 6.875V13.125" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+												</g>
+											</svg>
+											Compare
+										</p>
+										<a asp-controller="List" asp-action="Detail" asp-route-id="@car.Id" class="view-details">
+											View details
+											<img class="ml-4" src="~/assets/icons/CaretCircleRight.svg" alt="CaretCircleRight.svg">
+										</a>
+									</div>
+								</div>
+							</div>
+							delay = (delay % 4) + 1;
+						}
+					</div>
+				}
+				else
+				{
+					@* ── Boş vəziyyət (No Cars Found) ── *@
+					<div class="text-center py-80">
+						<div class="mb-24">
+							<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<circle cx="40" cy="40" r="39" stroke="#E5E7EB" stroke-width="2"/>
+								<path d="M22 47C22 47 20 42 20 37C20 31 25 26 31 26H49C55 26 60 31 60 37C60 42 58 47 58 47" stroke="#9FA1A4" stroke-width="2" stroke-linecap="round"/>
+								<circle cx="28" cy="47" r="5" stroke="#9FA1A4" stroke-width="2"/>
+								<circle cx="52" cy="47" r="5" stroke="#9FA1A4" stroke-width="2"/>
+								<path d="M33 47H47" stroke="#9FA1A4" stroke-width="2" stroke-linecap="round"/>
+								<path d="M31 26L28 33H52L49 26" stroke="#9FA1A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								<path d="M35 33V26" stroke="#9FA1A4" stroke-width="2" stroke-linecap="round"/>
+								<path d="M45 33V26" stroke="#9FA1A4" stroke-width="2" stroke-linecap="round"/>
+								<line x1="30" y1="56" x2="50" y2="56" stroke="#E5E7EB" stroke-width="2" stroke-linecap="round"/>
+							</svg>
+						</div>
+
+						@if (!string.IsNullOrEmpty(Model.Filter.SelectedBodyStyle))
+						{
+							<h3 class="h4 mb-12">
+								"<span class="text-highlight">@Model.Filter.SelectedBodyStyle</span>" tipinə uyğun maşın tapılmadı
+							</h3>
+							<p class="text-secondary mb-32" style="max-width:480px;margin-left:auto;margin-right:auto;">
+								Hal-hazırda bu kateqoriyada aktiv elan mövcud deyil. Aşağıdan digər tipləri yoxlaya bilərsiniz.
+							</p>
+							<div class="flex flex-wrap gap-12 justify-center mb-32">
+								@foreach (var style in otherStyles)
+								{
+									<a href="@Url.Action("Index", "List", new { bodyStyle = style.Name })"
+									   class="btn btn-small btn-line-style-2 effect-line-primary">
+										@style.Label
+									</a>
+								}
+							</div>
+						}
+						else
+						{
+							<h3 class="h4 mb-12">Axtarışınıza uyğun maşın tapılmadı</h3>
+							<p class="text-secondary mb-32" style="max-width:480px;margin-left:auto;margin-right:auto;">
+								Filterləri dəyişdirərək daha geniş axtarış etməyə cəhd edin.
+							</p>
+						}
+
+						<a href="@Url.Action("Index", "List")" class="btn btn-primary btn-large">
+							Bütün Elanları Göstər
+						</a>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+
+	<!-- Pagination -->
+	@if (Model.TotalPages > 1)
+	{
+		<div class="container">
+			<ul class="pagination justify-center">
+				@if (Model.CurrentPage > 1)
+				{
+					<li>
+						<a href="@Url.Action("Index", "List", new { brand = Model.Filter.SelectedBrand, condition = Model.Filter.Condition, fuelType = Model.Filter.SelectedFuelType, transmission = Model.Filter.SelectedTransmission, minPrice = Model.Filter.MinPrice, maxPrice = Model.Filter.MaxPrice, sortBy = Model.Filter.SortBy, page = Model.CurrentPage - 1 })" class="pagination__link">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M5.8075 10.4423L12.0575 16.6923C12.1156 16.7504 12.1845 16.7964 12.2603 16.8278C12.3362 16.8593 12.4175 16.8755 12.4997 16.8755C12.5818 16.8755 12.6631 16.8593 12.739 16.8278C12.8148 16.7964 12.8838 16.7504 12.9418 16.6923C12.9999 16.6342 13.046 16.5653 13.0774 16.4894C13.1088 16.4135 13.125 16.3322 13.125 16.2501C13.125 16.168 13.1088 16.0867 13.0774 16.0108C13.046 15.9349 12.9999 15.866 12.9418 15.8079L7.13316 10.0001L12.9418 4.19229C13.0591 4.07502 13.125 3.91596 13.125 3.7501C13.125 3.58425 13.0591 3.42519 12.9418 3.30792C12.8246 3.19064 12.6655 3.12476 12.4997 3.12476C12.3338 3.12476 12.1747 3.19064 12.0575 3.30792L5.8075 9.55791C5.74937 9.61596 5.7033 9.68489 5.67183 9.76077C5.64035 9.83664 5.62421 9.91797 5.62421 10.0001C5.62421 10.0822 5.64035 10.1636 5.67183 10.2394C5.7033 10.3153 5.74937 10.3842 5.8075 10.4423Z" fill="#9FA1A4" />
+							</svg>
+						</a>
+					</li>
+				}
+				@for (int p = Math.Max(1, Model.CurrentPage - 2); p <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); p++)
+				{
+					<li>
+						<a href="@Url.Action("Index", "List", new { brand = Model.Filter.SelectedBrand, condition = Model.Filter.Condition, fuelType = Model.Filter.SelectedFuelType, transmission = Model.Filter.SelectedTransmission, minPrice = Model.Filter.MinPrice, maxPrice = Model.Filter.MaxPrice, sortBy = Model.Filter.SortBy, page = p })"
+						   class="pagination__link @(p == Model.CurrentPage ? "active" : "")">
+							@p
+						</a>
+					</li>
+				}
+				@if (Model.CurrentPage < Model.TotalPages)
+				{
+					<li>
+						<a href="@Url.Action("Index", "List", new { brand = Model.Filter.SelectedBrand, condition = Model.Filter.Condition, fuelType = Model.Filter.SelectedFuelType, transmission = Model.Filter.SelectedTransmission, minPrice = Model.Filter.MinPrice, maxPrice = Model.Filter.MaxPrice, sortBy = Model.Filter.SortBy, page = Model.CurrentPage + 1 })" class="pagination__link">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M14.1925 10.4423L7.94254 16.6923C7.88447 16.7504 7.81553 16.7964 7.73966 16.8278C7.66379 16.8593 7.58247 16.8755 7.50035 16.8755C7.41823 16.8755 7.33691 16.8593 7.26104 16.8278C7.18517 16.7964 7.11623 16.7504 7.05816 16.6923C7.00009 16.6342 6.95403 16.5653 6.9226 16.4894C6.89117 16.4135 6.875 16.3322 6.875 16.2501C6.875 16.168 6.89117 16.0867 6.9226 16.0108C6.95403 15.9349 7.00009 15.866 7.05816 15.8079L12.8668 10.0001L7.05816 4.19229C6.94088 4.07502 6.875 3.91596 6.875 3.7501C6.875 3.58425 6.94088 3.42519 7.05816 3.30792C7.17544 3.19064 7.3345 3.12476 7.50035 3.12476C7.6662 3.12476 7.82526 3.19064 7.94254 3.30792L14.1925 9.55791C14.2506 9.61596 14.2967 9.68489 14.3282 9.76077C14.3597 9.83664 14.3758 9.91797 14.3758 10.0001C14.3758 10.0822 14.3597 10.1636 14.3282 10.2394C14.2967 10.3153 14.2506 10.3842 14.1925 10.4423Z" fill="#9FA1A4" />
+							</svg>
+						</a>
+					</li>
+				}
+			</ul>
+		</div>
+	}
+</section>
+<!-- Car Listings -->
+
+<!-- Filter Sidebar -->
+<div class="filter-sidebar filter-sidebar-popup" id="filterSidebar">
+	<div class="filter-sidebar__overlay"></div>
+	<div class="filter-sidebar__panel">
+		<div class="filter-sidebar__header bg-white">
+			<p class="h5">Advanced Search</p>
+			<button class="filter-sidebar__close" id="filterSidebarClose">
+				<img src="~/assets/icons/X.svg" alt="close">
+			</button>
+		</div>
+		<form method="get" asp-controller="List" asp-action="Index">
+			<div class="filter-sidebar__content">
+				<!-- Preserve current sortBy when reapplying filters -->
+				@if (!string.IsNullOrEmpty(Model.Filter.SortBy))
+				{
+					<input type="hidden" name="sortBy" value="@Model.Filter.SortBy" />
+				}
+
+				<!-- Brand -->
+				<div class="search-cars__select-wrapper mb-18">
+					<div class="search-cars__select filter-select-dropdown" data-name="brand">
+						<label for="BrandSelectToggle" class="search-cars__label">Select Brand</label>
+						<input type="checkbox" id="BrandSelectToggle" class="filter-select-dropdown__toggle">
+						<label for="BrandSelectToggle" class="filter-select-dropdown__text">
+							<span>@(Model.Filter.SelectedBrand ?? "All Brand")</span>
+						</label>
+						<div class="filter-select-dropdown__menu">
+							<div class="filter-select-dropdown__list">
+								<label class="filter-checkbox">
+									<input type="radio" name="brand" value="" @(string.IsNullOrEmpty(Model.Filter.SelectedBrand) ? "checked" : "")>
+									<span>ALL</span>
+								</label>
+								@foreach (var b in Model.Filter.Brands)
+								{
+									<label class="filter-checkbox">
+										<input type="radio" name="brand" value="@b" @(Model.Filter.SelectedBrand == b ? "checked" : "")>
+										<span>@b</span>
+									</label>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Price Range -->
+				<div class="filter-group filter-range mb-18">
+					<div class="filter-label mb-12">Price Range</div>
+					<div class="grid grid-cols-2 gap-12">
+						<div>
+							<p class="text-xs text-secondary mb-6">Min Price ($)</p>
+							<input type="number"
+								   name="minPrice"
+								   id="minPriceInput"
+								   class="input-large"
+								   placeholder="0"
+								   min="0"
+								   step="1"
+								   value="@(Model.Filter.MinPrice.HasValue ? Model.Filter.MinPrice.Value.ToString("0") : "")" />
+						</div>
+						<div>
+							<p class="text-xs text-secondary mb-6">Max Price ($)</p>
+							<input type="number"
+								   name="maxPrice"
+								   id="maxPriceInput"
+								   class="input-large"
+								   placeholder="Any"
+								   min="0"
+								   step="1"
+								   value="@(Model.Filter.MaxPrice.HasValue ? Model.Filter.MaxPrice.Value.ToString("0") : "")" />
+						</div>
+					</div>
+					@if (Model.Filter.MinPrice.HasValue || Model.Filter.MaxPrice.HasValue)
+					{
+						<p class="text-xs text-highlight mt-6">
+							@(Model.Filter.MinPrice.HasValue ? $"${Model.Filter.MinPrice.Value:N0}" : "$0")
+							–
+							@(Model.Filter.MaxPrice.HasValue ? $"${Model.Filter.MaxPrice.Value:N0}" : "Any")
+						</p>
+					}
+				</div>
+
+				<!-- Fuel Type -->
+				<div class="search-cars__select-wrapper mb-18">
+					<div class="search-cars__select filter-select-dropdown" data-name="FuelType">
+						<label for="FuelStyleSelectToggle" class="search-cars__label">Fuel Type</label>
+						<input type="checkbox" id="FuelStyleSelectToggle" class="filter-select-dropdown__toggle">
+						<label for="FuelStyleSelectToggle" class="filter-select-dropdown__text">
+							<span>@(Model.Filter.SelectedFuelType ?? "All")</span>
+						</label>
+						<div class="filter-select-dropdown__menu">
+							<div class="filter-select-dropdown__list">
+								<label class="filter-checkbox">
+									<input type="radio" name="fuelType" value="" @(string.IsNullOrEmpty(Model.Filter.SelectedFuelType) ? "checked" : "")>
+									<span>All</span>
+								</label>
+								@foreach (var ft in Model.Filter.FuelTypes)
+								{
+									<label class="filter-checkbox">
+										<input type="radio" name="fuelType" value="@ft" @(Model.Filter.SelectedFuelType == ft ? "checked" : "")>
+										<span>@ft</span>
+									</label>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Transmission -->
+				<div class="search-cars__select-wrapper mb-18">
+					<div class="search-cars__select filter-select-dropdown" data-name="Transmission">
+						<label for="TransmissionSelectToggle" class="search-cars__label">Transmission</label>
+						<input type="checkbox" id="TransmissionSelectToggle" class="filter-select-dropdown__toggle">
+						<label for="TransmissionSelectToggle" class="filter-select-dropdown__text">
+							<span>@(Model.Filter.SelectedTransmission ?? "All")</span>
+						</label>
+						<div class="filter-select-dropdown__menu">
+							<div class="filter-select-dropdown__list">
+								<label class="filter-checkbox">
+									<input type="radio" name="transmission" value="" @(string.IsNullOrEmpty(Model.Filter.SelectedTransmission) ? "checked" : "")>
+									<span>All</span>
+								</label>
+								@foreach (var tr in Model.Filter.Transmissions)
+								{
+									<label class="filter-checkbox">
+										<input type="radio" name="transmission" value="@tr" @(Model.Filter.SelectedTransmission == tr ? "checked" : "")>
+										<span>@tr</span>
+									</label>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Condition -->
+				<div class="search-cars__select-wrapper mb-18">
+					<div class="search-cars__select filter-select-dropdown" data-name="condition">
+						<label for="ConditionSelectToggle" class="search-cars__label">Condition</label>
+						<input type="checkbox" id="ConditionSelectToggle" class="filter-select-dropdown__toggle">
+						<label for="ConditionSelectToggle" class="filter-select-dropdown__text">
+							<span>@(Model.Filter.Condition ?? "All")</span>
+						</label>
+						<div class="filter-select-dropdown__menu">
+							<div class="filter-select-dropdown__list">
+								<label class="filter-checkbox">
+									<input type="radio" name="condition" value="" @(string.IsNullOrEmpty(Model.Filter.Condition) ? "checked" : "")>
+									<span>All</span>
+								</label>
+								<label class="filter-checkbox">
+									<input type="radio" name="condition" value="New" @(Model.Filter.Condition == "New" ? "checked" : "")>
+									<span>New</span>
+								</label>
+								<label class="filter-checkbox">
+									<input type="radio" name="condition" value="Used" @(Model.Filter.Condition == "Used" ? "checked" : "")>
+									<span>Used</span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<button type="submit" class="filter-sidebar__submit">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<g clip-path="url(#clip0_14922_29541)">
+							<path d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+							<path d="M15.8047 15.8047L21.0012 21.0012" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+						</g>
+					</svg>
+					Show @Model.TotalCount Matches
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+<!-- Filter Sidebar --><!-- Filter Sidebar -->
+
+@section Scripts {
+<script>
+// ====== Wishlist Heart (AJAX - səhifə yenilənmədən) ======
+$(document).on('click', '.heart', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $btn = $(this);
+    var carId = $btn.data('car-id');
+    if (!carId) return;
+
+    $.ajax({
+        type: 'POST',
+        url: '/Wishlist/Toggle/' + carId,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                // Update all heart buttons with same car-id on the page
+                $('.heart[data-car-id="' + carId + '"]').toggleClass('active', res.isInWishlist);
+                updateNavBadge('#wishlistNavCount', res.count);
+                showToast(res.isInWishlist ? 'Added to wishlist!' : 'Removed from wishlist.', 'success');
+            }
+        },
+        error: function() { showToast('Error updating wishlist.', 'error'); }
+    });
+});
+
+// ====== Compare Button (AJAX - stay on page, update counter) ======
+$(document).on('click', '.compare-details', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    var $btn = $(this);
+    var carId = $btn.data('car-id');
+    if (!carId) return;
+
+    // If already active, remove from compare
+    if ($btn.hasClass('active')) {
+        $.ajax({
+            type: 'POST',
+            url: '/Compare/Remove/' + carId,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+            },
+            success: function(res) {
+                if (res.success) {
+                    $btn.removeClass('active');
+                    updateNavBadge('#compareNavCount', res.count);
+                    showToast('Removed from compare.', 'success');
+                }
+            },
+            error: function() { showToast('Error removing from compare.', 'error'); }
+        });
+        return;
+    }
+
+    // Add to compare
+    $.ajax({
+        type: 'POST',
+        url: '/Compare/Add/' + carId,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+        },
+        success: function(res) {
+            if (res.success) {
+                $btn.addClass('active');
+                updateNavBadge('#compareNavCount', res.count);
+                showToast('Added to compare!', 'success');
+            } else {
+                showToast(res.message || 'Could not add to compare.', 'error');
+            }
+        },
+        error: function() { showToast('Error adding to compare.', 'error'); }
+    });
+});
+
+// ====== Sort Vehicles dropdown ======
+document.getElementById('sortVehiclesSelect').addEventListener('change', function () {
+    window.location.href = this.value;
+});
+
+// ====== Helpers ======
+function updateNavBadge(selector, count) {
+    var $badge = $(selector);
+    if (count > 0) {
+        $badge.text(count).show();
+    } else {
+        $badge.text('0').hide();
+    }
+}
+
+function showToast(msg, type) {
+    var existing = $('#action-toast');
+    if (existing.length) existing.remove();
+    var cls = type === 'success' ? 'auth-toast--success' : 'auth-toast--error';
+    var $toast = $('<div id="action-toast" class="auth-toast ' + cls + '"><span>' + msg + '</span><button onclick="$(\'#action-toast\').remove()">✕</button></div>');
+    $('body').append($toast);
+    setTimeout(function() { $toast.fadeOut(300, function() { $(this).remove(); }); }, 3000);
+}
+</script>
+}

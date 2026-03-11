@@ -1,0 +1,29 @@
+@model Coupon
+@{
+    ViewData["Title"] = "Kupon Redaktə Et";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div>Kupon Redaktə Et – @Model.Code</div>
+        <a asp-action="Index" class="btn-a ghost">← Geri</a>
+    </div>
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <div class="f-row">
+            <div class="fg"><label>Kupon Kodu</label><input asp-for="Code" class="fc" required></div>
+            <div class="fg"><label>Endirim Faizi (%)</label><input asp-for="DiscountPercent" class="fc" type="number" step="0.01" min="0"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>Sabit Endirim Məbləği ($)</label><input asp-for="DiscountAmount" class="fc" type="number" step="0.01" min="0"></div>
+            <div class="fg"><label>Minimum Sifariş Məbləği ($)</label><input asp-for="MinOrderAmount" class="fc" type="number" step="0.01" min="0"></div>
+        </div>
+        <div class="f-row">
+            <div class="fg"><label>İstifadə Limiti</label><input asp-for="UsageLimit" class="fc" type="number" min="0"></div>
+            <div class="fg"><label>Bitmə Tarixi</label><input asp-for="ExpiresAt" class="fc" type="date"></div>
+        </div>
+        <div class="fg">
+            <label class="f-chk"><input asp-for="IsActive" type="checkbox"> Aktiv</label>
+        </div>
+        <button class="btn-a primary" type="submit">Yadda Saxla</button>
+    </form>
+</div>

@@ -1,0 +1,531 @@
+@model Car_Project.ViewModels.Blog.BlogDetailViewModel
+@{
+    var categories = ViewBag.Categories as IList<Car_Project.Models.BlogCategory> ?? new List<Car_Project.Models.BlogCategory>();
+    var allTags = ViewBag.AllTags as IList<Car_Project.Models.BlogTag> ?? new List<Car_Project.Models.BlogTag>();
+    var recentPosts = ViewBag.RecentPosts as IList<Car_Project.Models.BlogPost> ?? new List<Car_Project.Models.BlogPost>();
+}
+
+<section class="blog-details-banner">
+	<img class="overlay-image" src="~/assets/images/blog/overlay-blogdetails.png" alt="blog-details-banner">
+	<div class="breadcrumb-wrapper">
+		<div class="container">
+			<ul class="breadcrumb">
+				<li>
+					<a class="text-white" asp-controller="Home" asp-action="Index">Home</a>
+				</li>
+				<li>
+					<img src="~/assets/icons/right.svg" alt="chevron-right">
+				</li>
+				<li>
+					<a class="text-white" asp-controller="Blog" asp-action="Index">Blog</a>
+				</li>
+				<li>
+					<img src="~/assets/icons/right.svg" alt="chevron-right">
+				</li>
+				<li>
+					<span class="text-muted">@Model.Title</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="image flex">
+		@if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+		{
+			<img src="@Model.ThumbnailUrl" alt="@Model.Title">
+		}
+		else
+		{
+			<img src="~/assets/images/blog/blog-details.jpg" alt="@Model.Title">
+		}
+	</div>
+	<div class="content">
+		<div class="container">
+			<h1 class="mb-20 text-white letter-spacing-1">@Model.Title</h1>
+			<ul class="flex items-center flex-wrap gap-20">
+				<li><a class="text-white" href="#">by @(Model.AuthorName ?? "Admin")</a></li>
+				<li><a class="text-white" href="#">@Model.PublishedAt?.ToString("MMM. d, yyyy")</a></li>
+				<li>
+					<a class="uppercase text-underline text-highlight"
+					   asp-controller="Blog" asp-action="Index"
+					   asp-route-category="@Model.CategoryName">@Model.CategoryName</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</section>
+
+<!-- Blog Content -->
+<section>
+	<div class="tf-spacing"></div>
+
+	<div class="container innerpage-container">
+		<div class="innerpage__content md-mb-30">
+
+			@if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+			{
+				<img class="post--img radius-20 flex mb-40" src="@Model.ThumbnailUrl" alt="@Model.Title">
+			}
+
+			<!-- Post Body -->
+			<div class="mb-40">
+				@Html.Raw(Model.Content)
+			</div>
+
+			<!-- Tags & Share -->
+			<div class="flex justify-between mb-40 gap-16 md-flex-col">
+				@if (Model.Tags.Any())
+				{
+					<ul class="blog-detail-tags flex gap-12 flex-wrap">
+						<li><p>Tag:</p></li>
+						@foreach (var tag in Model.Tags)
+						{
+							<li>
+								<a asp-controller="Blog" asp-action="Index" asp-route-tag="@tag">@tag</a>
+							</li>
+						}
+					</ul>
+				}
+				<ul class="blog-detail-social flex gap-12">
+					<li><p>Share this post:</p></li>
+					<li>
+						<a href="https://www.facebook.com/" target="_blank" title="Facebook">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_detail_fb)">
+									<path d="M11.5502 20V10.8777H14.6109L15.0701 7.32156H11.5502V5.05147C11.5502 4.0222 11.8348 3.32076 13.3125 3.32076L15.194 3.31999V0.13923C14.8686 0.0969453 13.7517 0 12.4517 0C9.73708 0 7.87861 1.65697 7.87861 4.69927V7.32156H4.80859V10.8777H7.87861V20H11.5502Z" fill="#1C1C1C"/>
+								</g>
+								<defs><clipPath id="clip0_detail_fb"><rect width="20" height="20" fill="white"/></clipPath></defs>
+							</svg>
+						</a>
+					</li>
+					<li>
+						<a href="https://x.com/" target="_blank" title="X (Twitter)">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_detail_x)">
+									<path d="M11.8616 8.46864L19.147 0H17.4206L11.0947 7.3532L6.04225 0H0.214844L7.85515 11.1193L0.214844 20H1.94134L8.62162 12.2348L13.9574 20H19.7848L11.8612 8.46864H11.8616ZM9.49695 11.2173L8.72283 10.1101L2.56342 1.29967H5.21521L10.1859 8.40994L10.96 9.51718L17.4214 18.7594H14.7696L9.49695 11.2177V11.2173Z" fill="#1C1C1C"/>
+								</g>
+								<defs><clipPath id="clip0_detail_x"><rect width="20" height="20" fill="white"/></clipPath></defs>
+							</svg>
+						</a>
+					</li>
+					<li>
+						<a href="https://www.instagram.com/" target="_blank" title="Instagram">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_detail_ig)">
+									<path d="M10 13.125C11.7259 13.125 13.125 11.7259 13.125 10C13.125 8.27411 11.7259 6.875 10 6.875C8.27411 6.875 6.875 8.27411 6.875 10C6.875 11.7259 8.27411 13.125 10 13.125Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+									<path d="M13.75 2.5H6.25C4.17893 2.5 2.5 4.17893 2.5 6.25V13.75C2.5 15.8211 4.17893 17.5 6.25 17.5H13.75C15.8211 17.5 17.5 15.8211 17.5 13.75V6.25C17.5 4.17893 15.8211 2.5 13.75 2.5Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+									<path d="M14.0625 6.71875C14.494 6.71875 14.8438 6.36897 14.8438 5.9375C14.8438 5.50603 14.494 5.15625 14.0625 5.15625C13.631 5.15625 13.2812 5.50603 13.2812 5.9375C13.2812 6.36897 13.631 6.71875 14.0625 6.71875Z" fill="#1C1C1C"/>
+								</g>
+								<defs><clipPath id="clip0_detail_ig"><rect width="20" height="20" fill="white"/></clipPath></defs>
+							</svg>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="divider mb-26"></div>
+
+			<!-- Post Navigation: Prev / Next -->
+			@if (Model.PrevPost != null || Model.NextPost != null)
+			{
+				<div class="flex justify-between gap-16 mb-40 md-flex-col">
+					@if (Model.PrevPost != null)
+					{
+						<a asp-controller="Blog" asp-action="Detail" asp-route-slug="@Model.PrevPost.Slug"
+						   class="blog-nav-post flex items-center gap-12 border border-light radius-12 p-16 hover-bg-light flex-1">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M12.5 15.625L6.875 10L12.5 4.375" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+							<div>
+								<p class="text-xs text-muted mb-4">Previous Post</p>
+								<p class="h7 font-weight-600 clamp clamp-2">@Model.PrevPost.Title</p>
+							</div>
+						</a>
+					}
+					else
+					{
+						<div class="flex-1"></div>
+					}
+					@if (Model.NextPost != null)
+					{
+						<a asp-controller="Blog" asp-action="Detail" asp-route-slug="@Model.NextPost.Slug"
+						   class="blog-nav-post flex items-center gap-12 border border-light radius-12 p-16 hover-bg-light flex-1 justify-end text-right">
+							<div>
+								<p class="text-xs text-muted mb-4">Next Post</p>
+								<p class="h7 font-weight-600 clamp clamp-2">@Model.NextPost.Title</p>
+							</div>
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M7.5 4.375L13.125 10L7.5 15.625" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</a>
+					}
+				</div>
+			}
+
+			<div class="divider mb-40"></div>
+
+			<!-- Comments Section -->
+			<p class="h3 mb-20">
+				@Model.Comments.Count Comment@(Model.Comments.Count != 1 ? "s" : "")
+			</p>
+
+			@if (Model.Comments.Any())
+			{
+				<div class="flex flex-col gap-24 mb-40">
+					@foreach (var comment in Model.Comments)
+					{
+						<div class="comments-post flex gap-16">
+							<div class="avatar flex-shrink-0">
+								<div class="comment-box__avatar guest">
+									@comment.AuthorName.Substring(0, Math.Min(2, comment.AuthorName.Length)).ToUpper()
+								</div>
+							</div>
+							<div class="content flex-1">
+								<div class="flex justify-between items-center mb-4 flex-wrap gap-8">
+									<p class="h5">@comment.AuthorName</p>
+									<p class="text-secondary text-sm">
+										@{
+											var timeDiff = DateTime.UtcNow - comment.CreatedDate;
+											if (timeDiff.TotalMinutes < 60)
+											{ <text>@((int)timeDiff.TotalMinutes) minutes ago</text> }
+											else if (timeDiff.TotalDays < 1)
+											{ <text>@((int)timeDiff.TotalHours) hours ago</text> }
+											else if (timeDiff.TotalDays < 2)
+											{ <text>1 day ago</text> }
+											else
+											{ <text>@((int)timeDiff.TotalDays) days ago</text> }
+										}
+									</p>
+								</div>
+								<p class="text-secondary h7">@comment.Content</p>
+
+								@if (Model.IsUserLoggedIn)
+								{
+									<button type="button" class="reply-toggle-btn" onclick="toggleReplyForm('comment-reply-@comment.Id')">
+										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
+										Cavab ver
+									</button>
+									<div id="comment-reply-@comment.Id" class="reply-form-wrapper" style="display:none;">
+										<form asp-controller="Blog" asp-action="ReplyToComment" method="post">
+											@Html.AntiForgeryToken()
+											<input type="hidden" name="blogPostId" value="@Model.Id" />
+											<input type="hidden" name="parentCommentId" value="@comment.Id" />
+											<textarea name="content" rows="2" class="message" placeholder="Cavabınızı yazın..." required></textarea>
+											<button type="submit" class="btn btn-primary btn-small font-weight-600">Göndər</button>
+										</form>
+									</div>
+								}
+
+								@if (comment.Replies.Any())
+								{
+									<div class="reply-list">
+										@foreach (var reply in comment.Replies)
+										{
+											<div class="comments-post reply-box flex gap-12">
+												<div class="avatar flex-shrink-0">
+													<div class="comment-box__avatar guest" style="width:32px;height:32px;font-size:12px;">
+														@reply.AuthorName.Substring(0, Math.Min(2, reply.AuthorName.Length)).ToUpper()
+													</div>
+												</div>
+												<div class="content flex-1">
+													<div class="flex justify-between items-center mb-4 flex-wrap gap-8">
+														<p class="h7 font-weight-600">@reply.AuthorName</p>
+														<p class="text-secondary text-xs">
+												@{
+													var rd = DateTime.UtcNow - reply.CreatedDate;
+													if (rd.TotalMinutes < 60)
+													{ <text>@((int)rd.TotalMinutes) min ago</text> }
+													else if (rd.TotalDays < 1)
+													{ <text>@((int)rd.TotalHours) hours ago</text> }
+													else if (rd.TotalDays < 2)
+													{ <text>1 day ago</text> }
+													else
+													{ <text>@((int)rd.TotalDays) days ago</text> }
+												}
+														</p>
+													</div>
+													<p class="text-secondary text-sm">@reply.Content</p>
+												</div>
+											</div>
+										}
+									</div>
+								}
+							</div>
+						</div>
+						<div class="divider mb-16 mt-16 w-full"></div>
+					}
+				</div>
+			}
+			else
+			{
+				<p class="text-secondary mb-40">No comments yet. Be the first to comment!</p>
+			}
+
+			<!-- Comment Form -->
+			@if (Model.IsUserLoggedIn)
+			{
+				<form asp-controller="Blog" asp-action="AddComment" method="post" class="blog-detail-comment-form">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="BlogPostId" value="@Model.Id" />
+					<p class="h3 mb-24 capitalize">Leave A Comment</p>
+
+					<!-- Login olan istifadəçinin adını göstər -->
+					<div class="flex items-center gap-12 mb-20 p-16 radius-12" style="background:#f8f9fa;">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="#1C1C1C" stroke-width="1.5"/>
+							<path d="M20 21C20 18.2386 16.4183 16 12 16C7.58172 16 4 18.2386 4 21" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<p class="h7">Commenting as <strong>@Model.LoggedInUserName</strong></p>
+					</div>
+
+					<div class="mb-16">
+						<p class="mb-8">Comment</p>
+						<textarea placeholder="Write your comment here..." rows="5" tabindex="5" name="Content" class="message" id="comment" required></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary-3 btn-large font-weight-600 capitalize">Post Comment</button>
+				</form>
+			}
+			else
+			{
+				<div class="flex flex-col items-center gap-16 p-40 radius-12 text-center" style="background:#f8f9fa;border:1px dashed #ddd;">
+					<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="#9FA1A4" stroke-width="1.5"/>
+						<path d="M20 21C20 18.2386 16.4183 16 12 16C7.58172 16 4 18.2386 4 21" stroke="#9FA1A4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+					</svg>
+					<p class="h5">Want to leave a comment?</p>
+					<p class="text-secondary h7">Please sign in to post a comment.</p>
+					<a asp-controller="Account" asp-action="Login"
+					   asp-route-returnUrl="@Context.Request.Path"
+					   class="btn btn-primary-3 btn-large font-weight-600">
+						Sign In to Comment
+					</a>
+				</div>
+			}
+		</div>
+
+		<!-- Sidebar -->
+		<div class="innerpage__sidebar">
+
+			<!-- Search -->
+			<form asp-controller="Blog" asp-action="Index" method="get" class="widget-search w-full mb-34">
+				<input class="input-normal" type="text" name="q" placeholder="Search posts...">
+				<button type="submit" class="widget-search-btn">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<g clip-path="url(#clip0_13399_10504)">
+							<path d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M15.8047 15.8047L21.0012 21.0012" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</g>
+					</svg>
+				</button>
+			</form>
+
+			<!-- Author Box -->
+			<div class="mb-32">
+				<div class="listing-details--contact-dealer style-3 mb-20">
+					@if (!string.IsNullOrEmpty(Model.AuthorAvatarUrl))
+					{
+						<img src="@Model.AuthorAvatarUrl" alt="@Model.AuthorName">
+					}
+					else
+					{
+						<img src="~/assets/images/avatar/contact-avatar.png" alt="@(Model.AuthorName ?? "Admin")">
+					}
+					<div class="content">
+						<p class="h4 mb-4 font-weight-600">@(Model.AuthorName ?? "Admin")</p>
+						<p class="text-secondary text-sm">Author</p>
+					</div>
+				</div>
+
+				@{
+					bool hasSocial = !string.IsNullOrEmpty(Model.AuthorFacebookUrl)
+					              || !string.IsNullOrEmpty(Model.AuthorTwitterUrl)
+					              || !string.IsNullOrEmpty(Model.AuthorInstagramUrl)
+					              || !string.IsNullOrEmpty(Model.AuthorLinkedInUrl);
+				}
+				@if (hasSocial)
+				{
+					<ul class="flex gap-12 flex-wrap">
+						@if (!string.IsNullOrEmpty(Model.AuthorFacebookUrl))
+						{
+							<li>
+								<a href="@Model.AuthorFacebookUrl" target="_blank" title="Facebook">
+									<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<g clip-path="url(#clip0_author_fb)">
+											<path d="M11.5502 20V10.8777H14.6109L15.0701 7.32156H11.5502V5.05147C11.5502 4.0222 11.8348 3.32076 13.3125 3.32076L15.194 3.31999V0.13923C14.8686 0.0969453 13.7517 0 12.4517 0C9.73708 0 7.87861 1.65697 7.87861 4.69927V7.32156H4.80859V10.8777H7.87861V20H11.5502Z" fill="#1C1C1C"/>
+										</g>
+										<defs><clipPath id="clip0_author_fb"><rect width="20" height="20" fill="white"/></clipPath></defs>
+									</svg>
+								</a>
+							</li>
+						}
+						@if (!string.IsNullOrEmpty(Model.AuthorTwitterUrl))
+						{
+							<li>
+								<a href="@Model.AuthorTwitterUrl" target="_blank" title="X (Twitter)">
+									<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<g clip-path="url(#clip0_author_x)">
+											<path d="M11.8616 8.46864L19.147 0H17.4206L11.0947 7.3532L6.04225 0H0.214844L7.85515 11.1193L0.214844 20H1.94134L8.62162 12.2348L13.9574 20H19.7848L11.8612 8.46864H11.8616ZM9.49695 11.2173L8.72283 10.1101L2.56342 1.29967H5.21521L10.1859 8.40994L10.96 9.51718L17.4214 18.7594H14.7696L9.49695 11.2177V11.2173Z" fill="#1C1C1C"/>
+										</g>
+										<defs><clipPath id="clip0_author_x"><rect width="20" height="20" fill="white"/></clipPath></defs>
+									</svg>
+								</a>
+							</li>
+						}
+						@if (!string.IsNullOrEmpty(Model.AuthorInstagramUrl))
+						{
+							<li>
+								<a href="@Model.AuthorInstagramUrl" target="_blank" title="Instagram">
+									<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<g clip-path="url(#clip0_author_ig)">
+											<path d="M10 13.125C11.7259 13.125 13.125 11.7259 13.125 10C13.125 8.27411 11.7259 6.875 10 6.875C8.27411 6.875 6.875 8.27411 6.875 10C6.875 11.7259 8.27411 13.125 10 13.125Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											<path d="M13.75 2.5H6.25C4.17893 2.5 2.5 4.17893 2.5 6.25V13.75C2.5 15.8211 4.17893 17.5 6.25 17.5H13.75C15.8211 17.5 17.5 15.8211 17.5 13.75V6.25C17.5 4.17893 15.8211 2.5 13.75 2.5Z" stroke="#1C1C1C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											<path d="M14.0625 6.71875C14.494 6.71875 14.8438 6.36897 14.8438 5.9375C14.8438 5.50603 14.494 5.15625 14.0625 5.15625C13.631 5.15625 13.2812 5.50603 13.2812 5.9375C13.2812 6.36897 13.631 6.71875 14.0625 6.71875Z" fill="#1C1C1C"/>
+										</g>
+										<defs><clipPath id="clip0_author_ig"><rect width="20" height="20" fill="white"/></clipPath></defs>
+									</svg>
+								</a>
+							</li>
+						}
+						@if (!string.IsNullOrEmpty(Model.AuthorLinkedInUrl))
+						{
+							<li>
+								<a href="@Model.AuthorLinkedInUrl" target="_blank" title="LinkedIn">
+									<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M17.04 17.043h-2.962v-4.64c0-1.107-.023-2.531-1.544-2.531-1.544 0-1.78 1.204-1.78 2.449v4.722H7.793V7.5h2.844v1.304h.039c.397-.75 1.364-1.542 2.808-1.542 3.001 0 3.556 1.975 3.556 4.545v5.236ZM4.447 6.194a1.72 1.72 0 1 1 0-3.44 1.72 1.72 0 0 1 0 3.44Zm1.484 10.85H2.963V7.5h2.968v9.543ZM18.521 0H1.474C.66 0 0 .645 0 1.44v17.12C0 19.355.66 20 1.474 20h17.047C19.34 20 20 19.355 20 18.56V1.44C20 .645 19.34 0 18.521 0Z" fill="#1C1C1C"/>
+									</svg>
+								</a>
+							</li>
+						}
+					</ul>
+				}
+			</div>
+
+			<div class="divider mb-32 w-full"></div>
+
+			<!-- Categories -->
+			<p class="h4 mb-16">Categories</p>
+			<ul class="widget-categories mb-32">
+				@foreach (var category in categories)
+				{
+					<li>
+						<a asp-controller="Blog" asp-action="Index" asp-route-category="@category.Slug"
+						   class="@(Model.CategoryName == category.Name ? "active" : "")">
+							<span class="label">@category.Name</span>
+						</a>
+					</li>
+				}
+			</ul>
+
+			<div class="divider mb-32 w-full"></div>
+
+			<!-- Recent Posts -->
+			<p class="h4 mb-16 capitalize">Recent Posts</p>
+			<div class="mb-32">
+				@foreach (var post in recentPosts)
+				{
+					<a asp-controller="Blog" asp-action="Detail" asp-route-slug="@post.Slug"
+					   class="recent-post overflow-hidden mb-16 flex gap-12 items-center">
+						<div class="image flex-shrink-0">
+							<img class="post--img flex" style="width:80px;height:60px;object-fit:cover;border-radius:8px;"
+							     src="@(!string.IsNullOrEmpty(post.ThumbnailUrl) ? post.ThumbnailUrl : "/assets/images/blog/post-25.jpg")"
+							     alt="@post.Title">
+						</div>
+						<div class="content">
+							<div class="flex gap-8 flex-wrap mb-4">
+								<span class="text-xs text-muted">@post.PublishedAt?.ToString("MMM. d, yyyy")</span>
+								<span class="text-xs text-highlight uppercase">@(post.Category?.Name ?? "")</span>
+							</div>
+							<p class="title h7 clamp clamp-2">@post.Title</p>
+						</div>
+					</a>
+					<div class="divider mb-16 w-full"></div>
+				}
+			</div>
+
+			<div class="divider mb-32 w-full"></div>
+
+			<!-- Newsletter -->
+			<p class="h4 mb-18">Subscribe Newsletter</p>
+			<form asp-controller="Contact" asp-action="Newsletter" method="post" class="widget-search w-full mb-34">
+				<input class="input-normal" type="email" name="email" required placeholder="Email address">
+				<button type="submit" class="widget-search-btn">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M21.3112 2.689C21.1226 2.5005 20.8871 2.36569 20.629 2.29846C20.371 2.23122 20.0997 2.234 19.843 2.3065H19.829L1.83461 7.7665C1.54248 7.85069 1.28283 8.02166 1.09007 8.25676C0.897302 8.49185 0.780525 8.77997 0.75521 9.08294C0.729895 9.3859 0.797238 9.6894 0.948314 9.95323C1.09939 10.2171 1.32707 10.4287 1.60117 10.5602L9.56242 14.4377L13.4343 22.3943C13.5547 22.6513 13.7462 22.8685 13.9861 23.0201C14.226 23.1718 14.5042 23.2517 14.788 23.2502C14.8312 23.2502 14.8743 23.2484 14.9174 23.2446C15.2201 23.2201 15.5081 23.1036 15.7427 22.9107C15.9773 22.7178 16.1473 22.4578 16.2299 22.1656L21.6862 4.17119C21.7596 3.90115 21.7636 3.63024 21.6977 3.37223C21.6318 3.11421 21.4984 2.8784 21.3112 2.689Z" fill="#1C1C1C"/>
+					</svg>
+				</button>
+			</form>
+
+			<div class="divider mb-32 w-full"></div>
+
+			<!-- Tags -->
+			@if (allTags.Any())
+			{
+				<p class="h4 mb-16">Tags</p>
+				<ul class="widget-tags flex flex-wrap gap-8">
+					@foreach (var tag in allTags)
+					{
+						<li>
+							<a asp-controller="Blog" asp-action="Index" asp-route-tag="@tag.Name"
+							   class="@(Model.Tags.Contains(tag.Name) ? "active" : "")">@tag.Name</a>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</div>
+</section>
+
+<!-- Related Articles -->
+@if (Model.RelatedPosts.Any())
+{
+	<section class="py-100">
+		<div class="container">
+			<h2 class="mb-12">Related Articles</h2>
+			<p class="h7 text-secondary mb-40">
+				Get the latest insights, expert tips, and updates to stay informed and inspired.
+			</p>
+			<div class="swiper-container swiper-news">
+				<div class="swiper-wrapper">
+					@foreach (var post in Model.RelatedPosts)
+					{
+						<div class="swiper-slide">
+							<a asp-controller="Blog" asp-action="Detail" asp-route-slug="@post.Slug" class="post-style-2 overflow-hidden">
+								@if (!string.IsNullOrEmpty(post.ThumbnailUrl))
+								{
+									<img class="post--img flex" src="@post.ThumbnailUrl" alt="@post.Title">
+								}
+								else
+								{
+									<img class="post--img flex" src="~/assets/images/blog/post-4.jpg" alt="@post.Title">
+								}
+								<div class="content">
+									<p class="h5 text-white mb-8 title clamp clamp-2">@post.Title</p>
+									<div class="flex gap-8 justify-start flex-wrap">
+										<span class="text-white text-xs">by @(post.AuthorName ?? "Admin")</span>
+										<span class="text-white text-xs">@post.PublishedAt?.ToString("MMM. d, yyyy")</span>
+										<span class="text-xs text-highlight uppercase text-underline">@post.CategoryName</span>
+									</div>
+								</div>
+							</a>
+						</div>
+					}
+				</div>
+				<div class="swiper-pagination pagination-dark pagination-style pagination-swiper-news mt-35"></div>
+			</div>
+		</div>
+	</section>
+}
+
+@section Scripts {
+<script>
+function toggleReplyForm(id) {
+    var el = document.getElementById(id);
+    if (el) {
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        if (el.style.display === 'block') {
+            var ta = el.querySelector('textarea');
+            if (ta) ta.focus();
+        }
+    }
+}
+</script>
+}

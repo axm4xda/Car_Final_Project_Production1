@@ -1,0 +1,62 @@
+@model ContactMessage
+@{
+    ViewData["Title"] = "Mesaj Detalları";
+}
+<div class="a-card">
+    <div class="a-card-head">
+        <div class="a-card-title">Mesaj #@Model.Id</div>
+        <div class="act-btns">
+            <a asp-action="Index" class="btn-a ghost">← Geri</a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="del-form" onsubmit="return confirm('Silmək istədiyinizdən əminsiniz?')">
+                @Html.AntiForgeryToken()
+                <button class="btn-a danger">🗑 Sil</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Ad Soyad</label>
+            <p style="font-size:15px;font-weight:500;">@Model.FullName</p>
+        </div>
+        <div class="fg">
+            <label>Email</label>
+            <p style="font-size:15px;"><a href="mailto:@Model.Email" style="color:#2563eb;text-decoration:underline;">@Model.Email</a></p>
+        </div>
+    </div>
+
+    <div class="f-row" style="margin-bottom:20px;">
+        <div class="fg">
+            <label>Telefon</label>
+            <p style="font-size:15px;">@(Model.Phone ?? "—")</p>
+        </div>
+        <div class="fg">
+            <label>Status</label>
+            <p style="font-size:15px;">
+                @if (Model.IsRead)
+                {
+                    <span class="a-badge green">Oxundu</span>
+                }
+                else
+                {
+                    <span class="a-badge yellow">Yeni</span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="fg" style="margin-bottom:20px;">
+        <label>Mövzu</label>
+        <p style="font-size:15px;font-weight:600;">@Model.Subject</p>
+    </div>
+
+    <div class="fg" style="margin-bottom:20px;">
+        <label>Mesaj</label>
+        <div style="padding:16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;line-height:1.7;white-space:pre-wrap;">@Model.Message</div>
+    </div>
+
+    <div class="fg">
+        <label>Göndərilmə tarixi</label>
+        <p style="font-size:14px;color:#6b7280;">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</p>
+    </div>
+</div>

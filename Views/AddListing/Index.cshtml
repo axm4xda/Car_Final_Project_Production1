@@ -1,0 +1,578 @@
+@model Car
+@using Car_Project.Models
+@{
+    ViewData["Title"] = "Yeni Elan Əlavə Et";
+    var brands = ViewBag.Brands as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+    var allFeatures = ViewBag.AllFeatures as List<CarFeature> ?? new List<CarFeature>();
+    bool isFirstListing = ViewBag.IsFirstListing ?? true;
+}
+
+<style>
+    /* ── Add Listing Page ──────────────────────────────────── */
+    .al-page { max-width: 900px; margin: 0 auto; }
+    .al-header { text-align: center; margin-bottom: 40px; }
+    .al-header h2 { margin-bottom: 8px; }
+    .al-header p { color: #6b7280; font-size: 15px; }
+
+    .al-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+    }
+    .al-card-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .al-card-title span {
+        width: 32px; height: 32px;
+        background: #FF5722;
+        color: #fff;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .al-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .al-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .al-field { margin-bottom: 0; }
+    .al-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+    .al-field label .required { color: #FF5722; }
+    .al-field input,
+    .al-field select,
+    .al-field textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #fff;
+    }
+    .al-field input:focus,
+    .al-field select:focus,
+    .al-field textarea:focus {
+        border-color: #FF5722;
+        box-shadow: 0 0 0 3px rgba(255,87,34,0.08);
+    }
+    .al-field textarea { resize: vertical; min-height: 100px; }
+
+    /* File upload area */
+    .al-upload {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 32px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .al-upload:hover { border-color: #FF5722; background: #fff5f2; }
+    .al-upload input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+    .al-upload-icon {
+        width: 48px; height: 48px;
+        margin: 0 auto 12px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .al-upload-text { font-size: 14px; font-weight: 500; color: #374151; }
+    .al-upload-hint { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+
+    /* Preview thumbnails */
+    .al-preview-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 16px;
+    }
+    .al-preview-item {
+        position: relative;
+        width: 100px; height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+    .al-preview-item img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+    }
+
+    /* Features grid */
+    .al-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+    }
+    .al-feature-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .al-feature-item:hover { border-color: #FF5722; background: #fff5f2; }
+    .al-feature-item input[type="checkbox"] { accent-color: #FF5722; width: 16px; height: 16px; }
+    .al-feature-item.checked { border-color: #FF5722; background: #fff5f2; }
+
+    /* Submit */
+    .al-submit-wrapper { text-align: center; padding: 12px 0 40px; }
+    .al-submit-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 48px;
+        background: #FF5722;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+    .al-submit-btn:hover { background: #e64a19; }
+    .al-submit-btn:active { transform: scale(0.98); }
+
+    /* ── Listing Type Selector ── */
+    .lt-selector {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 4px;
+    }
+    .lt-option { cursor: pointer; }
+    .lt-option input[type="radio"] { display: none; }
+    .lt-box {
+        border: 2px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 20px 18px;
+        transition: border-color .2s, background .2s, box-shadow .2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .lt-option input:checked + .lt-box {
+        border-color: #FF5722;
+        background: #fff5f2;
+        box-shadow: 0 0 0 3px rgba(255,87,34,.1);
+    }
+    .lt-box-icon { font-size: 28px; margin-bottom: 8px; }
+    .lt-box-title { font-size: 16px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .lt-box-desc  { font-size: 13px; color: #6b7280; line-height: 1.4; }
+    .lt-box-badge {
+        position: absolute; top: 12px; right: 12px;
+        background: linear-gradient(135deg,#FF5722,#ff7043);
+        color: #fff; font-size: 11px; font-weight: 700;
+        padding: 2px 10px; border-radius: 20px;
+    }
+    .lt-box-price {
+        margin-top: 10px;
+        font-size: 15px; font-weight: 700;
+        color: #FF5722;
+    }
+    .lt-free-note {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        color: #065f46;
+        margin-top: 12px;
+        display: flex; gap: 8px; align-items: center;
+    }
+    @@media (max-width: 480px) { .lt-selector { grid-template-columns: 1fr; } }
+</style>
+
+<!-- Breadcrumb -->
+<section class="background-light mb-32">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>Yeni Elan</span></li>
+        </ul>
+    </div>
+</section>
+
+<section class="pb-100">
+    <div class="container">
+        <div class="al-page">
+
+            <div class="al-header">
+                <h2>🚗 Yeni Elan Əlavə Et</h2>
+                <p>Maşın məlumatlarını doldurun və elanınızı dərc edin</p>
+            </div>
+
+            @if (isFirstListing)
+            {
+                <div class="lt-free-note" style="margin-bottom:20px;">
+                    🎉 <strong>İlk elanınız tamamilə PULSUZDUR!</strong> Normal elan seçsəniz heç bir ödəniş tələb olunmur.
+                </div>
+            }
+
+            <form asp-controller="AddListing" asp-action="Index" method="post" enctype="multipart/form-data" id="addListingForm">
+                @Html.AntiForgeryToken()
+
+                <!-- ── 0. Elan Növü ──────────────────────────────── -->
+                <div class="al-card">
+                    <div class="al-card-title"><span>0</span> Elan Növünü Seçin</div>
+
+                    <div class="lt-selector">
+                        <label class="lt-option">
+                            <input type="radio" name="ListingType" value="0" id="lt-normal" checked />
+                            <div class="lt-box">
+                                <div class="lt-box-icon">📋</div>
+                                <div class="lt-box-title">Normal Elan</div>
+                                <div class="lt-box-desc">Standart sıralamada göstərilir.</div>
+                                <div class="lt-box-price">
+                                    @if (isFirstListing)
+                                    { <span style="color:#059669">✓ Pulsuz</span> }
+                                    else
+                                    { <span>$9.99</span> }
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="lt-option">
+                            <input type="radio" name="ListingType" value="1" id="lt-vip" />
+                            <div class="lt-box">
+                                <div class="lt-box-badge">⭐ VIP</div>
+                                <div class="lt-box-icon">🏆</div>
+                                <div class="lt-box-title">VIP Elan</div>
+                                <div class="lt-box-desc">Siyahının <strong>ən üstündə</strong> göstərilir, VIP nişanı ilə fərqlənir.</div>
+                                <div class="lt-box-price">$9.99</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    @if (!isFirstListing)
+                    {
+                        <p style="font-size:12px;color:#9ca3af;margin-top:8px;">
+                            ℹ️ İkinci elanınızdan etibarən aktivləşdirmə haqqı tələb olunur ($9.99).
+                        </p>
+                    }
+                </div>
+
+                <!-- ── 1. Əsas Məlumatlar ──────────────────────── -->
+                <div class="al-card">
+                    <div class="al-card-title"><span>1</span> Əsas Məlumatlar</div>
+
+                    <div class="al-row">
+                        <div class="al-field">
+                            <label>Elanın Adı <span class="required">*</span></label>
+                            <input asp-for="Title" placeholder="Məs: Mercedes C300 2020" required />
+                        </div>
+                        <div class="al-field">
+                            <label>Marka <span class="required">*</span></label>
+                            <select asp-for="BrandId" asp-items="@brands" required>
+                                <option value="">— Marka seçin —</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="al-row-3">
+                        <div class="al-field">
+                            <label>İl <span class="required">*</span></label>
+                            <input asp-for="Year" type="number" placeholder="2024" min="1900" max="2030" required />
+                        </div>
+                        <div class="al-field">
+                            <label>Yürüş (km) <span class="required">*</span></label>
+                            <input asp-for="Mileage" type="number" placeholder="50000" min="0" required />
+                        </div>
+                        <div class="al-field">
+                            <label>Vəziyyət <span class="required">*</span></label>
+                            <select asp-for="Condition" asp-items="Html.GetEnumSelectList<CarCondition>()"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 2. Qiymət ───────────────────────────────── -->
+                <div class="al-card">
+                    <div class="al-card-title"><span>2</span> Qiymət</div>
+
+                    <div class="al-row">
+                        <div class="al-field">
+                            <label>Qiymət ($) <span class="required">*</span></label>
+                            <input asp-for="Price" id="al-price" type="number" step="0.01" placeholder="25000" min="0" required />
+                        </div>
+                        <div class="al-field">
+                            <label>
+                                Aylıq Ödəniş ($)
+                                <small style="font-size:11px;color:#9ca3af;font-weight:400;"> — Faiz (%)</small>
+                            </label>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <input asp-for="MonthlyPayment" id="al-monthly" type="number" step="0.01" placeholder="Avtomatik hesablanacaq" min="0" readonly style="flex:1;background:#f9fafb;cursor:not-allowed;" />
+                                <input id="al-interest" type="number" step="0.01" value="1.20" min="0" max="100" placeholder="%" style="width:80px;padding:12px 10px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;" title="Faiz dərəcəsi (%)">
+                                <select id="al-term" style="width:120px;padding:12px 10px;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;">
+                                    <option value="12">12 ay</option>
+                                    <option value="24">24 ay</option>
+                                    <option value="36">36 ay</option>
+                                    <option value="48">48 ay</option>
+                                    <option value="60" selected>60 ay</option>
+                                    <option value="72">72 ay</option>
+                                    <option value="84">84 ay</option>
+                                </select>
+                                <button type="button" id="al-calc-btn" class="btn btn-primary" style="padding:12px 16px;white-space:nowrap;height:auto;">Hesabla</button>
+                            </div>
+                            <small style="color:#9ca3af;font-size:11px;margin-top:4px;display:block;">Qiyməti daxil edib <strong>Hesabla</strong> düyməsinə basın</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 3. Texniki Xüsusiyyətlər ────────────────── -->
+                <div class="al-card">
+                    <div class="al-card-title"><span>3</span> Texniki Xüsusiyyətlər</div>
+
+                    <div class="al-row">
+                        <div class="al-field">
+                            <label>Yanacaq Növü <span class="required">*</span></label>
+                            <select asp-for="FuelType" asp-items="Html.GetEnumSelectList<FuelType>()"></select>
+                        </div>
+                        <div class="al-field">
+                            <label>Transmissiya <span class="required">*</span></label>
+                            <select asp-for="Transmission" asp-items="Html.GetEnumSelectList<TransmissionType>()"></select>
+                        </div>
+                    </div>
+
+                    <div class="al-row">
+                        <div class="al-field">
+                            <label>Kuzov Tipi</label>
+                            <input asp-for="BodyStyle" placeholder="Sedan, SUV, Hatchback..." />
+                        </div>
+                        <div class="al-field">
+                            <label>Ötürmə Tipi</label>
+                            <input asp-for="DriveType" placeholder="FWD, RWD, AWD..." />
+                        </div>
+                    </div>
+
+                    <div class="al-row-3">
+                        <div class="al-field">
+                            <label>Rəng</label>
+                            <input asp-for="Color" placeholder="Qara, Ağ, Boz..." />
+                        </div>
+                        <div class="al-field">
+                            <label>Salon Rəngi</label>
+                            <input asp-for="InteriorColor" placeholder="Qara dəri, Bej..." />
+                        </div>
+                        <div class="al-field">
+                            <label>Silindr Sayı</label>
+                            <input asp-for="Cylinders" type="number" placeholder="4" min="1" max="16" />
+                        </div>
+                    </div>
+
+                    <div class="al-row">
+                        <div class="al-field">
+                            <label>Qapı Sayı</label>
+                            <input asp-for="DoorCount" type="number" placeholder="4" min="1" max="6" />
+                        </div>
+                        <div class="al-field">
+                            <label>Badge (isteğe bağlı)</label>
+                            <input asp-for="Badge" placeholder="New Listing, Great Price..." />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 4. Şəkillər ─────────────────────────────── -->
+                <div class="al-card">
+                    <div class="al-card-title"><span>4</span> Şəkillər</div>
+
+                    <div class="al-field" style="margin-bottom:20px;">
+                        <label>Əsas Şəkil (Thumbnail) <span class="required">*</span></label>
+                        <div class="al-upload" id="thumbnailUploadArea">
+                            <input type="file" name="thumbnailFile" accept="image/*" id="thumbnailInput" required />
+                            <div class="al-upload-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                            </div>
+                            <div class="al-upload-text">Əsas şəkli yükləyin</div>
+                            <div class="al-upload-hint">JPG, PNG — Məsləhət: 800x600 px</div>
+                        </div>
+                        <div class="al-preview-list" id="thumbnailPreview"></div>
+                    </div>
+
+                    <div class="al-field">
+                        <label>Əlavə Şəkillər (çoxlu seçə bilərsiniz)</label>
+                        <div class="al-upload" id="imagesUploadArea">
+                            <input type="file" name="imageFiles" accept="image/*" multiple id="imagesInput" />
+                            <div class="al-upload-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                            </div>
+                            <div class="al-upload-text">Əlavə şəkilləri yükləyin</div>
+                            <div class="al-upload-hint">Bir neçə şəkil seçə bilərsiniz</div>
+                        </div>
+                        <div class="al-preview-list" id="imagesPreview"></div>
+                    </div>
+                </div>
+
+                <!-- ── 5. Təsvir ────────────────────────────────── -->
+                <div class="al-card">
+                    <div class="al-card-title"><span>5</span> Təsvir</div>
+                    <div class="al-field">
+                        <label>Maşın haqqında ətraflı məlumat</label>
+                        <textarea asp-for="Description" rows="5" placeholder="Maşınız haqqında ətraflı məlumat yazın..."></textarea>
+                    </div>
+                </div>
+
+                <!-- ── 6. Xüsusiyyətlər ────────────────────────── -->
+                @if (allFeatures.Any())
+                {
+                    <div class="al-card">
+                        <div class="al-card-title"><span>6</span> Xüsusiyyətlər</div>
+                        <div class="al-features">
+                            @foreach (var f in allFeatures)
+                            {
+                                <label class="al-feature-item">
+                                    <input type="checkbox" name="featureIds" value="@f.Id" />
+                                    @f.Name
+                                </label>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- ── Submit ───────────────────────────────────── -->
+                <div class="al-submit-wrapper">
+                    <button type="submit" class="al-submit-btn" id="submitBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z"/>
+                            <path d="M8.25 12H15.75"/>
+                            <path d="M12 8.25V15.75"/>
+                        </svg>
+                        <span id="submitBtnText">Elanı Göndər</span>
+                    </button>
+                    <p id="submitNote" style="margin-top:10px;font-size:13px;color:#6b7280;"></p>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // ====== Listing type selector — update submit button text ======
+    function updateSubmitText() {
+        var isVip  = document.getElementById('lt-vip').checked;
+        var isFirst = @(isFirstListing ? "true" : "false");
+        var btn  = document.getElementById('submitBtnText');
+        var note = document.getElementById('submitNote');
+
+        if (isVip) {
+            btn.textContent  = '⭐ VIP Elan Göndər — Ödənişə keç ($9.99)';
+            note.textContent = 'Növbəti addımda kart məlumatlarınızı daxil edəcəksiniz.';
+        } else if (!isFirst) {
+            btn.textContent  = 'Elan Göndər — Ödənişə keç ($9.99)';
+            note.textContent = 'İkinci elanınızdan etibarən $9.99 aktivləşdirmə haqqı tələb olunur.';
+        } else {
+            btn.textContent  = '✓ Elanı Pulsuz Göndər';
+            note.textContent = '';
+        }
+    }
+
+    document.getElementById('lt-normal').addEventListener('change', updateSubmitText);
+    document.getElementById('lt-vip').addEventListener('change', updateSubmitText);
+    updateSubmitText();
+
+    // ====== Image preview helpers ======
+    function showPreviews(input, container) {
+        var $container = $(container);
+        $container.empty();
+        if (!input.files) return;
+        Array.from(input.files).forEach(function(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $container.append('<div class="al-preview-item"><img src="' + e.target.result + '" alt="preview"></div>');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    $('#thumbnailInput').on('change', function() { showPreviews(this, '#thumbnailPreview'); });
+    $('#imagesInput').on('change',    function() { showPreviews(this, '#imagesPreview');   });
+
+    // ====== Feature checkbox visual toggle ======
+    $('.al-feature-item input[type="checkbox"]').on('change', function() {
+        $(this).closest('.al-feature-item').toggleClass('checked', this.checked);
+    });
+
+    // ====== Monthly Payment Calculator ======
+    document.getElementById('al-calc-btn').addEventListener('click', function () {
+        var price    = parseFloat(document.getElementById('al-price').value)    || 0;
+        var interest = parseFloat(document.getElementById('al-interest').value) || 0;
+        var term     = parseInt(document.getElementById('al-term').value)        || 60;
+
+        if (price <= 0) { alert('Zəhmət olmasa əvvəlcə qiyməti daxil edin.'); return; }
+
+        var monthlyRate = (interest / 100) / 12;
+        var monthly;
+        if (monthlyRate === 0) {
+            monthly = price / term;
+        } else {
+            monthly = price * (monthlyRate * Math.pow(1 + monthlyRate, term))
+                            / (Math.pow(1 + monthlyRate, term) - 1);
+        }
+
+        var input = document.getElementById('al-monthly');
+        input.value = monthly.toFixed(2);
+        input.style.background   = '#ecfdf5';
+        input.style.borderColor  = '#6ee7b7';
+        input.removeAttribute('readonly');
+        setTimeout(function() { input.setAttribute('readonly', ''); input.style.cursor = 'not-allowed'; }, 100);
+    });
+
+    document.getElementById('al-price').addEventListener('input', function () {
+        var m = document.getElementById('al-monthly');
+        m.value = '';
+        m.style.background  = '#f9fafb';
+        m.style.borderColor = '#e5e7eb';
+    });
+</script>
+}

@@ -1,0 +1,374 @@
+﻿@model Car_Project.ViewModels.Shop.ProductDetailViewModel
+@{
+    ViewData["Title"] = Model.Name;
+    var mainImage     = Model.Images.FirstOrDefault() ?? "~/assets/images/shop/product-1.jpg";
+    var discountPct   = Model.OldPrice.HasValue && Model.OldPrice > 0
+                            ? (int)Math.Round((1 - Model.Price / Model.OldPrice.Value) * 100)
+                            : (int?)null;
+}
+
+@Html.AntiForgeryToken()
+
+<!-- breadcrumb -->
+<section class="background-light">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><a asp-controller="Product" asp-action="Index">Shop</a></li>
+            <li><img src="~/assets/icons/right.svg" alt="chevron-right"></li>
+            <li><span>@Model.Name</span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- Product Details -->
+<section class="bg-white pb-100 product-details-page">
+    <div class="container flat-tabs">
+        <div class="tf-spacing-style3"></div>
+
+        <div class="flex md-flex-col gap-30">
+
+            <!-- ── Images ──────────────────────────────────────────────────── -->
+            <div class="product-details-slider">
+                @if (Model.Images.Any())
+                {
+                    <div class="swiper swiper-listing-details-main mb-20">
+                        <div class="swiper-wrapper">
+                            @foreach (var img in Model.Images)
+                            {
+                                <div class="swiper-slide">
+                                    <div class="listing-details-item main-item relative">
+                                        <img src="@img" alt="@Model.Name">
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="swiper swiper-listing-details-thumbs pb-60 overflow-hidden">
+                        <div class="swiper-wrapper">
+                            @foreach (var img in Model.Images)
+                            {
+                                <div class="swiper-slide">
+                                    <div class="listing-details-thumb">
+                                        <img src="@img" alt="thumbnail">
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="swiper swiper-listing-details-main mb-20">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <div class="listing-details-item main-item relative">
+                                    <img src="~/assets/images/shop/product-10.jpg" alt="@Model.Name">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- ── Info ────────────────────────────────────────────────────── -->
+            <div class="product-details-content">
+
+                @if (!string.IsNullOrEmpty(Model.Badge))
+                {
+                    <p class="mb-10">
+                        <span class="promotion uppercase text-white d-inline-block"
+                              style="background-color:@(Model.BadgeColor ?? "#ef4444");padding:2px 10px;border-radius:4px;">
+                            @Model.Badge
+                        </span>
+                    </p>
+                }
+
+                <p class="h3 mb-20">@Model.Name</p>
+
+                <p class="h3 price flex items-center gap-8 mb-20">
+                    $@Model.Price.ToString("F2")
+                    @if (Model.OldPrice.HasValue)
+                    {
+                        <span class="h5 text-muted price-old">$@Model.OldPrice.Value.ToString("F2")</span>
+                    }
+                    @if (discountPct.HasValue)
+                    {
+                        <span class="sale">-@discountPct%</span>
+                    }
+                </p>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="text-secondary mb-20">@Model.Description</p>
+                }
+
+                <ul class="flex flex-col product-details-list gap-4 mb-20">
+                    <li class="flex items-center gap-8">
+                        <p class="flex items-center gap-2">
+                            <span>&#x2022; </span>
+                            <span class="font-weight-600 flex w-80">Category</span>
+                        </p>
+                        @Model.CategoryName
+                    </li>
+                    <li class="flex items-center gap-8">
+                        <p class="flex items-center gap-2">
+                            <span>&#x2022; </span>
+                            <span class="font-weight-600 flex w-80">Availability</span>
+                        </p>
+                        @(Model.Stock > 0 ? $"In Stock ({Model.Stock} left)" : "Out of Stock")
+                    </li>
+                </ul>
+
+                <div class="divider mb-20"></div>
+
+                <!-- Add to Cart form -->
+                <form asp-controller="Product" asp-action="AddToCart" method="post" id="addToCartForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="productId" value="@Model.Id">
+
+                    @if (TempData["CartError"] != null)
+                    {
+                        <div class="mb-16 p-12" style="background:#fee2e2;color:#dc2626;border-radius:8px;">
+                            @TempData["CartError"]
+                        </div>
+                    }
+                    <p class="h7 font-weight-500 mb-10">Quantity:</p>
+                    <div class="quantity-selector style-2 mb-20" id="qtySelector">
+
+                        <button type="button" id="qtyMinus" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <input class="quantity-selector__value" value="1" name="quantity"
+                               id="qtyInput" type="number" min="1" max="@Model.Stock"
+                               style="text-align:center;" />
+                        <button type="button" id="qtyPlus" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M5 12H19" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-8 mb-12">
+                        @if (Model.Stock > 0)
+                        {
+                            <button type="submit" class="btn btn-primary btn-large w-full capitalize">
+                                Add to Cart — $@Model.Price.ToString("F2")
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" disabled
+                                    class="btn btn-primary btn-large w-full capitalize"
+                                    style="opacity:.5;cursor:not-allowed;">
+                                Out of Stock
+                            </button>
+                        }
+                    </div>
+                </form>
+
+                <!-- Buy Now -->
+                @if (Model.Stock > 0)
+                {
+                    <form asp-controller="Product" asp-action="BuyNow" method="post" class="mb-20" id="buyNowForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.Id">
+                        <input type="hidden" name="quantity" id="buyNowQty" value="1">
+                        <button type="submit" class="btn btn-primary-3 btn-large w-full">
+                            Buy it now
+                        </button>
+                    </form>
+                }
+
+                <p class="mb-8">
+                    Pickup available at
+                    <a class="text-underline" asp-controller="Contact" asp-action="Index">Shop location</a>.
+                    Usually ready in 24 hours
+                </p>
+
+                <ul class="flex flex-col gap-12 mb-12 list-item">
+                    <li>
+                        <a class="flex gap-4" asp-controller="Contact" asp-action="Index">
+                            <svg class="min-w-max mt-2" width="20" height="20" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 7.21875C13.178 7.21875 12.3744 7.46251 11.6909 7.9192C11.0074 8.3759 10.4747 9.02502 10.1601 9.78447C9.84555 10.5439 9.76324 11.3796 9.92361 12.1858C10.084 12.9921 10.4798 13.7326 11.0611 14.3139C11.6423 14.8952 12.3829 15.291 13.1892 15.4514C13.9954 15.6118 14.8311 15.5295 15.5905 15.2149C16.35 14.9003 16.9991 14.3676 17.4558 13.6841C17.9125 13.0006 18.1562 12.197 18.1562 11.375C18.1562 10.2727 17.7184 9.21554 16.9389 8.43609C16.1595 7.65664 15.1023 7.21875 14 7.21875Z" fill="#1C1C1C" />
+                            </svg>
+                            <span class="text-underline">View Store Information</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex gap-4">
+                            <svg class="min-w-max mt-2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 3.125C8.51664 3.125 7.0666 3.56487 5.83323 4.38898C4.59986 5.21309 3.63856 6.38443 3.07091 7.75487C2.50325 9.12532 2.35472 10.6333 2.64411 12.0882C2.9335 13.543 3.64781 14.8794 4.6967 15.9283C5.7456 16.9772 7.08197 17.6915 8.53683 17.9809C9.99168 18.2703 11.4997 18.1218 12.8701 17.5541C14.2406 16.9864 15.4119 16.0251 16.236 14.7918C17.0601 13.5584 17.5 12.1084 17.5 10.625C17.4977 8.63657 16.7068 6.73024 15.3008 5.32421C13.8948 3.91818 11.9884 3.12727 10 3.125Z" fill="#1C1C1C" />
+                            </svg>
+                            <p>
+                                <span class="text-secondary">Estimated Delivery:</span> 12-26 days
+                                <span class="text-secondary">(International)</span>, 3-6 days
+                                <span class="text-secondary">(United States)</span>
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex gap-4">
+                            <svg class="min-w-max mt-2" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18.7504 4.3743V8.1243C18.7504 8.29006 18.6846 8.44903 18.5674 8.56624C18.4501 8.68345 18.2912 8.7493 18.1254 8.7493H14.3754C14.2097 8.7493 14.0507 8.68345 13.9335 8.56624C13.8163 8.44903 13.7504 8.29006 13.7504 8.1243C13.7504 7.95854 13.8163 7.79957 13.9335 7.68236C14.0507 7.56515 14.2097 7.4993 14.3754 7.4993H16.516L14.4387 5.59617L14.4192 5.57742C12.273 3.28125 8.125 3.28125 5.90625 5.65185C5.90625 5.65185 5.90625 11.375 22.0938 11.375Z" fill="#1C1C1C" />
+                            </svg>
+                            <p>Return within <span class="text-secondary">45 days</span> of purchase.</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="divider mb-20"></div>
+
+                <p class="mb-4">Available: <span class="text-secondary">@(Model.Stock > 0 ? "Instock" : "Out of Stock")</span></p>
+                <p class="mb-20">Categories: <span class="text-secondary">@Model.CategoryName</span></p>
+
+                <div class="divider mb-20"></div>
+
+                <div class="flex items-center flex-wrap gap-16">
+                    Guaranteed safe checkout:
+                    <div class="checkouts flex gap-12 flex-wrap">
+                        <img src="~/assets/images/shop/checkout-1.png" alt="Visa">
+                        <img src="~/assets/images/shop/checkout-2.png" alt="Mastercard">
+                        <img src="~/assets/images/shop/checkout-3.png" alt="AmEx">
+                        <img src="~/assets/images/shop/checkout-4.png" alt="PayPal">
+                        <img src="~/assets/images/shop/checkout-5.png" alt="Apple Pay">
+                        <img src="~/assets/images/shop/checkout-6.png" alt="Google Pay">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tf-spacing mb-8"></div>
+
+        <!-- ── Tabs ──────────────────────────────────────────────────────────── -->
+        <div class="overflow-x-auto">
+            <ul class="menu-tab menu-tab-style6 primary text-white justify-center mx-auto">
+                <li class="active"><span class="h4 text-white font-weight-600">Description</span></li>
+                <li><span class="h4 text-white font-weight-600">Shipping & Returns</span></li>
+            </ul>
+        </div>
+
+        <div class="rating-box-product-detail rating-box max-w-1170 mx-auto content-tab">
+            <!-- Description tab -->
+            <div class="content-inner active">
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="mb-24">@Model.Description</p>
+                }
+                else
+                {
+                    <p class="text-secondary mb-24">No description available.</p>
+                }
+            </div>
+
+            <!-- Shipping tab -->
+            <div class="content-inner">
+                <p class="font-weight-500 h5 mb-15">Shipping & Returns Policy</p>
+                <p class="text-secondary mb-15">
+                    We offer free standard shipping on all orders over $50.
+                    Orders are processed within 1-2 business days.
+                    Estimated delivery is 3-6 business days domestically, 12-26 days internationally.
+                </p>
+                <p class="text-secondary">
+                    Returns are accepted within 45 days of purchase. Items must be unused and in original packaging.
+                    Duties & taxes are non-refundable.
+                </p>
+            </div>
+        </div>
+
+        <!-- ── Related Products ─────────────────────────────────────────────── -->
+        @if (Model.RelatedProducts.Any())
+        {
+            <div class="tf-spacing"></div>
+            <h2 class="mb-40 text-center">Related Products</h2>
+            <div class="swiper-card swiper-products">
+                <div class="swiper-wrapper">
+                    @foreach (var rp in Model.RelatedProducts)
+                    {
+                        <div class="swiper-slide">
+                            <div class="product">
+                                <div class="product-top">
+                                    @if (!string.IsNullOrEmpty(rp.Badge))
+                                    {
+                                        <div class="promotion uppercase text-white"
+                                             style="background-color:@(rp.BadgeColor ?? "#ef4444")">
+                                            @rp.Badge
+                                        </div>
+                                    }
+                                    <a class="img" asp-controller="Product"
+                                       asp-action="Details" asp-route-id="@rp.Id">
+                                        <img class="img"
+                                             src="@(rp.ThumbnailUrl ?? "~/assets/images/shop/product-1.jpg")"
+                                             alt="@rp.Name">
+                                    </a>
+                                    <form asp-controller="Product" asp-action="AddToCart" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@rp.Id">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="product-add-to-cart">
+                                            @(rp.InStock ? "Add to Cart" : "Out of Stock")
+                                        </button>
+                                    </form>
+                                </div>
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@rp.Id"
+                                   class="block mb-4 h7 font-weight-500">@rp.Name</a>
+                                <p class="h5 price">
+                                    $@rp.Price.ToString("F2")
+                                    @if (rp.OldPrice.HasValue)
+                                    {
+                                        <span class="price-old">$@rp.OldPrice.Value.ToString("F2")</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="swiper-pagination pagination-dark pagination-style pagination-swiper-products mt-38"></div>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+<script>
+(function () {
+    var input   = document.getElementById('qtyInput');
+    var minus   = document.getElementById('qtyMinus');
+    var plus    = document.getElementById('qtyPlus');
+    var buyQty  = document.getElementById('buyNowQty');
+    var maxQty  = parseInt(input ? input.getAttribute('max') : '99') || 99;
+
+    function sync() {
+        if (buyQty) buyQty.value = input.value;
+    }
+
+    if (minus) {
+        minus.addEventListener('click', function () {
+            var val = parseInt(input.value) || 1;
+            if (val > 1) { input.value = val - 1; sync(); }
+        });
+    }
+
+    if (plus) {
+        plus.addEventListener('click', function () {
+            var val = parseInt(input.value) || 1;
+            if (val < maxQty) { input.value = val + 1; sync(); }
+        });
+    }
+
+    if (input) {
+        input.addEventListener('change', function () {
+            var val = parseInt(input.value) || 1;
+            if (val < 1)      val = 1;
+            if (val > maxQty) val = maxQty;
+            input.value = val;
+            sync();
+        });
+    }
+})();
+</script>
+}

@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "404 - Page Not Found";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Error | Aurexo</title>
+    <link rel="stylesheet" href="~/assets/scss/swiper/swiper-bundle.min.css">
+    <link rel="stylesheet" href="~/assets/app.css">
+    <link rel="shortcut icon" href="~/assets/images/favicon.png">
+    <style>
+        .preload { display: none !important; }
+    </style>
+</head>
+<body class="inner-page">
+
+    <div id="wrapper">
+        <section class="error-page">
+            <div class="container">
+                <div class="error-page-inner">
+
+                    <div class="image">
+                        <img src="~/assets/images/pages/404.jpg" alt="404 Error">
+                    </div>
+
+                    <div class="content">
+                        <p class="title mb-55">Oops!</p>
+                        <h2 class="mb-12">Something is Missing...</h2>
+                        <p class="mb-24">
+                            The page you are looking for cannot be found.
+                            Take a break before trying again.
+                        </p>
+                        <div class="flex">
+                            <a asp-controller="Home" asp-action="Index"
+                               class="btn btn-primary btn-large font-weight-600">
+                                Back To Homepage
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Go Top Button -->
+    <div class="progress-wrap active-progress">
+        <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
+                  style="transition: stroke-dashoffset 10ms linear 0s; stroke-dasharray: 307.919, 307.919; stroke-dashoffset: 286.138;"></path>
+        </svg>
+        <img class="progress-wrap-icon" src="~/assets/icons/top.svg" alt="top">
+    </div>
+
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/app.js"></script>
+</body>
+</html>
